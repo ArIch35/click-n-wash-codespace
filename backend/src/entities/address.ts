@@ -1,6 +1,7 @@
-import { Column, Entity } from 'typeorm';
+import { Column, Entity, OneToMany } from 'typeorm';
 import { number, object, string } from 'yup';
 import BaseEntity from './base-entity';
+import WashingMachine from './washing-machine';
 
 @Entity()
 class Address extends BaseEntity {
@@ -15,6 +16,9 @@ class Address extends BaseEntity {
 
   @Column({ nullable: false })
   postalCode!: number;
+
+  @OneToMany(() => WashingMachine, (washingMachine) => washingMachine.address)
+  washingMachines!: WashingMachine[]
 }
 
 export default Address;
