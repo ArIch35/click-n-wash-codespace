@@ -1,6 +1,7 @@
 import { Column, Entity, OneToMany } from 'typeorm';
 import { number, object, string } from 'yup';
 import BaseEntity from './base-entity';
+import Contract from './contract';
 import Laundromat from './laundromat';
 
 @Entity()
@@ -22,6 +23,9 @@ class User extends BaseEntity {
 
   @OneToMany(() => Laundromat, (laundromat) => laundromat.owner)
   laundromats?: Laundromat[];
+
+  @OneToMany(() => Contract, (contract) => contract.user)
+  contracts?: Contract[];
 }
 
 export default User;
