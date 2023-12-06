@@ -1,4 +1,8 @@
 import { DataSource } from 'typeorm';
+import Contract from './entities/contract';
+import Laundromat from './entities/laundromat';
+import User from './entities/user';
+import WashingMachine from './entities/washing-machine';
 
 const AppDataSource = new DataSource({
   type: 'postgres',
@@ -9,7 +13,7 @@ const AppDataSource = new DataSource({
   database: process.env.DB_NAME || 'cnw-db',
   synchronize: true,
   logging: true,
-  entities: [],
+  entities: [User, Laundromat, WashingMachine, Contract],
   subscribers: [],
   migrations: [],
 });
