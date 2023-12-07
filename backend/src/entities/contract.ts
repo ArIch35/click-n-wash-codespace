@@ -1,5 +1,6 @@
-import { Column, Entity, ManyToOne } from 'typeorm';
+import { AfterLoad, Column, Entity, ManyToOne } from 'typeorm';
 import { number, object, string } from 'yup';
+import getDb from '../db';
 import BaseEntity from './base-entity';
 import User from './user';
 import WashingMachine from './washing-machine';
@@ -27,6 +28,18 @@ class Contract extends BaseEntity {
     nullable: false,
   })
   washingMachine!: WashingMachine;
+
+  @AfterLoad()
+  async updateStatus(): Promise<void> {
+    if (this.status !== 'ongoing') {
+      return;
+    }
+    const today = new Date();
+    if (today > this.endDate) {
+      this.status = 'finished';
+      await getDb().contractRepository.save(this);
+    }
+  }
 }
 
 export default Contract;
