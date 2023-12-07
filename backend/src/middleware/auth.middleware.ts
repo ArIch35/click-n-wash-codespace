@@ -1,6 +1,6 @@
 import { RequestHandler } from 'express';
 import { FirebaseError } from 'firebase-admin';
-import admin from '../firebase';
+import admin from '../firebase-admin';
 import { customMessage } from '../router/http-return-messages';
 import { STATUS_UNAUTHORIZED } from '../router/http-status-codes';
 
