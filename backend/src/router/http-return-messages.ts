@@ -8,6 +8,13 @@ interface Message {
   message: string;
 }
 
+export const customMessage = (success: boolean, message: string): Message => {
+  return {
+    success,
+    message,
+  };
+};
+
 export const MESSAGE_OK: Message = {
   success: true,
   message: 'Request Sucessfull!',
@@ -20,7 +27,7 @@ export const MESSAGE_SERVER_ERROR: Message = {
 
 export const MESSAGE_NOT_FOUND: Message = {
   success: false,
-  message: 'Entry Doesn\'t Exist!',
+  message: 'Entry Does Not Exist!',
 };
 
 export const MESSAGE_CONFLICT_RESOLVED: Message = {
