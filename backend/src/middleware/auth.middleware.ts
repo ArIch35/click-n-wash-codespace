@@ -1,6 +1,6 @@
 import { RequestHandler } from 'express';
 import { FirebaseError } from 'firebase-admin';
-import auth from '../firebase';
+import admin from '../firebase';
 import { customMessage } from '../router/http-return-messages';
 import { STATUS_UNAUTHORIZED } from '../router/http-status-codes';
 
@@ -17,9 +17,12 @@ const checkToken: RequestHandler = (async (req, res, next) => {
     }
 
     const idToken = req.headers.authorization.split('Bearer ')[1];
-    const decodedToken = await auth.verifyIdToken(idToken).catch((error: FirebaseError) => {
-      throw new Error(error.message);
-    });
+    const decodedToken = await admin
+      .auth()
+      .verifyIdToken(idToken)
+      .catch((error: FirebaseError) => {
+        throw new Error(error.message);
+      });
     const { uid } = decodedToken;
     res.locals.uid = uid;
     next();

@@ -12,6 +12,5 @@ admin.initializeApp({
     projectId: process.env.FIREBASE_PROJECT_ID,
   }),
 });
-const auth = admin.auth();
 
-export default auth;
+export default admin;
