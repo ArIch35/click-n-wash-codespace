@@ -44,3 +44,8 @@ export const MESSAGE_VALUE_UNDEFINED: Message = {
   success: false,
   message: 'Values are INVALID!',
 };
+
+export const MESSAGE_FORBIDDEN_NOT_OWNER: Message = {
+  success: false,
+  message: 'You are not the owner!',
+};
