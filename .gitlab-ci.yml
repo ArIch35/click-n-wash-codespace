@@ -8,11 +8,11 @@ test-format:
   script:
     - cd backend
     - npm install
-    - npm run format
+    - npm run prettier:check
     - npm run lint
     - cd ../frontend
     - npm install
-    - npm run format
+    - npm run prettier:check
     - npm run lint
 
 test-integration:
