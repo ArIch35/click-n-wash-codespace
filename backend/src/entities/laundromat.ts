@@ -36,5 +36,4 @@ export const createLaundromatSchema = object({
   country: string().required(),
   postalCode: number().required(),
   price: number().required(),
-  owner: object().required(),
 });

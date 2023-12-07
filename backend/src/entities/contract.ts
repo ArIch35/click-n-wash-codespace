@@ -49,6 +49,5 @@ export const createContractSchema = object({
   endDate: string().required(),
   status: string().required(),
   price: number().required(),
-  user: object().required(),
   washingMachine: object().required(),
 });
