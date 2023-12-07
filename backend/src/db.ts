@@ -28,7 +28,6 @@ export const connectToDb = async (): Promise<void> => {
     contractRepository: em.getRepository(Contract),
     // Add other repositories here
   };
-  console.log('Connected to DB');
 };
 
 /**
