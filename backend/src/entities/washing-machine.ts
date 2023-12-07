@@ -7,9 +7,6 @@ import Laundromat from './laundromat';
 @Entity()
 class WashingMachine extends BaseEntity {
   @Column({ nullable: false })
-  name!: string;
-
-  @Column({ nullable: false })
   brand!: string;
 
   @Column({ nullable: true })

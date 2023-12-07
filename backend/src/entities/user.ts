@@ -10,12 +10,6 @@ class User extends BaseEntity {
   email!: string;
 
   @Column({ nullable: false })
-  firstname!: string;
-
-  @Column({ nullable: false })
-  lastname!: string;
-
-  @Column({ nullable: false })
   credit!: number;
 
   @Column({ nullable: false })

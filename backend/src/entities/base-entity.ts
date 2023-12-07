@@ -1,4 +1,11 @@
-import { BeforeUpdate, Column, Entity, PrimaryColumn } from 'typeorm';
+import {
+  Column,
+  CreateDateColumn,
+  DeleteDateColumn,
+  Entity,
+  PrimaryColumn,
+  UpdateDateColumn,
+} from 'typeorm';
 import { v4 } from 'uuid';
 
 @Entity()
@@ -6,16 +13,17 @@ abstract class BaseEntity {
   @PrimaryColumn({ type: 'varchar' })
   id: string = v4();
 
-  @Column()
-  createdAt: string = new Date().getTime().toString();
+  @CreateDateColumn()
+  createdAt!: Date;
 
-  @Column()
-  updatedAt: string = new Date().getTime().toString();
+  @UpdateDateColumn()
+  updatedAt!: Date;
 
-  @BeforeUpdate()
-  updateTimestamp() {
-    this.updatedAt = new Date().getTime().toString();
-  }
+  @DeleteDateColumn()
+  deletedAt?: Date;
+
+  @Column({ nullable: false })
+  name!: string;
 }
 
 export default BaseEntity;
