@@ -1,0 +1,25 @@
+image: node:lts-alpine
+
+stages:
+  - test
+
+test-format:
+  stage: test
+  script:
+    - cd backend
+    - npm install
+    - npm run prettier:check
+    - npm run lint
+    - cd ../frontend
+    - npm install
+    - npm run prettier:check
+    - npm run lint
+
+test-integration:
+  stage: test
+  script:
+    - cd backend
+    # - npm install
+    # - npm run test
+    - cd ../frontend
+    # TODO: Add frontend tests
