@@ -1,5 +1,5 @@
 import { Column, Entity, OneToMany } from 'typeorm';
-import { number, object, string } from 'yup';
+import { boolean, number, object, string } from 'yup';
 import BaseEntity from './base-entity';
 import Contract from './contract';
 import Laundromat from './laundromat';
@@ -26,7 +26,18 @@ export default User;
 
 export const createUserSchema = object({
   email: string().email().required(),
-  firstname: string().required(),
-  lastname: string().required(),
+  name: string().required(),
   credit: number().required(),
+  isAlsoVendor: boolean(),
 });
+
+export const updateUserSchema = object({
+  email: string().email(),
+  name: string(),
+  credit: number(),
+  isAlsoVendor: boolean(),
+}).test(
+  'at-least-one-field',
+  'You must provide at least one field',
+  value => Object.values(value).some(field => field !== undefined && field !== null)
+);
