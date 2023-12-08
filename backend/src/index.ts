@@ -1,6 +1,7 @@
 import cors from 'cors';
 import express from 'express';
 import 'reflect-metadata';
+import { connectToDb } from './db';
 
 import checkToken from './middleware/auth.middleware';
 import contractRouter from './router/contract.router';
@@ -17,22 +18,23 @@ import generateTokenRouter from './router/generate-token.router';
  * This file is responsible for setting up the express server and the routes.
  */
 const PORT = process.env.PORT || 8080;
-/* 
-Import { signInWithEmailAndPassword } from 'firebase/auth';
-import firebaseAuth from './utils/firebase';
-import { connectToDb } from './db';
-ConnectToDb()
+
+connectToDb()
   .then(() => {
     console.log('Connected to DB');
   })
   .catch((err) => {
     console.error('Failed to connect to DB', err);
   });
+/*
+import { signInWithEmailAndPassword } from 'firebase/auth';
+import firebaseAuth from './utils/firebase';
 signInWithEmailAndPassword(firebaseAuth, 'testuser1@gmail.com', 'testuser1').then((userCredential) => {
   userCredential.user.getIdToken().then((_) => {
     // Console.log(_);
   }); 
 }); */
+
 const app = express();
 
 app.use(cors());
