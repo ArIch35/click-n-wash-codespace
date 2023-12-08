@@ -1,4 +1,4 @@
-import { Repository } from 'typeorm';
+import { EntityManager, Repository } from 'typeorm';
 import AppDataSource from './data-source';
 import Contract from './entities/contract';
 import Laundromat from './entities/laundromat';
@@ -6,6 +6,7 @@ import User from './entities/user';
 import WashingMachine from './entities/washing-machine';
 
 interface Db {
+  entityManager: EntityManager;
   userRepository: Repository<User>;
   laundromatRepository: Repository<Laundromat>;
   washingMachineRepository: Repository<WashingMachine>;
@@ -22,6 +23,7 @@ export const connectToDb = async (): Promise<void> => {
   const orm = await AppDataSource.initialize();
   const em = orm.createEntityManager();
   currentDb = {
+    entityManager: em,
     userRepository: em.getRepository(User),
     laundromatRepository: em.getRepository(Laundromat),
     washingMachineRepository: em.getRepository(WashingMachine),
