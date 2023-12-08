@@ -26,7 +26,7 @@ connectToDb()
     console.error('Failed to connect to DB', err);
   });
 /*
-import { signInWithEmailAndPassword } from 'firebase/auth';
+Import { signInWithEmailAndPassword } from 'firebase/auth';
 import firebaseAuth from './utils/firebase';
 signInWithEmailAndPassword(firebaseAuth, 'testuser1@gmail.com', 'testuser1').then((userCredential) => {
   userCredential.user.getIdToken().then((_) => {
