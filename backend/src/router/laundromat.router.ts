@@ -1,8 +1,9 @@
 import { RequestHandler, Router } from 'express';
 import { ValidationError } from 'yup';
 import getDb from '../db';
-import { createLaundromatSchema } from '../entities/laundromat';
+import { createLaundromatSchema, updateLaundromatSchema } from '../entities/laundromat';
 import {
+  MESSAGE_CONFLICT_UNRESOLVED,
   MESSAGE_FORBIDDEN_NOT_OWNER,
   MESSAGE_NOT_FOUND,
   MESSAGE_OK,
@@ -11,6 +12,7 @@ import {
 } from './http-return-messages';
 import {
   STATUS_BAD_REQUEST,
+  STATUS_CONFLICT,
   STATUS_FORBIDDEN,
   STATUS_NOT_FOUND,
   STATUS_OK,
@@ -42,13 +44,25 @@ router.get('/:id', (async (req, res) => {
 
 router.post('/', (async (req, res) => {
   try {
-    const validated = await createLaundromatSchema.validate(req.body, { abortEarly: false });
+    const validated = await createLaundromatSchema.validate(req.body, {
+      abortEarly: false,
+      strict: true,
+    });
 
     // Check whether the owner exists
     const uid = res.locals.uid as string | undefined;
     const user = await getDb().userRepository.findOne({ where: { id: uid } });
+
     if (!user) {
       return res.status(STATUS_NOT_FOUND).json(MESSAGE_NOT_FOUND);
+    }
+
+    // Check whether a laundromat exists with the same name for the current user
+    const laundromatExistsWithSameNameForCurrentUser = await getDb().laundromatRepository.findOne({
+      where: { name: validated.name, owner: { id: uid } },
+    });
+    if (laundromatExistsWithSameNameForCurrentUser) {
+      return res.status(STATUS_CONFLICT).json(MESSAGE_CONFLICT_UNRESOLVED);
     }
 
     const laundromat = getDb().laundromatRepository.create({
@@ -69,10 +83,14 @@ router.post('/', (async (req, res) => {
 
 router.put('/:id', (async (req, res) => {
   try {
-    const validated = await createLaundromatSchema.validate(req.body, { abortEarly: false });
+    const validated = await updateLaundromatSchema.validate(req.body, {
+      abortEarly: false,
+      strict: true,
+    });
 
     const laundromatExists = await getDb().laundromatRepository.findOne({
       where: { id: req.params.id },
+      relations: ['owner'],
     });
     if (!laundromatExists) {
       return res.status(STATUS_NOT_FOUND).json(MESSAGE_NOT_FOUND);
@@ -100,6 +118,7 @@ router.delete('/:id', (async (req, res) => {
   try {
     const laundromatExists = await getDb().laundromatRepository.findOne({
       where: { id: req.params.id },
+      relations: ['owner'],
     });
     if (!laundromatExists) {
       return res.status(STATUS_NOT_FOUND).json(MESSAGE_NOT_FOUND);

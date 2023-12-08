@@ -9,6 +9,9 @@ import { STATUS_OK } from './router/http-status-codes';
 import laundromatRouter from './router/laundromat.router';
 import userRouter from './router/user.router';
 import washingMachineRouter from './router/washing-machine.router';
+import generateTokenRouter from './router/generate-token.router';
+import { signInWithEmailAndPassword } from 'firebase/auth';
+import firebaseAuth from './utils/firebase';
 
 /**
  * The main entry point for the application.
@@ -22,7 +25,11 @@ connectToDb()
   .catch((err) => {
     console.error('Failed to connect to DB', err);
   });
-
+signInWithEmailAndPassword(firebaseAuth, "testuser1@gmail.com", "testuser1").then((userCredential) => {
+  userCredential.user.getIdToken().then((_) => {
+    //console.log(_);
+  }); 
+});
 const app = express();
 
 app.use(cors());
@@ -35,11 +42,13 @@ app.use('/users', userRouter);
 app.use('/laundromats', laundromatRouter);
 app.use('/washingmachines', washingMachineRouter);
 app.use('/contracts', contractRouter);
+app.use('/generateToken', generateTokenRouter);
 // Add routes here
 
 app.get('/', (_req, res) => {
   res.status(STATUS_OK).send(customMessage(true, 'Server is running'));
 });
+
 
 app.listen(PORT, () => {
   console.log('Server is running on port', PORT);

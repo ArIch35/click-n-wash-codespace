@@ -36,6 +36,8 @@ export const updateUserSchema = object({
   name: string(),
   credit: number(),
   isAlsoVendor: boolean(),
-}).test('at-least-one-field', 'You must provide at least one field', (value) =>
+})
+.noUnknown(true)
+.test('at-least-one-field', 'You must provide at least one field', (value) =>
   Object.values(value).some((field) => field !== undefined && field !== null),
 );

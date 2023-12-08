@@ -1,8 +1,12 @@
 import { RequestHandler, Router } from 'express';
 import { ValidationError } from 'yup';
 import getDb from '../db';
-import { createWashingMaschineSchema } from '../entities/washing-machine';
 import {
+  createWashingMaschineSchema,
+  updateWashingMaschineSchema,
+} from '../entities/washing-machine';
+import {
+  MESSAGE_CONFLICT_UNRESOLVED,
   MESSAGE_FORBIDDEN_NOT_OWNER,
   MESSAGE_NOT_FOUND,
   MESSAGE_OK,
@@ -11,6 +15,7 @@ import {
 } from './http-return-messages';
 import {
   STATUS_BAD_REQUEST,
+  STATUS_CONFLICT,
   STATUS_FORBIDDEN,
   STATUS_NOT_FOUND,
   STATUS_OK,
@@ -44,7 +49,10 @@ router.get('/:id', (async (req, res) => {
 
 router.post('/', (async (req, res) => {
   try {
-    const validated = await createWashingMaschineSchema.validate(req.body, { abortEarly: false });
+    const validated = await createWashingMaschineSchema.validate(req.body, {
+      abortEarly: false,
+      strict: true,
+    });
 
     // Check whether laundromat exists and belongs to the user
     const uid = res.locals.uid as string | undefined;
@@ -53,6 +61,15 @@ router.post('/', (async (req, res) => {
     });
     if (!laundromat) {
       return res.status(STATUS_NOT_FOUND).json(MESSAGE_NOT_FOUND);
+    }
+
+    // Check whether a washing machine exists with the same name for the current laundromat
+    const washingMachineExistsWithSameNameForCurrentLaundromat =
+      await getDb().washingMachineRepository.findOne({
+        where: { name: validated.name, laundromat: { id: laundromat.id } },
+      });
+    if (washingMachineExistsWithSameNameForCurrentLaundromat) {
+      return res.status(STATUS_CONFLICT).json(MESSAGE_CONFLICT_UNRESOLVED);
     }
 
     const washingMachine = getDb().washingMachineRepository.create({
@@ -73,7 +90,10 @@ router.post('/', (async (req, res) => {
 
 router.put('/:id', (async (req, res) => {
   try {
-    const validated = await createWashingMaschineSchema.validate(req.body, { abortEarly: false });
+    const validated = await updateWashingMaschineSchema.validate(req.body, {
+      abortEarly: false,
+      strict: true,
+    });
 
     const washingMachineExists = await getDb().washingMachineRepository.findOne({
       where: { id: req.params.id },
@@ -89,10 +109,7 @@ router.put('/:id', (async (req, res) => {
       return res.status(STATUS_FORBIDDEN).json(MESSAGE_FORBIDDEN_NOT_OWNER);
     }
 
-    getDb().washingMachineRepository.merge(washingMachineExists, {
-      ...validated,
-      laundromat: washingMachineExists.laundromat,
-    });
+    getDb().washingMachineRepository.merge(washingMachineExists, validated);
     const result = await getDb().washingMachineRepository.save(washingMachineExists);
     return res.status(STATUS_OK).json(result);
   } catch (error: unknown) {
@@ -120,7 +137,7 @@ router.delete('/:id', (async (req, res) => {
       return res.status(STATUS_FORBIDDEN).json(MESSAGE_FORBIDDEN_NOT_OWNER);
     }
 
-    await getDb().laundromatRepository.delete({ id: req.params.id });
+    await getDb().washingMachineRepository.delete({ id: req.params.id });
     return res.status(STATUS_OK).json(MESSAGE_OK);
   } catch (error: unknown) {
     return res.status(STATUS_SERVER_ERROR).json(MESSAGE_SERVER_ERROR);

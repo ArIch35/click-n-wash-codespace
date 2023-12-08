@@ -31,9 +31,23 @@ class Laundromat extends BaseEntity {
 export default Laundromat;
 
 export const createLaundromatSchema = object({
+  name: string().required(),
   street: string().required(),
   city: string().required(),
   country: string().required(),
   postalCode: number().required(),
   price: number().required(),
-});
+}).noUnknown(true);
+
+export const updateLaundromatSchema = object({
+  name: string(),
+  street: string(),
+  city: string(),
+  country: string(),
+  postalCode: number(),
+  price: number(),
+})
+  .noUnknown()
+  .test('at-least-one-field', 'You must provide at least one field', (value) =>
+    Object.values(value).some((field) => field !== undefined && field !== null),
+  );

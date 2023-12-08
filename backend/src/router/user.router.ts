@@ -42,7 +42,10 @@ router.get('/:email', (async (req, res) => {
 
 router.post('/', (async (req, res) => {
   try {
-    const validated = await createUserSchema.validate(req.body, { abortEarly: false });
+    const validated = await createUserSchema.validate(req.body, {
+      abortEarly: false,
+      strict: true,
+    });
 
     const user = getDb().userRepository.create(validated);
 
@@ -52,6 +55,13 @@ router.post('/', (async (req, res) => {
     if (userExists) {
       return res.status(STATUS_CONFLICT).json(MESSAGE_CONFLICT_UNRESOLVED);
     }
+
+    // Create the user with id from firebase
+    const uid = res.locals.uid as string | undefined;
+    if (!uid) {
+      return res.status(STATUS_SERVER_ERROR).json(MESSAGE_SERVER_ERROR);
+    }
+    user.id = uid;
 
     const result = await getDb().userRepository.save(user);
     return res.status(STATUS_OK).json(result);
@@ -66,7 +76,10 @@ router.post('/', (async (req, res) => {
 
 router.put('/:email', (async (req, res) => {
   try {
-    const validated = await updateUserSchema.validate(req.body, { abortEarly: false });
+    const validated = await updateUserSchema.validate(req.body, {
+      abortEarly: false,
+      strict: true,
+    });
 
     const userExists = await getDb().userRepository.findOne({ where: { email: req.params.email } });
     if (!userExists) {
