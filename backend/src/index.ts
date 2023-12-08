@@ -1,7 +1,7 @@
 import cors from 'cors';
 import express from 'express';
 import 'reflect-metadata';
-import { connectToDb } from './db';
+
 import checkToken from './middleware/auth.middleware';
 import contractRouter from './router/contract.router';
 import { customMessage } from './router/http-return-messages';
@@ -10,26 +10,29 @@ import laundromatRouter from './router/laundromat.router';
 import userRouter from './router/user.router';
 import washingMachineRouter from './router/washing-machine.router';
 import generateTokenRouter from './router/generate-token.router';
-import { signInWithEmailAndPassword } from 'firebase/auth';
-import firebaseAuth from './utils/firebase';
+
 
 /**
  * The main entry point for the application.
  * This file is responsible for setting up the express server and the routes.
  */
 const PORT = process.env.PORT || 8080;
-connectToDb()
+/* 
+Import { signInWithEmailAndPassword } from 'firebase/auth';
+import firebaseAuth from './utils/firebase';
+import { connectToDb } from './db';
+ConnectToDb()
   .then(() => {
     console.log('Connected to DB');
   })
   .catch((err) => {
     console.error('Failed to connect to DB', err);
   });
-signInWithEmailAndPassword(firebaseAuth, "testuser1@gmail.com", "testuser1").then((userCredential) => {
+signInWithEmailAndPassword(firebaseAuth, 'testuser1@gmail.com', 'testuser1').then((userCredential) => {
   userCredential.user.getIdToken().then((_) => {
-    //console.log(_);
+    // Console.log(_);
   }); 
-});
+}); */
 const app = express();
 
 app.use(cors());

@@ -27,7 +27,7 @@ export const createWashingMaschineSchema = object({
   description: string(),
   laundromat: string().required(),
 })
-.noUnknown()
+.noUnknown();
 
 export const updateWashingMaschineSchema = object({
   name: string(),
