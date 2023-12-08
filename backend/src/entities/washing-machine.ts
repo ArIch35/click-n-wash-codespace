@@ -26,15 +26,14 @@ export const createWashingMaschineSchema = object({
   brand: string().required(),
   description: string(),
   laundromat: string().required(),
-})
-.noUnknown();
+}).noUnknown();
 
 export const updateWashingMaschineSchema = object({
   name: string(),
   brand: string(),
   description: string(),
 })
-.noUnknown()
-.test('at-least-one-field', 'You must provide at least one field', (value) =>
-  Object.values(value).some((field) => field !== undefined && field !== null),
-);
+  .noUnknown()
+  .test('at-least-one-field', 'You must provide at least one field', (value) =>
+    Object.values(value).some((field) => field !== undefined && field !== null),
+  );

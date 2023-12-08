@@ -11,7 +11,6 @@ import userRouter from './router/user.router';
 import washingMachineRouter from './router/washing-machine.router';
 import generateTokenRouter from './router/generate-token.router';
 
-
 /**
  * The main entry point for the application.
  * This file is responsible for setting up the express server and the routes.
@@ -51,7 +50,6 @@ app.use('/generateToken', generateTokenRouter);
 app.get('/', (_req, res) => {
   res.status(STATUS_OK).send(customMessage(true, 'Server is running'));
 });
-
 
 app.listen(PORT, () => {
   console.log('Server is running on port', PORT);
