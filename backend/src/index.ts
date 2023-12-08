@@ -5,7 +5,9 @@ import { connectToDb } from './db';
 import checkToken from './middleware/auth.middleware';
 import { customMessage } from './router/http-return-messages';
 import { STATUS_OK } from './router/http-status-codes';
+import laundromatRouter from './router/laundromat.router';
 import userRouter from './router/user.router';
+import washingMachineRouter from './router/washing-machine.router';
 
 /**
  * The main entry point for the application.
@@ -28,7 +30,9 @@ app.use(express.urlencoded({ extended: true }));
 app.use(checkToken);
 // Add middleware here
 
-app.use('/users/', userRouter);
+app.use('/users', userRouter);
+app.use('/laundromats', laundromatRouter);
+app.use('/washingmachines', washingMachineRouter);
 // Add routes here
 
 app.get('/', (_req, res) => {

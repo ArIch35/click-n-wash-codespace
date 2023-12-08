@@ -25,5 +25,5 @@ export const createWashingMaschineSchema = object({
   name: string().required(),
   brand: string().required(),
   description: string(),
-  laundromat: object().required(),
+  laundromat: string().required(),
 });
