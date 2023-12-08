@@ -1,5 +1,5 @@
 import { AfterLoad, Column, Entity, ManyToOne } from 'typeorm';
-import { number, object, string } from 'yup';
+import { object, string } from 'yup';
 import getDb from '../db';
 import BaseEntity from './base-entity';
 import User from './user';
@@ -47,7 +47,9 @@ export default Contract;
 export const createContractSchema = object({
   startDate: string().required(),
   endDate: string().required(),
-  status: string().required(),
-  price: number().required(),
-  washingMachine: object().required(),
+  washingMachine: string().required(),
 });
+
+export const updateContractSchema = object({
+  status: string().required(),
+}).test('is-cancelled', 'Contract can only be cancelled', (value) => value.status === 'cancelled');

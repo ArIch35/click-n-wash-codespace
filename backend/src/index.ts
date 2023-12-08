@@ -3,6 +3,7 @@ import express from 'express';
 import 'reflect-metadata';
 import { connectToDb } from './db';
 import checkToken from './middleware/auth.middleware';
+import contractRouter from './router/contract.router';
 import { customMessage } from './router/http-return-messages';
 import { STATUS_OK } from './router/http-status-codes';
 import laundromatRouter from './router/laundromat.router';
@@ -33,6 +34,7 @@ app.use(checkToken);
 app.use('/users', userRouter);
 app.use('/laundromats', laundromatRouter);
 app.use('/washingmachines', washingMachineRouter);
+app.use('/contracts', contractRouter);
 // Add routes here
 
 app.get('/', (_req, res) => {
