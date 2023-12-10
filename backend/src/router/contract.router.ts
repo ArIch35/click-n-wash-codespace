@@ -47,7 +47,7 @@ router.post('/', (async (req, res) => {
     const validated = await createContractSchema.validate(req.body, { abortEarly: false });
 
     // Check whether user exists
-    const uid = res.locals.uid as string | undefined;
+    const uid = res.locals.uid as string;
     const user = await getDb().userRepository.findOne({
       where: { id: uid },
     });
@@ -116,7 +116,7 @@ router.put('/:id', (async (req, res) => {
     }
 
     // Check whether user exists
-    const uid = res.locals.uid as string | undefined;
+    const uid = res.locals.uid as string;
     const user = await getDb().userRepository.findOne({
       where: { id: uid },
     });

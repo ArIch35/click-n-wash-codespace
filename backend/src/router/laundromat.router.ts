@@ -50,7 +50,7 @@ router.post('/', (async (req, res) => {
     });
 
     // Check whether the owner exists
-    const uid = res.locals.uid as string | undefined;
+    const uid = res.locals.uid as string;
     const user = await getDb().userRepository.findOne({ where: { id: uid } });
 
     if (!user) {
@@ -97,7 +97,7 @@ router.put('/:id', (async (req, res) => {
     }
 
     // Check whether the owner of the laundromat is the same as the user
-    const uid = res.locals.uid as string | undefined;
+    const uid = res.locals.uid as string;
     if (laundromatExists.owner.id !== uid) {
       return res.status(STATUS_FORBIDDEN).json(MESSAGE_FORBIDDEN_NOT_OWNER);
     }
@@ -125,7 +125,7 @@ router.delete('/:id', (async (req, res) => {
     }
 
     // Check whether the owner of the laundromat is the same as the user
-    const uid = res.locals.uid as string | undefined;
+    const uid = res.locals.uid as string;
     if (laundromatExists.owner.id !== uid) {
       return res.status(STATUS_FORBIDDEN).json(MESSAGE_FORBIDDEN_NOT_OWNER);
     }
