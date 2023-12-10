@@ -11,7 +11,7 @@ import {
   MESSAGE_NOT_FOUND,
   MESSAGE_OK,
   MESSAGE_SERVER_ERROR,
-  MESSAGE_VALUE_UNDEFINED,
+  customMessage,
 } from '../utils/http-return-messages';
 import {
   STATUS_BAD_REQUEST,
@@ -81,7 +81,7 @@ router.post('/', (async (req, res) => {
     return res.status(STATUS_OK).json(result);
   } catch (error: unknown) {
     if (error instanceof ValidationError) {
-      return res.status(STATUS_BAD_REQUEST).json(MESSAGE_VALUE_UNDEFINED);
+      return res.status(STATUS_BAD_REQUEST).json(customMessage(false, error.errors.join(', ')));
     } else {
       return res.status(STATUS_SERVER_ERROR).json(MESSAGE_SERVER_ERROR);
     }
@@ -114,7 +114,7 @@ router.put('/:id', (async (req, res) => {
     return res.status(STATUS_OK).json(result);
   } catch (error: unknown) {
     if (error instanceof ValidationError) {
-      return res.status(STATUS_BAD_REQUEST).json(MESSAGE_VALUE_UNDEFINED);
+      return res.status(STATUS_BAD_REQUEST).json(customMessage(false, error.errors.join(', ')));
     } else {
       return res.status(STATUS_SERVER_ERROR).json(MESSAGE_SERVER_ERROR);
     }

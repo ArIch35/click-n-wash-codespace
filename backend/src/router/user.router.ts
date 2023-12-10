@@ -69,7 +69,7 @@ router.post('/', (async (req, res) => {
     return res.status(STATUS_OK).json(result);
   } catch (error: unknown) {
     if (error instanceof ValidationError) {
-      return res.status(STATUS_BAD_REQUEST).json(customMessage(false, error.message));
+      return res.status(STATUS_BAD_REQUEST).json(customMessage(false, error.errors.join(', ')));
     } else {
       return res.status(STATUS_SERVER_ERROR).json(MESSAGE_SERVER_ERROR);
     }
@@ -95,7 +95,7 @@ router.put('/', (async (req, res) => {
     return res.status(STATUS_OK).json(result);
   } catch (error: unknown) {
     if (error instanceof ValidationError) {
-      return res.status(STATUS_BAD_REQUEST).json(customMessage(false, error.message));
+      return res.status(STATUS_BAD_REQUEST).json(customMessage(false, error.errors.join(', ')));
     } else {
       return res.status(STATUS_SERVER_ERROR).json(MESSAGE_SERVER_ERROR);
     }
