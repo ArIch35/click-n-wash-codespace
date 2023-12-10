@@ -10,7 +10,7 @@ import laundromatRouter from './router/laundromat.router';
 import userRouter from './router/user.router';
 import washingMachineRouter from './router/washing-machine.router';
 import { customMessage } from './utils/http-return-messages';
-import { STATUS_OK } from './utils/http-status-codes';
+import { STATUS_NOT_FOUND, STATUS_OK } from './utils/http-status-codes';
 
 /**
  * The main entry point for the application.
@@ -51,6 +51,10 @@ app.use('/generateToken', generateTokenRouter);
 
 app.get('/', (_req, res) => {
   res.status(STATUS_OK).send(customMessage(true, 'Server is running'));
+});
+
+app.use('*', (_req, res) => {
+  res.status(STATUS_NOT_FOUND).send(customMessage(false, 'Route not found'));
 });
 
 app.listen(PORT, () => {
