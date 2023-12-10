@@ -8,14 +8,14 @@ import {
   MESSAGE_OK,
   MESSAGE_SERVER_ERROR,
   MESSAGE_VALUE_UNDEFINED,
-} from './http-return-messages';
+} from '../utils/http-return-messages';
 import {
   STATUS_BAD_REQUEST,
   STATUS_CONFLICT,
   STATUS_NOT_FOUND,
   STATUS_OK,
   STATUS_SERVER_ERROR,
-} from './http-status-codes';
+} from '../utils/http-status-codes';
 
 const router: Router = Router();
 

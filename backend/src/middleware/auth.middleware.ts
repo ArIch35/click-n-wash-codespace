@@ -1,8 +1,8 @@
 import { RequestHandler } from 'express';
 import { FirebaseError } from 'firebase-admin';
 import admin from '../firebase-admin';
-import { customMessage } from '../router/http-return-messages';
-import { STATUS_UNAUTHORIZED } from '../router/http-status-codes';
+import { customMessage } from '../utils/http-return-messages';
+import { STATUS_UNAUTHORIZED } from '../utils/http-status-codes';
 
 // Middleware
 const checkToken: RequestHandler = (async (req, res, next) => {
