@@ -1,21 +1,21 @@
 import { RequestHandler, Router } from 'express';
 import { ValidationError } from 'yup';
 import getDb from '../db';
-import { createContractSchema, updateContractSchema } from '../entities/contract';
+import { createContractSchema, finalizeContract, updateContractSchema } from '../entities/contract';
+import StatusError from '../utils/error-with-status';
 import {
   MESSAGE_FORBIDDEN_NOT_OWNER,
   MESSAGE_NOT_FOUND,
   MESSAGE_SERVER_ERROR,
-  MESSAGE_VALUE_UNDEFINED,
   customMessage,
-} from './http-return-messages';
+} from '../utils/http-return-messages';
 import {
   STATUS_BAD_REQUEST,
   STATUS_FORBIDDEN,
   STATUS_NOT_FOUND,
   STATUS_OK,
   STATUS_SERVER_ERROR,
-} from './http-status-codes';
+} from '../utils/http-status-codes';
 
 const router: Router = Router();
 
@@ -47,12 +47,12 @@ router.post('/', (async (req, res) => {
     const validated = await createContractSchema.validate(req.body, { abortEarly: false });
 
     // Check whether user exists
-    const uid = res.locals.uid as string | undefined;
+    const uid = res.locals.uid as string;
     const user = await getDb().userRepository.findOne({
       where: { id: uid },
     });
     if (!user) {
-      return res.status(STATUS_NOT_FOUND).json(MESSAGE_NOT_FOUND);
+      return res.status(STATUS_BAD_REQUEST).json(customMessage(false, 'User does not exist'));
     }
 
     // Check whether washing machine exists
@@ -61,7 +61,9 @@ router.post('/', (async (req, res) => {
       relations: ['laundromat', 'laundromat.owner'],
     });
     if (!washingMachine) {
-      return res.status(STATUS_NOT_FOUND).json(MESSAGE_NOT_FOUND);
+      return res
+        .status(STATUS_BAD_REQUEST)
+        .json(customMessage(false, 'Washing machine does not exist'));
     }
 
     // Check whether user credit is sufficient
@@ -75,31 +77,22 @@ router.post('/', (async (req, res) => {
       user,
       washingMachine,
     });
-
-    await getDb().entityManager.transaction(async (transactionalEntityManager) => {
-      // Update user credit if the user is not the owner of the laundromat
-      if (user.id !== washingMachine.laundromat.owner.id) {
-        user.credit -= contract.price;
-        washingMachine.laundromat.owner.credit += contract.price;
-      }
-      await transactionalEntityManager.save(user);
-      await transactionalEntityManager.save(washingMachine.laundromat.owner);
-      await transactionalEntityManager.save(contract);
-    });
-
+    await finalizeContract(contract);
     return res.status(STATUS_OK).json(contract);
   } catch (error: unknown) {
     if (error instanceof ValidationError) {
-      return res.status(STATUS_BAD_REQUEST).json(MESSAGE_VALUE_UNDEFINED);
-    } else {
-      return res.status(STATUS_SERVER_ERROR).json(MESSAGE_SERVER_ERROR);
+      return res.status(STATUS_BAD_REQUEST).json(customMessage(false, error.errors.join(', ')));
+    } else if (error instanceof StatusError) {
+      return res.status(error.status).json(customMessage(false, error.message));
     }
+    return res.status(STATUS_SERVER_ERROR).json(MESSAGE_SERVER_ERROR);
   }
 }) as RequestHandler);
 
 router.put('/:id', (async (req, res) => {
   try {
     await updateContractSchema.validate(req.body, { abortEarly: false });
+    const uid = res.locals.uid as string;
 
     // Check whether contract exists
     const contract = await getDb().contractRepository.findOne({
@@ -115,15 +108,6 @@ router.put('/:id', (async (req, res) => {
       return res.status(STATUS_NOT_FOUND).json(MESSAGE_NOT_FOUND);
     }
 
-    // Check whether user exists
-    const uid = res.locals.uid as string | undefined;
-    const user = await getDb().userRepository.findOne({
-      where: { id: uid },
-    });
-    if (!user) {
-      return res.status(STATUS_NOT_FOUND).json(MESSAGE_NOT_FOUND);
-    }
-
     // Check whether the user in contract is the same as the user
     if (uid !== contract.user.id) {
       return res.status(STATUS_FORBIDDEN).json(MESSAGE_FORBIDDEN_NOT_OWNER);
@@ -134,25 +118,15 @@ router.put('/:id', (async (req, res) => {
       return res.status(STATUS_FORBIDDEN).json(customMessage(false, 'Contract is not ongoing'));
     }
 
-    await getDb().entityManager.transaction(async (transactionalEntityManager) => {
-      // Update user credit if the user is not the owner of the laundromat
-      if (uid !== contract.washingMachine.laundromat.owner.id) {
-        user.credit -= contract.price;
-        contract.washingMachine.laundromat.owner.credit += contract.price;
-      }
-      contract.status = 'cancelled';
-      await transactionalEntityManager.save(user);
-      await transactionalEntityManager.save(contract.washingMachine.laundromat.owner);
-      await transactionalEntityManager.save(contract);
-    });
-
+    await finalizeContract(contract, true);
     return res.status(STATUS_OK).json(contract);
   } catch (error: unknown) {
     if (error instanceof ValidationError) {
-      return res.status(STATUS_BAD_REQUEST).json(MESSAGE_VALUE_UNDEFINED);
-    } else {
-      return res.status(STATUS_SERVER_ERROR).json(MESSAGE_SERVER_ERROR);
+      return res.status(STATUS_BAD_REQUEST).json(customMessage(false, error.errors.join(', ')));
+    } else if (error instanceof StatusError) {
+      return res.status(error.status).json(customMessage(false, error.message));
     }
+    return res.status(STATUS_SERVER_ERROR).json(MESSAGE_SERVER_ERROR);
   }
 }) as RequestHandler);
 

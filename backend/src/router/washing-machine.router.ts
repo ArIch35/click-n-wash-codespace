@@ -5,22 +5,21 @@ import {
   createWashingMaschineSchema,
   updateWashingMaschineSchema,
 } from '../entities/washing-machine';
+import StatusError from '../utils/error-with-status';
 import {
-  MESSAGE_CONFLICT_UNRESOLVED,
   MESSAGE_FORBIDDEN_NOT_OWNER,
   MESSAGE_NOT_FOUND,
   MESSAGE_OK,
   MESSAGE_SERVER_ERROR,
-  MESSAGE_VALUE_UNDEFINED,
-} from './http-return-messages';
+  customMessage,
+} from '../utils/http-return-messages';
 import {
   STATUS_BAD_REQUEST,
-  STATUS_CONFLICT,
   STATUS_FORBIDDEN,
   STATUS_NOT_FOUND,
   STATUS_OK,
   STATUS_SERVER_ERROR,
-} from './http-status-codes';
+} from '../utils/http-status-codes';
 
 const router: Router = Router();
 
@@ -55,21 +54,14 @@ router.post('/', (async (req, res) => {
     });
 
     // Check whether laundromat exists and belongs to the user
-    const uid = res.locals.uid as string | undefined;
+    const uid = res.locals.uid as string;
     const laundromat = await getDb().laundromatRepository.findOne({
       where: { id: validated.laundromat, owner: { id: uid } },
     });
     if (!laundromat) {
-      return res.status(STATUS_NOT_FOUND).json(MESSAGE_NOT_FOUND);
-    }
-
-    // Check whether a washing machine exists with the same name for the current laundromat
-    const washingMachineExistsWithSameNameForCurrentLaundromat =
-      await getDb().washingMachineRepository.findOne({
-        where: { name: validated.name, laundromat: { id: laundromat.id } },
-      });
-    if (washingMachineExistsWithSameNameForCurrentLaundromat) {
-      return res.status(STATUS_CONFLICT).json(MESSAGE_CONFLICT_UNRESOLVED);
+      return res
+        .status(STATUS_BAD_REQUEST)
+        .json(customMessage(false, 'Laundromat does not exist or does not belong to user'));
     }
 
     const washingMachine = getDb().washingMachineRepository.create({
@@ -81,10 +73,11 @@ router.post('/', (async (req, res) => {
     return res.status(STATUS_OK).json(result);
   } catch (error: unknown) {
     if (error instanceof ValidationError) {
-      return res.status(STATUS_BAD_REQUEST).json(MESSAGE_VALUE_UNDEFINED);
-    } else {
-      return res.status(STATUS_SERVER_ERROR).json(MESSAGE_SERVER_ERROR);
+      return res.status(STATUS_BAD_REQUEST).json(customMessage(false, error.errors.join(', ')));
+    } else if (error instanceof StatusError) {
+      return res.status(error.status).json(customMessage(false, error.message));
     }
+    return res.status(STATUS_SERVER_ERROR).json(MESSAGE_SERVER_ERROR);
   }
 }) as RequestHandler);
 
@@ -104,7 +97,7 @@ router.put('/:id', (async (req, res) => {
     }
 
     // Check whether the owner of the laundromat is the same as the user
-    const uid = res.locals.uid as string | undefined;
+    const uid = res.locals.uid as string;
     if (washingMachineExists.laundromat.owner.id !== uid) {
       return res.status(STATUS_FORBIDDEN).json(MESSAGE_FORBIDDEN_NOT_OWNER);
     }
@@ -114,10 +107,11 @@ router.put('/:id', (async (req, res) => {
     return res.status(STATUS_OK).json(result);
   } catch (error: unknown) {
     if (error instanceof ValidationError) {
-      return res.status(STATUS_BAD_REQUEST).json(MESSAGE_VALUE_UNDEFINED);
-    } else {
-      return res.status(STATUS_SERVER_ERROR).json(MESSAGE_SERVER_ERROR);
+      return res.status(STATUS_BAD_REQUEST).json(customMessage(false, error.errors.join(', ')));
+    } else if (error instanceof StatusError) {
+      return res.status(error.status).json(customMessage(false, error.message));
     }
+    return res.status(STATUS_SERVER_ERROR).json(MESSAGE_SERVER_ERROR);
   }
 }) as RequestHandler);
 
@@ -132,7 +126,7 @@ router.delete('/:id', (async (req, res) => {
     }
 
     // Check whether the owner of the laundromat is the same as the user
-    const uid = res.locals.uid as string | undefined;
+    const uid = res.locals.uid as string;
     if (washingMachineExists.laundromat.owner.id !== uid) {
       return res.status(STATUS_FORBIDDEN).json(MESSAGE_FORBIDDEN_NOT_OWNER);
     }

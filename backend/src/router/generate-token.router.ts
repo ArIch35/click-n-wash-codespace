@@ -1,9 +1,9 @@
-import { RequestHandler, Router } from 'express';
-import admin from '../firebase-admin';
 import axios from 'axios';
 import dotenv from 'dotenv';
-import { STATUS_OK, STATUS_SERVER_ERROR } from './http-status-codes';
-import { MESSAGE_SERVER_ERROR } from './http-return-messages';
+import { RequestHandler, Router } from 'express';
+import admin from '../firebase-admin';
+import { MESSAGE_SERVER_ERROR } from '../utils/http-return-messages';
+import { STATUS_OK, STATUS_SERVER_ERROR } from '../utils/http-status-codes';
 
 dotenv.config({
   path: '../.env',
