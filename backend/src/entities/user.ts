@@ -1,5 +1,5 @@
 import { Column, Entity, OneToMany } from 'typeorm';
-import { boolean, number, object, string } from 'yup';
+import { boolean, object, string } from 'yup';
 import BaseEntity from './base-entity';
 import Contract from './contract';
 import Laundromat from './laundromat';
@@ -9,10 +9,10 @@ class User extends BaseEntity {
   @Column({ unique: true, nullable: false })
   email!: string;
 
-  @Column({ nullable: false })
-  credit!: number;
+  @Column()
+  credit: number = 100;
 
-  @Column({ nullable: false })
+  @Column()
   isAlsoVendor: boolean = false;
 
   @OneToMany(() => Laundromat, (laundromat) => laundromat.owner)
@@ -25,16 +25,11 @@ class User extends BaseEntity {
 export default User;
 
 export const createUserSchema = object({
-  email: string().email().required(),
   name: string().required(),
-  credit: number().required(),
-  isAlsoVendor: boolean(),
-});
+}).noUnknown(true);
 
 export const updateUserSchema = object({
-  email: string().email(),
   name: string(),
-  credit: number(),
   isAlsoVendor: boolean(),
 })
   .noUnknown(true)

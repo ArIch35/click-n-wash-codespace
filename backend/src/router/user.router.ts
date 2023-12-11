@@ -7,20 +7,21 @@ import {
   MESSAGE_NOT_FOUND,
   MESSAGE_OK,
   MESSAGE_SERVER_ERROR,
-  MESSAGE_VALUE_UNDEFINED,
-} from './http-return-messages';
+  customMessage,
+} from '../utils/http-return-messages';
 import {
   STATUS_BAD_REQUEST,
   STATUS_CONFLICT,
   STATUS_NOT_FOUND,
   STATUS_OK,
   STATUS_SERVER_ERROR,
-} from './http-status-codes';
+} from '../utils/http-status-codes';
 
 const router: Router = Router();
 
 router.get('/', (async (_, res) => {
   try {
+    //! To be removed or made unauthorized
     const users = await getDb().userRepository.find();
     return res.status(STATUS_OK).json(users);
   } catch (error) {
@@ -28,9 +29,11 @@ router.get('/', (async (_, res) => {
   }
 }) as RequestHandler);
 
-router.get('/:email', (async (req, res) => {
+router.get('/:idOrEmail', (async (req, res) => {
   try {
-    const user = await getDb().userRepository.findOne({ where: { email: req.params.email } });
+    const user = await getDb().userRepository.findOne({
+      where: [{ id: req.params.idOrEmail }, { email: req.params.idOrEmail }],
+    });
     if (!user) {
       return res.status(STATUS_NOT_FOUND).json(MESSAGE_NOT_FOUND);
     }
@@ -46,42 +49,44 @@ router.post('/', (async (req, res) => {
       abortEarly: false,
       strict: true,
     });
+    const uid = res.locals.uid as string;
+    const email = res.locals.email as string | undefined;
 
-    const user = getDb().userRepository.create(validated);
+    const user = getDb().userRepository.create({
+      ...validated,
+      id: uid,
+      email,
+    });
 
     const userExists = await getDb().userRepository.findOne({
-      where: { email: validated.email },
+      where: [{ id: uid }, { email }],
     });
     if (userExists) {
       return res.status(STATUS_CONFLICT).json(MESSAGE_CONFLICT_UNRESOLVED);
     }
 
-    // Create the user with id from firebase
-    const uid = res.locals.uid as string | undefined;
-    if (!uid) {
-      return res.status(STATUS_SERVER_ERROR).json(MESSAGE_SERVER_ERROR);
-    }
-    user.id = uid;
-
     const result = await getDb().userRepository.save(user);
     return res.status(STATUS_OK).json(result);
   } catch (error: unknown) {
     if (error instanceof ValidationError) {
-      return res.status(STATUS_BAD_REQUEST).json(MESSAGE_VALUE_UNDEFINED);
+      return res.status(STATUS_BAD_REQUEST).json(customMessage(false, error.errors.join(', ')));
     } else {
       return res.status(STATUS_SERVER_ERROR).json(MESSAGE_SERVER_ERROR);
     }
   }
 }) as RequestHandler);
 
-router.put('/:email', (async (req, res) => {
+router.put('/', (async (req, res) => {
   try {
     const validated = await updateUserSchema.validate(req.body, {
       abortEarly: false,
       strict: true,
     });
+    const uid = res.locals.uid as string;
 
-    const userExists = await getDb().userRepository.findOne({ where: { email: req.params.email } });
+    const userExists = await getDb().userRepository.findOne({
+      where: { id: uid },
+    });
     if (!userExists) {
       return res.status(STATUS_NOT_FOUND).json(MESSAGE_NOT_FOUND);
     }
@@ -90,20 +95,21 @@ router.put('/:email', (async (req, res) => {
     return res.status(STATUS_OK).json(result);
   } catch (error: unknown) {
     if (error instanceof ValidationError) {
-      return res.status(STATUS_BAD_REQUEST).json(MESSAGE_VALUE_UNDEFINED);
+      return res.status(STATUS_BAD_REQUEST).json(customMessage(false, error.errors.join(', ')));
     } else {
       return res.status(STATUS_SERVER_ERROR).json(MESSAGE_SERVER_ERROR);
     }
   }
 }) as RequestHandler);
 
-router.delete('/:email', (async (req, res) => {
+router.delete('/', (async (_req, res) => {
   try {
-    const userExists = await getDb().userRepository.findOne({ where: { email: req.params.email } });
+    const uid = res.locals.uid as string;
+    const userExists = await getDb().userRepository.findOne({ where: { id: uid } });
     if (!userExists) {
       return res.status(STATUS_NOT_FOUND).json(MESSAGE_NOT_FOUND);
     }
-    await getDb().userRepository.delete({ email: req.params.email });
+    await getDb().userRepository.delete({ id: uid });
     return res.status(STATUS_OK).json(MESSAGE_OK);
   } catch (error: unknown) {
     return res.status(STATUS_SERVER_ERROR).json(MESSAGE_SERVER_ERROR);

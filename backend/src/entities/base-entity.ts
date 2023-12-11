@@ -22,7 +22,7 @@ abstract class BaseEntity {
   @DeleteDateColumn()
   deletedAt?: Date;
 
-  @Column({ nullable: false })
+  @Column()
   name!: string;
 }
 
