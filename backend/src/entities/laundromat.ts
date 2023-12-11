@@ -8,19 +8,19 @@ import WashingMachine from './washing-machine';
 
 @Entity()
 class Laundromat extends BaseEntity {
-  @Column({ nullable: false })
+  @Column()
   street!: string;
 
-  @Column({ nullable: false })
+  @Column()
   city!: string;
 
-  @Column({ nullable: false })
+  @Column()
   country!: string;
 
-  @Column({ nullable: false })
+  @Column()
   postalCode!: number;
 
-  @Column({ nullable: false })
+  @Column()
   price!: number;
 
   @ManyToOne(() => User, (user) => user.laundromats, { nullable: false })

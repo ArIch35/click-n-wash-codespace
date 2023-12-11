@@ -9,10 +9,10 @@ class User extends BaseEntity {
   @Column({ unique: true, nullable: false })
   email!: string;
 
-  @Column({ nullable: false })
+  @Column()
   credit: number = 100;
 
-  @Column({ nullable: false })
+  @Column()
   isAlsoVendor: boolean = false;
 
   @OneToMany(() => Laundromat, (laundromat) => laundromat.owner)

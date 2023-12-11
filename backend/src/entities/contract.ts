@@ -10,16 +10,16 @@ type Status = 'ongoing' | 'finished' | 'cancelled';
 
 @Entity()
 class Contract extends BaseEntity {
-  @Column({ nullable: false })
+  @Column()
   startDate!: Date;
 
-  @Column({ nullable: false })
+  @Column()
   endDate!: Date;
 
-  @Column({ nullable: false })
+  @Column()
   status: Status = 'ongoing';
 
-  @Column({ nullable: false })
+  @Column()
   price!: number;
 
   @ManyToOne(() => User, (user) => user.contracts, { nullable: false })
