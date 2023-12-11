@@ -2,6 +2,7 @@ import { RequestHandler, Router } from 'express';
 import { ValidationError } from 'yup';
 import getDb from '../db';
 import { createContractSchema, updateContractSchema } from '../entities/contract';
+import StatusError from '../utils/error-with-status';
 import {
   MESSAGE_FORBIDDEN_NOT_OWNER,
   MESSAGE_NOT_FOUND,
@@ -51,7 +52,7 @@ router.post('/', (async (req, res) => {
       where: { id: uid },
     });
     if (!user) {
-      return res.status(STATUS_NOT_FOUND).json(MESSAGE_NOT_FOUND);
+      return res.status(STATUS_BAD_REQUEST).json(customMessage(false, 'User does not exist'));
     }
 
     // Check whether washing machine exists
@@ -60,7 +61,9 @@ router.post('/', (async (req, res) => {
       relations: ['laundromat', 'laundromat.owner'],
     });
     if (!washingMachine) {
-      return res.status(STATUS_NOT_FOUND).json(MESSAGE_NOT_FOUND);
+      return res
+        .status(STATUS_BAD_REQUEST)
+        .json(customMessage(false, 'Washing machine does not exist'));
     }
 
     // Check whether user credit is sufficient
@@ -90,9 +93,10 @@ router.post('/', (async (req, res) => {
   } catch (error: unknown) {
     if (error instanceof ValidationError) {
       return res.status(STATUS_BAD_REQUEST).json(customMessage(false, error.errors.join(', ')));
-    } else {
-      return res.status(STATUS_SERVER_ERROR).json(MESSAGE_SERVER_ERROR);
+    } else if (error instanceof StatusError) {
+      return res.status(error.status).json(customMessage(false, error.message));
     }
+    return res.status(STATUS_SERVER_ERROR).json(MESSAGE_SERVER_ERROR);
   }
 }) as RequestHandler);
 
@@ -136,8 +140,8 @@ router.put('/:id', (async (req, res) => {
     await getDb().entityManager.transaction(async (transactionalEntityManager) => {
       // Update user credit if the user is not the owner of the laundromat
       if (uid !== contract.washingMachine.laundromat.owner.id) {
-        user.credit -= contract.price;
-        contract.washingMachine.laundromat.owner.credit += contract.price;
+        user.credit += contract.price;
+        contract.washingMachine.laundromat.owner.credit -= contract.price;
       }
       contract.status = 'cancelled';
       await transactionalEntityManager.save(user);
@@ -149,9 +153,10 @@ router.put('/:id', (async (req, res) => {
   } catch (error: unknown) {
     if (error instanceof ValidationError) {
       return res.status(STATUS_BAD_REQUEST).json(customMessage(false, error.errors.join(', ')));
-    } else {
-      return res.status(STATUS_SERVER_ERROR).json(MESSAGE_SERVER_ERROR);
+    } else if (error instanceof StatusError) {
+      return res.status(error.status).json(customMessage(false, error.message));
     }
+    return res.status(STATUS_SERVER_ERROR).json(MESSAGE_SERVER_ERROR);
   }
 }) as RequestHandler);
 
