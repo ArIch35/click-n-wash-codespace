@@ -2,8 +2,8 @@ import { RequestHandler, Router } from 'express';
 import { ValidationError } from 'yup';
 import getDb from '../db';
 import { createLaundromatSchema, updateLaundromatSchema } from '../entities/laundromat';
+import StatusError from '../utils/error-with-status';
 import {
-  MESSAGE_CONFLICT_UNRESOLVED,
   MESSAGE_FORBIDDEN_NOT_OWNER,
   MESSAGE_NOT_FOUND,
   MESSAGE_OK,
@@ -12,7 +12,6 @@ import {
 } from '../utils/http-return-messages';
 import {
   STATUS_BAD_REQUEST,
-  STATUS_CONFLICT,
   STATUS_FORBIDDEN,
   STATUS_NOT_FOUND,
   STATUS_OK,
@@ -52,17 +51,8 @@ router.post('/', (async (req, res) => {
     // Check whether the owner exists
     const uid = res.locals.uid as string;
     const user = await getDb().userRepository.findOne({ where: { id: uid } });
-
     if (!user) {
-      return res.status(STATUS_NOT_FOUND).json(MESSAGE_NOT_FOUND);
-    }
-
-    // Check whether a laundromat exists with the same name for the current user
-    const laundromatExistsWithSameNameForCurrentUser = await getDb().laundromatRepository.findOne({
-      where: { name: validated.name, owner: { id: uid } },
-    });
-    if (laundromatExistsWithSameNameForCurrentUser) {
-      return res.status(STATUS_CONFLICT).json(MESSAGE_CONFLICT_UNRESOLVED);
+      return res.status(STATUS_BAD_REQUEST).json(customMessage(false, 'User does not exist'));
     }
 
     const laundromat = getDb().laundromatRepository.create({
@@ -75,9 +65,10 @@ router.post('/', (async (req, res) => {
   } catch (error: unknown) {
     if (error instanceof ValidationError) {
       return res.status(STATUS_BAD_REQUEST).json(customMessage(false, error.errors.join(', ')));
-    } else {
-      return res.status(STATUS_SERVER_ERROR).json(MESSAGE_SERVER_ERROR);
+    } else if (error instanceof StatusError) {
+      return res.status(error.status).json(customMessage(false, error.message));
     }
+    return res.status(STATUS_SERVER_ERROR).json(MESSAGE_SERVER_ERROR);
   }
 }) as RequestHandler);
 
@@ -108,9 +99,10 @@ router.put('/:id', (async (req, res) => {
   } catch (error: unknown) {
     if (error instanceof ValidationError) {
       return res.status(STATUS_BAD_REQUEST).json(customMessage(false, error.errors.join(', ')));
-    } else {
-      return res.status(STATUS_SERVER_ERROR).json(MESSAGE_SERVER_ERROR);
+    } else if (error instanceof StatusError) {
+      return res.status(error.status).json(customMessage(false, error.message));
     }
+    return res.status(STATUS_SERVER_ERROR).json(MESSAGE_SERVER_ERROR);
   }
 }) as RequestHandler);
 
