@@ -23,7 +23,7 @@ class WashingMachine extends BaseEntity {
   @BeforeInsert()
   @BeforeUpdate()
   /**
-   * Rules to check before inserting or updating a laundromat.
+   * Rules to check before inserting or updating a washing machine.
    */
   async rules(): Promise<void> {
     await checkDuplicateNameWithinLaundromat(this);
