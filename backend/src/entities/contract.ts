@@ -1,13 +1,4 @@
-import {
-  AfterLoad,
-  BeforeInsert,
-  Between,
-  Column,
-  Entity,
-  LessThanOrEqual,
-  ManyToOne,
-  MoreThanOrEqual,
-} from 'typeorm';
+import { AfterLoad, BeforeInsert, Column, Entity, ManyToOne } from 'typeorm';
 import { date, object, string } from 'yup';
 import getDb from '../db';
 import StatusError from '../utils/error-with-status';
@@ -74,38 +65,23 @@ const checkAvailability = async (
   startDate: Date,
   endDate: Date,
 ) => {
-  const conflictingContract = await getDb().contractRepository.findOne({
-    where: [
+  const bufferDuration = 15 * 60000; // 15 minutes
+  const startDateBuffer = new Date(startDate.getTime() - bufferDuration);
+  const endDateBuffer = new Date(endDate.getTime() + bufferDuration);
+  const conflictingContract = await getDb()
+    .contractRepository.createQueryBuilder('contract')
+    .where('contract.washingMachine = :washingMachine', { washingMachine: washingMachine.id })
+    .andWhere('contract.status = :status', { status: 'ongoing' })
+    .andWhere(
+      '(contract.startDate BETWEEN :startDateBuffer AND :endDateBuffer OR contract.endDate BETWEEN :startDateBuffer AND :endDateBuffer OR :startDateBuffer BETWEEN contract.startDate AND contract.endDate OR :endDateBuffer BETWEEN contract.startDate AND contract.endDate)',
       {
-        washingMachine: {
-          id: washingMachine.id,
-        },
-        status: 'ongoing',
-        startDate: Between(startDate, endDate),
+        startDateBuffer,
+        endDateBuffer,
       },
-      {
-        washingMachine: {
-          id: washingMachine.id,
-        },
-        status: 'ongoing',
-        endDate: Between(startDate, endDate),
-      },
-      {
-        washingMachine: {
-          id: washingMachine.id,
-        },
-        status: 'ongoing',
-        startDate: MoreThanOrEqual(startDate) && LessThanOrEqual(endDate),
-      },
-      {
-        washingMachine: {
-          id: washingMachine.id,
-        },
-        status: 'ongoing',
-        endDate: MoreThanOrEqual(startDate) && LessThanOrEqual(endDate),
-      },
-    ],
-  });
+    )
+    .getOne();
+  console.log('conflictingContract', conflictingContract);
+
   if (conflictingContract) {
     throw new StatusError(
       `Washing machine ${washingMachine.name} is not available within the time period`,
