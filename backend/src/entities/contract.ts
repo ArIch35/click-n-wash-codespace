@@ -1,6 +1,16 @@
-import { AfterLoad, BeforeInsert, Column, Entity, ManyToOne } from 'typeorm';
+import {
+  AfterLoad,
+  BeforeInsert,
+  Between,
+  Column,
+  Entity,
+  LessThanOrEqual,
+  ManyToOne,
+  MoreThanOrEqual,
+} from 'typeorm';
 import { date, object, string } from 'yup';
 import getDb from '../db';
+import StatusError from '../utils/error-with-status';
 import BaseEntity from './base-entity';
 import User from './user';
 import WashingMachine from './washing-machine';
@@ -30,10 +40,12 @@ class Contract extends BaseEntity {
   washingMachine!: WashingMachine;
 
   @BeforeInsert()
-  setName(): void {
-    this.name = `Contract between ${this.user.name} and ${
-      this.washingMachine.name
-    } from ${this.startDate.toISOString()} to ${this.endDate.toISOString()} for ${this.price}€`;
+  /**
+   * Rules to check before inserting a contract.
+   */
+  async rules(): Promise<void> {
+    await checkAvailability(this.washingMachine, this.startDate, this.endDate);
+    setName(this);
   }
 
   @AfterLoad()
@@ -50,6 +62,69 @@ class Contract extends BaseEntity {
 }
 
 export default Contract;
+
+/**
+ * Checks whether a washing machine is available within the time period
+ * @param washingMachine The washing machine to check
+ * @param startDate The start date of the time period
+ * @param endDate The end date of the time period
+ */
+const checkAvailability = async (
+  washingMachine: WashingMachine,
+  startDate: Date,
+  endDate: Date,
+) => {
+  const conflictingContract = await getDb().contractRepository.findOne({
+    where: [
+      {
+        washingMachine: {
+          id: washingMachine.id,
+        },
+        status: 'ongoing',
+        startDate: Between(startDate, endDate),
+      },
+      {
+        washingMachine: {
+          id: washingMachine.id,
+        },
+        status: 'ongoing',
+        endDate: Between(startDate, endDate),
+      },
+      {
+        washingMachine: {
+          id: washingMachine.id,
+        },
+        status: 'ongoing',
+        startDate: MoreThanOrEqual(startDate) && LessThanOrEqual(endDate),
+      },
+      {
+        washingMachine: {
+          id: washingMachine.id,
+        },
+        status: 'ongoing',
+        endDate: MoreThanOrEqual(startDate) && LessThanOrEqual(endDate),
+      },
+    ],
+  });
+  if (conflictingContract) {
+    throw new StatusError(
+      `Washing machine ${washingMachine.name} is not available within the time period`,
+      409,
+    );
+  }
+};
+
+/**
+ * Sets the name of a contract
+ * @param contract The contract to set the name
+ */
+const setName = (contract: Contract): void => {
+  contract.name = `Contract between ${contract.user.name} and ${
+    contract.washingMachine.name
+  } from ${contract.startDate.toISOString()} to ${contract.endDate.toISOString()} for ${
+    contract.price
+  }€`;
+};
 
 /**
  * Finalize a contract by using transaction to update both user and laundromat owner credit and contract status
@@ -80,7 +155,13 @@ export const createContractSchema = object({
   startDate: date().required(),
   endDate: date().required(),
   washingMachine: string().required(),
-});
+})
+  .test('is-valid-date', 'Start date must be before end date', (value) => {
+    return value.startDate < value.endDate;
+  })
+  .test('is-in-future', 'Start date must be in the future', (value) => {
+    return value.startDate > new Date();
+  });
 
 export const updateContractSchema = object({
   status: string().required(),
