@@ -1,5 +1,5 @@
-import { AfterLoad, Column, Entity, ManyToOne } from 'typeorm';
-import { object, string } from 'yup';
+import { AfterLoad, BeforeInsert, Column, Entity, ManyToOne } from 'typeorm';
+import { date, object, string } from 'yup';
 import getDb from '../db';
 import BaseEntity from './base-entity';
 import User from './user';
@@ -29,6 +29,13 @@ class Contract extends BaseEntity {
   })
   washingMachine!: WashingMachine;
 
+  @BeforeInsert()
+  setName(): void {
+    this.name = `Contract between ${this.user.name} and ${
+      this.washingMachine.name
+    } from ${this.startDate.toISOString()} to ${this.endDate.toISOString()} for ${this.price}€`;
+  }
+
   @AfterLoad()
   async updateStatus(): Promise<void> {
     if (this.status !== 'ongoing') {
@@ -37,7 +44,7 @@ class Contract extends BaseEntity {
     const today = new Date();
     if (today > this.endDate) {
       this.status = 'finished';
-      await getDb().contractRepository.save(this);
+      await getDb().contractRepository.update(this.id, { status: 'finished' });
     }
   }
 }
@@ -45,8 +52,8 @@ class Contract extends BaseEntity {
 export default Contract;
 
 export const createContractSchema = object({
-  startDate: string().required(),
-  endDate: string().required(),
+  startDate: date().required(),
+  endDate: date().required(),
   washingMachine: string().required(),
 });
 
