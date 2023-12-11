@@ -1,7 +1,7 @@
 import { RequestHandler, Router } from 'express';
 import { ValidationError } from 'yup';
 import getDb from '../db';
-import { createContractSchema, updateContractSchema } from '../entities/contract';
+import { createContractSchema, finalizeContract, updateContractSchema } from '../entities/contract';
 import StatusError from '../utils/error-with-status';
 import {
   MESSAGE_FORBIDDEN_NOT_OWNER,
@@ -77,18 +77,7 @@ router.post('/', (async (req, res) => {
       user,
       washingMachine,
     });
-
-    await getDb().entityManager.transaction(async (transactionalEntityManager) => {
-      // Update user credit if the user is not the owner of the laundromat
-      if (user.id !== washingMachine.laundromat.owner.id) {
-        user.credit -= contract.price;
-        washingMachine.laundromat.owner.credit += contract.price;
-      }
-      await transactionalEntityManager.save(user);
-      await transactionalEntityManager.save(washingMachine.laundromat.owner);
-      await transactionalEntityManager.save(contract);
-    });
-
+    await finalizeContract(contract);
     return res.status(STATUS_OK).json(contract);
   } catch (error: unknown) {
     if (error instanceof ValidationError) {
@@ -103,6 +92,7 @@ router.post('/', (async (req, res) => {
 router.put('/:id', (async (req, res) => {
   try {
     await updateContractSchema.validate(req.body, { abortEarly: false });
+    const uid = res.locals.uid as string;
 
     // Check whether contract exists
     const contract = await getDb().contractRepository.findOne({
@@ -118,15 +108,6 @@ router.put('/:id', (async (req, res) => {
       return res.status(STATUS_NOT_FOUND).json(MESSAGE_NOT_FOUND);
     }
 
-    // Check whether user exists
-    const uid = res.locals.uid as string;
-    const user = await getDb().userRepository.findOne({
-      where: { id: uid },
-    });
-    if (!user) {
-      return res.status(STATUS_NOT_FOUND).json(MESSAGE_NOT_FOUND);
-    }
-
     // Check whether the user in contract is the same as the user
     if (uid !== contract.user.id) {
       return res.status(STATUS_FORBIDDEN).json(MESSAGE_FORBIDDEN_NOT_OWNER);
@@ -137,18 +118,7 @@ router.put('/:id', (async (req, res) => {
       return res.status(STATUS_FORBIDDEN).json(customMessage(false, 'Contract is not ongoing'));
     }
 
-    await getDb().entityManager.transaction(async (transactionalEntityManager) => {
-      // Update user credit if the user is not the owner of the laundromat
-      if (uid !== contract.washingMachine.laundromat.owner.id) {
-        user.credit += contract.price;
-        contract.washingMachine.laundromat.owner.credit -= contract.price;
-      }
-      contract.status = 'cancelled';
-      await transactionalEntityManager.save(user);
-      await transactionalEntityManager.save(contract.washingMachine.laundromat.owner);
-      await transactionalEntityManager.save(contract);
-    });
-
+    await finalizeContract(contract, true);
     return res.status(STATUS_OK).json(contract);
   } catch (error: unknown) {
     if (error instanceof ValidationError) {
