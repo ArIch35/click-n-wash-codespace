@@ -12,7 +12,7 @@ const createSocket = (server: HttpServer): RequestHandler => {
   });
   console.log('Socket.io server created');
 
-  return (async (_, res, next) => {
+  return ((_, res, next) => {
     res.locals.socket = socket;
     next();
   }) as RequestHandler;
