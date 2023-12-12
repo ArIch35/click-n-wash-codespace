@@ -11,6 +11,8 @@ import userRouter from './router/user.router';
 import washingMachineRouter from './router/washing-machine.router';
 import { customMessage } from './utils/http-return-messages';
 import { STATUS_NOT_FOUND, STATUS_OK } from './utils/http-status-codes';
+import http from 'http';
+import createSocket from './middleware/socket.middleware';
 
 /**
  * The main entry point for the application.
@@ -34,12 +36,15 @@ signInWithEmailAndPassword(firebaseAuth, 'testuser1@gmail.com', 'testuser1').the
   }); 
 }); */
 
+
 const app = express();
+const server = http.createServer(app);
 
 app.use(cors());
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true }));
 app.use(checkToken);
+app.use(createSocket(server));
 // Add middleware here
 
 app.use('/users', userRouter);
@@ -57,6 +62,6 @@ app.use('*', (_req, res) => {
   res.status(STATUS_NOT_FOUND).send(customMessage(false, 'Route not found'));
 });
 
-app.listen(PORT, () => {
+server.listen(PORT, () => {
   console.log('Server is running on port', PORT);
 });
