@@ -36,7 +36,6 @@ signInWithEmailAndPassword(firebaseAuth, 'testuser1@gmail.com', 'testuser1').the
   }); 
 }); */
 
-
 const app = express();
 const server = http.createServer(app);
 
