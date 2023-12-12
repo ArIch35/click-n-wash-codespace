@@ -1,9 +1,5 @@
-import dotenv from 'dotenv';
 import admin from 'firebase-admin';
-
-dotenv.config({
-  path: '../.env',
-});
+import './utils/load-env';
 
 admin.initializeApp({
   credential: admin.credential.cert({
