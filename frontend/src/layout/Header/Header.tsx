@@ -1,8 +1,10 @@
-import { Group, Burger, Button, Anchor } from '@mantine/core';
+import { Group, Burger, Button, Anchor, Modal } from '@mantine/core';
 import classes from './Header.module.css';
+import { AuthenticationForm } from '../../components/auth/AuthentificationForm';
+import { useDisclosure, useMediaQuery } from '@mantine/hooks';
 
 const links = [
-  { link: '/about', label: 'Sign In / Register' },
+  { link: '/about', label: 'Login / Register' },
 ];
 
 interface HeaderProps {
@@ -11,13 +13,18 @@ interface HeaderProps {
 }
 
 const Header = ({ toggle, setVisible } : HeaderProps) => {
+  const [modalOpened, modalHandlers] = useDisclosure(false);
+  const isMobile = useMediaQuery('(max-width: 50em)');
 
   const items = links.map((link) => (
     <Anchor
       key={link.label}
       underline='hover'
       className={classes.link}
-      onClick={(event) => event.preventDefault()}
+      onClick={(event) => {
+        event.preventDefault();
+        modalHandlers.open();
+      }}
     >
       {link.label}
     </Anchor>
@@ -26,6 +33,16 @@ const Header = ({ toggle, setVisible } : HeaderProps) => {
   return (
     <header className={classes.header}>
       <div className={classes.inner}>
+      <Modal 
+        opened={modalOpened} 
+        onClose={modalHandlers.close}
+        withCloseButton={isMobile}
+        fullScreen={isMobile}
+        transitionProps={{ transition: 'fade', duration: 200 }}
+        centered
+      >
+        <AuthenticationForm />
+      </Modal>
         <Group>
           <Burger 
             onClick={() => {
