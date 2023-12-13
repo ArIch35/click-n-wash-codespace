@@ -3,23 +3,20 @@ import classes from './Header.module.css';
 import { AuthenticationForm } from '../../components/auth/AuthentificationForm';
 import { useDisclosure } from '@mantine/hooks';
 
-const links = [
-  { link: '/about', label: 'Login / Register' },
-];
+const links = [{ link: '/about', label: 'Login / Register' }];
 
 interface HeaderProps {
   toggle: () => void;
   setVisible: (visible: boolean) => void;
 }
 
-const Header = ({ toggle, setVisible } : HeaderProps) => {
+const Header = ({ toggle, setVisible }: HeaderProps) => {
   const [modalOpened, modalHandlers] = useDisclosure(false);
-  
 
   const items = links.map((link) => (
     <Anchor
       key={link.label}
-      underline='hover'
+      underline="hover"
       className={classes.link}
       onClick={(event) => {
         event.preventDefault();
@@ -33,18 +30,16 @@ const Header = ({ toggle, setVisible } : HeaderProps) => {
   return (
     <header className={classes.header}>
       <div className={classes.inner}>
-        <AuthenticationForm 
-          opened={modalOpened} 
-          onClose={modalHandlers.close}
-        />
+        <AuthenticationForm opened={modalOpened} onClose={modalHandlers.close} />
         <Group>
-          <Burger 
+          <Burger
             onClick={() => {
               toggle();
               setVisible(true);
             }}
-            size={'sm'}  />
-          <Button size='md' variant='transparent' fw={700}>
+            size={'sm'}
+          />
+          <Button size="md" variant="transparent" fw={700}>
             Click n' Wash
           </Button>
         </Group>

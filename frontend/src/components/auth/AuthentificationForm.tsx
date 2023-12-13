@@ -35,7 +35,7 @@ export function AuthenticationForm(props: ModalProps) {
   });
 
   return (
-    <Modal 
+    <Modal
       withCloseButton={isMobile}
       fullScreen={isMobile}
       transitionProps={{ transition: 'fade', duration: 200 }}
@@ -100,14 +100,19 @@ export function AuthenticationForm(props: ModalProps) {
               ? 'Already have an account? Login'
               : "Don't have an account? Register"}
           </Anchor>
-          <Button type="submit" radius="xl" onClick={() => {
-           createUserWithEmailAndPassword(firebaseAuth, form.values.email, form.values.password).then((result) => {
-             console.log(result);
-           }
-           ).catch((error) => {
-             console.error(error);
-           });
-          }}>
+          <Button
+            type="submit"
+            radius="xl"
+            onClick={() => {
+              createUserWithEmailAndPassword(firebaseAuth, form.values.email, form.values.password)
+                .then((result) => {
+                  console.log(result);
+                })
+                .catch((error) => {
+                  console.error(error);
+                });
+            }}
+          >
             {upperFirst(type)}
           </Button>
         </Group>
