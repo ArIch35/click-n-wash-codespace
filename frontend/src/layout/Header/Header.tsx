@@ -40,7 +40,7 @@ const Header = ({ toggle, setVisible }: HeaderProps) => {
             size={'sm'}
           />
           <Button size="md" variant="transparent" fw={700}>
-            Click n' Wash
+            Click n&apos; Wash
           </Button>
         </Group>
         <Group>

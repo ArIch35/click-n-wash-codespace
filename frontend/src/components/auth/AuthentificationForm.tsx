@@ -44,7 +44,7 @@ export function AuthenticationForm(props: ModalProps) {
       {...props}
     >
       <Text size="lg" fw={500}>
-        Welcome to Click n' Wash, {type} with
+        Welcome to Click n&apos; Wash, {type} with
       </Text>
 
       <Group grow mb="md" mt="md">
@@ -98,7 +98,7 @@ export function AuthenticationForm(props: ModalProps) {
           <Anchor component="button" type="button" c="dimmed" onClick={() => toggle()} size="xs">
             {type === 'register'
               ? 'Already have an account? Login'
-              : "Don't have an account? Register"}
+              : 'Don\'t have an account? Register'}
           </Anchor>
           <Button
             type="submit"
