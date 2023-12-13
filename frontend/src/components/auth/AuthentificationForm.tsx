@@ -98,7 +98,7 @@ export function AuthenticationForm(props: ModalProps) {
           <Anchor component="button" type="button" c="dimmed" onClick={() => toggle()} size="xs">
             {type === 'register'
               ? 'Already have an account? Login'
-              : 'Don\'t have an account? Register'}
+              : 'Not a member yet? Register'}
           </Anchor>
           <Button
             type="submit"
