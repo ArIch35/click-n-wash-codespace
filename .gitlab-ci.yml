@@ -33,7 +33,9 @@ test-integration:
     VITE_FIREBASE_MEASUREMENT_ID: $VITE_FIREBASE_MEASUREMENT_ID
   services:
     - postgres:latest
+      timeout: 120s
   script:
+    - echo "$VITE_FIREBASE_APP_ID"
     - cd backend
     - npm install
     - npm run test
