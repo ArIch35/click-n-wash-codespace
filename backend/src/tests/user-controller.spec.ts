@@ -99,6 +99,18 @@ mocha.describe('UserController', () => {
   });
 
   /**
+   * Test the GET /users/:idOrEmail endpoint with an invalid id.
+   */
+  mocha.it('should return a not found error', async () => {
+    const userToken = await userTest1!.getIdToken();
+    const res = await api.get('/users/123456').auth(userToken, { type: 'bearer' }).expect(404);
+
+    expect(res.body).to.be.an('object').contains({
+      success: false,
+      message: 'Entry Does Not Exist!',
+    });
+  });
+  /**
    * Test the PUT /users endpoint.
    */
   mocha.it('should update the user created in the previous test', async () => {
