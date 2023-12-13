@@ -1,24 +1,25 @@
-import { useToggle, upperFirst } from '@mantine/hooks';
+import { useToggle, upperFirst, useMediaQuery } from '@mantine/hooks';
 import { useForm } from '@mantine/form';
 import {
   TextInput,
   PasswordInput,
   Text,
-  Paper,
   Group,
-  PaperProps,
   Button,
   Divider,
   Checkbox,
   Anchor,
   Stack,
+  Modal,
+  ModalProps,
 } from '@mantine/core';
 import { GoogleButton } from './GoogleButton';
 import { createUserWithEmailAndPassword } from 'firebase/auth';
 import firebaseAuth from '../../firebase';
 
-export function AuthenticationForm(props: PaperProps) {
+export function AuthenticationForm(props: ModalProps) {
   const [type, toggle] = useToggle(['login', 'register']);
+  const isMobile = useMediaQuery('(max-width: 50em)');
   const form = useForm({
     initialValues: {
       email: '',
@@ -34,7 +35,14 @@ export function AuthenticationForm(props: PaperProps) {
   });
 
   return (
-    <Paper radius="md" p="xl" withBorder {...props}>
+    <Modal 
+      withCloseButton={isMobile}
+      fullScreen={isMobile}
+      transitionProps={{ transition: 'fade', duration: 200 }}
+      centered
+      radius={isMobile ? 0 : 'md'}
+      {...props}
+    >
       <Text size="lg" fw={500}>
         Welcome to Click n' Wash, {type} with
       </Text>
@@ -104,6 +112,6 @@ export function AuthenticationForm(props: PaperProps) {
           </Button>
         </Group>
       </form>
-    </Paper>
+    </Modal>
   );
 }
