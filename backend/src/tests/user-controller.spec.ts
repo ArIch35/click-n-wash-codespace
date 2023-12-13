@@ -79,6 +79,7 @@ mocha.describe('UserController', () => {
       message: 'Entry Already Exist!, Cancelling....',
     });
   });
+
   /**
    * Test the GET /users/:idOrEmail endpoint.
    */
@@ -110,6 +111,7 @@ mocha.describe('UserController', () => {
       message: 'Entry Does Not Exist!',
     });
   });
+
   /**
    * Test the PUT /users endpoint.
    */
@@ -130,6 +132,20 @@ mocha.describe('UserController', () => {
         email: 'testuser1@gmail.com',
         id: userTest1?.uid,
       });
+  });
+
+  /**
+   * Test the PUT /users endpoint with an invalid id.
+   */
+  mocha.it('should return a not found error', async () => {
+    const userToken = '123456';
+    await api
+      .put('/users')
+      .auth(userToken, { type: 'bearer' })
+      .send({
+        name: 'TestUser1Updated',
+      })
+      .expect(401);
   });
 
   /**
