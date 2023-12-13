@@ -1,16 +1,43 @@
 import BaseLayout from "../layout/BaseLayout";
-import { Button } from "@mantine/core";
+import InputSelect from "../components/inputs/InputSelect";
+import { useForm } from '@mantine/form';
+import { useEffect } from "react";
 
 const HomePage = () => {
+  const form = useForm({
+    initialValues: {
+      location: '',
+    },
+  });
+
+  useEffect(() => {
+    const storedValue = window.localStorage.getItem('location-form');
+    if (storedValue) {
+      try {
+        const parsedValue = (storedValue);
+        console.log(parsedValue);
+        form.setValues({ location: parsedValue });
+      } catch (e) {
+        console.error(e);
+      }
+    }
+  }
+  ,[]);
+
+  useEffect(() => {
+    localStorage.setItem('location-form', form.values.location);
+  }, [form.values]);
+
   return (
     <BaseLayout>
-      <Button w={'100vw'} onClick={(event) =>{
-          event.preventDefault();
-          console.log('clicked')
-        }}>
-        Click n' Wash
-      </Button>
-
+      <InputSelect
+        name="test"
+        options={[
+          { value: "test", label: "test" },
+          { value: "test2", label: "test2" },
+        ]}
+        {...form.getInputProps('location')}
+      />
     </BaseLayout>
   );
 };
