@@ -17,6 +17,10 @@ test-format:
 
 test-integration:
   stage: test
+  variables:
+    POSTGRES_DB: cnw-db
+    POSTGRES_USER: cnw-user
+    POSTGRES_PASSWORD: cnw-password
   services:
     - postgres:latest
   script:
