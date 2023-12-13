@@ -21,7 +21,7 @@ const HomePage = () => {
         console.error(e);
       }
     }
-  }, []);
+  });
 
   useEffect(() => {
     localStorage.setItem('location-form', form.values.location);
