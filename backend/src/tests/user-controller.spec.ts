@@ -62,6 +62,24 @@ mocha.describe('UserController', () => {
   });
 
   /**
+   * Test to POST /users endpoint with an already existing user.
+   */
+  mocha.it('should return a conflict error', async () => {
+    const userToken = await userTest1!.getIdToken();
+    const res = await api
+      .post('/users')
+      .auth(userToken, { type: 'bearer' })
+      .send({
+        name: 'TestUser1',
+      })
+      .expect(409);
+
+    expect(res.body).to.be.an('object').contains({
+      success: false,
+      message: 'Entry Already Exist!, Cancelling....',
+    });
+  });
+  /**
    * Test the GET /users/:idOrEmail endpoint.
    */
   mocha.it('should return the user created in the previous test', async () => {
