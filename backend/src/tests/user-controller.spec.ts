@@ -8,7 +8,8 @@ import firebaseAuth from '../utils/firebase';
 import { User, createUserWithEmailAndPassword, deleteUser } from 'firebase/auth';
 import getDb from '../db';
 
-const api = supertest('http://localhost:5000');
+const TEST_PORT = 5050;
+const api = supertest(`http://localhost:${TEST_PORT}`);
 
 mocha.describe('UserController', () => {
   let testServer: Server<typeof IncomingMessage, typeof ServerResponse> | null = null;
@@ -16,8 +17,8 @@ mocha.describe('UserController', () => {
   let userTest1: User | null = null;
 
   mocha.before(async () => {
-    testServer = (await server(true)).listen(5000, () => {
-      console.log('Test server is running on port 5000');
+    testServer = (await server(true)).listen(TEST_PORT, () => {
+      console.log('Test server is running on port ' + TEST_PORT);
     });
 
     await getDb().dropDatabase();
