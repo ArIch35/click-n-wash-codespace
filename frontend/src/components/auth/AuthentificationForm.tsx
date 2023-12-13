@@ -96,9 +96,7 @@ export function AuthenticationForm(props: ModalProps) {
 
         <Group justify="space-between" mt="xl">
           <Anchor component="button" type="button" c="dimmed" onClick={() => toggle()} size="xs">
-            {type === 'register'
-              ? 'Already have an account? Login'
-              : 'Not a member yet? Register'}
+            {type === 'register' ? 'Already have an account? Login' : 'Not a member yet? Register'}
           </Anchor>
           <Button
             type="submit"
