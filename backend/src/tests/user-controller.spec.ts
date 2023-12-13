@@ -154,4 +154,17 @@ mocha.describe('UserController', () => {
 
     await deleteUser(userTest1);
   });
+
+  /**
+   * Test the DELETE /users endpoint with an invalid id.
+   */
+  mocha.it('should return a not found error', async () => {
+    const userToken = await userTest1!.getIdToken();
+    const res = await api.delete('/users').auth(userToken, { type: 'bearer' }).expect(404);
+
+    expect(res.body).to.be.an('object').contains({
+      success: false,
+      message: 'Entry Does Not Exist!',
+    });
+  });
 });
