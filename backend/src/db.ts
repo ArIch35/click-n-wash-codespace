@@ -25,6 +25,10 @@ export const connectToDb = async (test?: boolean): Promise<void> => {
     process.env['DB_NAME'] = 'unit-test-db';
   }
 
+  if (AppDataSource.isInitialized) {
+    await AppDataSource.destroy();
+  }
+
   const orm = await AppDataSource.initialize();
   const em = orm.createEntityManager();
   currentDb = {

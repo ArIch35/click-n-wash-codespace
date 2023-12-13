@@ -5,7 +5,12 @@ import supertest from 'supertest';
 import '../utils/load-env';
 import server from '../server';
 import firebaseAuth from '../utils/firebase';
-import { User, createUserWithEmailAndPassword, deleteUser } from 'firebase/auth';
+import {
+  User,
+  createUserWithEmailAndPassword,
+  deleteUser,
+  signInWithEmailAndPassword,
+} from 'firebase/auth';
 import getDb from '../db';
 
 const TEST_PORT = 5050;
@@ -37,6 +42,19 @@ mocha.describe('UserController', () => {
    * Test the POST /users endpoint.
    */
   mocha.it('should create a new user', async () => {
+    try {
+      // If able to sign in then delete the user
+      const existingUserCredential = await signInWithEmailAndPassword(
+        firebaseAuth,
+        'testuser1@gmail.com',
+        'testuser1',
+      );
+
+      await deleteUser(existingUserCredential.user);
+    } catch (e) {
+      console.log(e);
+    }
+
     const userCredential = await createUserWithEmailAndPassword(
       firebaseAuth,
       'testuser1@gmail.com',
@@ -161,16 +179,6 @@ mocha.describe('UserController', () => {
     });
   });
 
-  mocha.after(async () => {
-    testServer?.close();
-
-    if (!userTest1) {
-      throw new Error('User not created');
-    }
-
-    await deleteUser(userTest1);
-  });
-
   /**
    * Test the DELETE /users endpoint with an invalid id.
    */
@@ -182,5 +190,9 @@ mocha.describe('UserController', () => {
       success: false,
       message: 'Entry Does Not Exist!',
     });
+  });
+
+  mocha.after(() => {
+    testServer?.close();
   });
 });
