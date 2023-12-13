@@ -43,7 +43,7 @@ export function GoogleButton(props: ButtonProps & React.ComponentPropsWithoutRef
         const provider = new GoogleAuthProvider();
         signInWithPopup(firebaseAuth, provider)
           .then((result) => {
-            dispatch(setUserId(result.user?.uid || null))
+            dispatch(setUserId(result.user?.uid || null));
             console.log(result);
           })
           .catch((error) => {

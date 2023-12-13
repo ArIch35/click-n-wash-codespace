@@ -9,7 +9,7 @@ const notificationSlice = createSlice({
 
   reducers: {
     setUserId(state, action) {
-      state.userId = action.payload;
+      state.userId = action.payload as string;
     },
   },
 });

@@ -1,8 +1,8 @@
-import { combineReducers } from "@reduxjs/toolkit";
-import notificationReducer from "./notification.reducer";
+import { combineReducers } from '@reduxjs/toolkit';
+import notificationReducer from './notification.reducer';
 
 const rootReducer = combineReducers({
-    notificationState: notificationReducer,
+  notificationState: notificationReducer,
 });
 
 export type RootState = ReturnType<typeof rootReducer>;

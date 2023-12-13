@@ -112,9 +112,7 @@ export function AuthenticationForm(props: ModalProps) {
                     console.log(result);
                   })
                   .catch((error) => {
-                    const errorCode = error.code;
-                    const errorMessage = error.message;
-                    console.error('Error logging in: ', errorCode, errorMessage);
+                    console.error(error);
                   });
                 return;
               }
@@ -125,9 +123,6 @@ export function AuthenticationForm(props: ModalProps) {
                 })
                 .catch((error) => {
                   console.error(error);
-                  if (error.code === 'auth/email-already-in-use') {
-                    alert('That email address is already in use!');
-                  }
                 });
             }}
           >
