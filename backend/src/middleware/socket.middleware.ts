@@ -15,7 +15,8 @@ const createSocket = (server: HttpServer): RequestHandler => {
 
   socket.on('connection', (client) => {
     console.log(client.id, 'connected');
-    client.on('registerUser', (userId: string) => {
+    
+    client.on('registerUserToSocket', (userId: string) => {
       users[userId] = client.id;
       console.log(`${userId}:${client.id} registered`);
     });

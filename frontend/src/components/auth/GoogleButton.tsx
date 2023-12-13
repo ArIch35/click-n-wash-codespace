@@ -1,6 +1,8 @@
 import { Button, ButtonProps } from '@mantine/core';
 import firebaseAuth from '../../firebase';
 import { GoogleAuthProvider, signInWithPopup } from 'firebase/auth';
+import { useDispatch } from 'react-redux';
+import { setUserId } from '../../reducers/notification.reducer';
 
 function GoogleIcon(props: React.ComponentPropsWithoutRef<'svg'>) {
   return (
@@ -32,6 +34,7 @@ function GoogleIcon(props: React.ComponentPropsWithoutRef<'svg'>) {
 }
 
 export function GoogleButton(props: ButtonProps & React.ComponentPropsWithoutRef<'button'>) {
+  const dispatch = useDispatch();
   return (
     <Button
       leftSection={<GoogleIcon />}
@@ -40,6 +43,7 @@ export function GoogleButton(props: ButtonProps & React.ComponentPropsWithoutRef
         const provider = new GoogleAuthProvider();
         signInWithPopup(firebaseAuth, provider)
           .then((result) => {
+            dispatch(setUserId(result.user?.uid || null))
             console.log(result);
           })
           .catch((error) => {
