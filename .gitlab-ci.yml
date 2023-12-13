@@ -32,7 +32,8 @@ test-integration:
     VITE_FIREBASE_APP_ID: $VITE_FIREBASE_APP_ID
     VITE_FIREBASE_MEASUREMENT_ID: $VITE_FIREBASE_MEASUREMENT_ID
   services:
-    - postgres:latest
+    - name: postgres:latest
+      alias: postgres
       timeout: 120s
   script:
     - echo "$VITE_FIREBASE_APP_ID"
