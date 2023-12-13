@@ -17,7 +17,7 @@ Click n' Wash is a student-led initiative aimed at simplifying the laundry exper
 - **Book a Washing machine**: a user can book a washing machine direct from the web, when the washing machine is available.
 - **Check the availability of a Washing machine**: a user can check the availability for a washing machine direct from the website, without the need to go to the laundromat.
 - **Report a Problem**: a user can report a problem to the technician or the owner of the laundromat,when the washing machine has an issue.
-- \*\*
+- **search the nearest Laundromat**: the user can search for the nearest Laundromat from their location.
 
 ## Database Structures <a name="database-structures"></a>
 
