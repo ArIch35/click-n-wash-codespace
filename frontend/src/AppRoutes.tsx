@@ -1,13 +1,5 @@
-import { Route, RouteProps, Routes } from 'react-router-dom';
-import HomePage from './pages/HomePage';
-
-export const routes: RouteProps[] = [
-  {
-    path: '/',
-    element: <HomePage />,
-    index: true,
-  },
-];
+import { Route, Routes } from 'react-router-dom';
+import { routes } from './routeConstants';
 
 const AppRoutes = () => {
   return (
