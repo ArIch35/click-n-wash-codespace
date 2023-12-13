@@ -17,9 +17,11 @@ test-format:
 
 test-integration:
   stage: test
+  services:
+    - postgres:latest
   script:
     - cd backend
-    # - npm install
-    # - npm run test
+    - npm install
+    - npm run test
     - cd ../frontend
     # TODO: Add frontend tests
