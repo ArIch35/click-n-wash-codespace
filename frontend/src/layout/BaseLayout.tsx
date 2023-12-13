@@ -5,7 +5,7 @@ import Header from './Header/Header';
 import Navbar from '../components/navbar/Navbar';
 
 const BaseLayout = ({children} : {children: ReactNode}) => {
-  const [opened, { open, close }] = useDisclosure();
+  const [navbarOpened, navbarHandlers] = useDisclosure();
   const [visible, setVisible] = useState(false);
 
   const scaleX = {
@@ -18,13 +18,13 @@ const BaseLayout = ({children} : {children: ReactNode}) => {
   return (
     <AppShell>
      <AppShell.Header zIndex={0}>
-      <Header toggle={open} setVisible={setVisible} />
+      <Header toggle={navbarHandlers.open} setVisible={setVisible} />
      </AppShell.Header>
 
      <AppShell.Main>
       <div style={{position: 'absolute', zIndex:10}}>
        <Transition
-        mounted={opened}
+        mounted={navbarOpened}
         transition={scaleX}
         timingFunction="ease"
         keepMounted
@@ -49,7 +49,7 @@ const BaseLayout = ({children} : {children: ReactNode}) => {
            blur={1}
            onClick={(event) => {
             event.preventDefault();
-            close();
+            navbarHandlers.close();
             setVisible(false);
            }}
           />
