@@ -19,6 +19,7 @@ const NotificationProvider = ({ children }: NotificationProviderProps) => {
     }
 
     function endConnection(): void {
+      socket.emit('deleteUserFromSocket', userIdFromReducer);
       socket.disconnect();
     }
     console.log('socket', socket);

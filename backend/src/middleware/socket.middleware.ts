@@ -19,6 +19,16 @@ const createSocket = (server: HttpServer): RequestHandler => {
     client.on('registerUserToSocket', (userId: string) => {
       users[userId] = client.id;
       console.log(`${userId}:${client.id} registered`);
+      console.log(users);
+    });
+
+    client.on('deleteUserFromSocket', (userId: string | undefined) => {
+      if (!userId) {
+        return;
+      }
+      delete users[userId];
+      console.log(`${userId}:${client.id} deleted`);
+      console.log(users);
     });
   });
 
