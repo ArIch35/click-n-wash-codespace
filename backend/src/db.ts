@@ -7,6 +7,7 @@ import WashingMachine from './entities/washing-machine';
 
 interface Db {
   entityManager: EntityManager;
+  dropDatabase: () => Promise<void>;
   userRepository: Repository<User>;
   laundromatRepository: Repository<Laundromat>;
   washingMachineRepository: Repository<WashingMachine>;
@@ -19,11 +20,20 @@ let currentDb: Db | null = null;
 /**
  * Connects to the database and initializes the repositories.
  */
-export const connectToDb = async (): Promise<void> => {
+export const connectToDb = async (test?: boolean): Promise<void> => {
+  if (test) {
+    process.env['DB_NAME'] = 'unit-test-db';
+  }
+
   const orm = await AppDataSource.initialize();
   const em = orm.createEntityManager();
   currentDb = {
     entityManager: em,
+    dropDatabase: async () => {
+      await getDb().washingMachineRepository.delete({});
+      await getDb().laundromatRepository.delete({});
+      await getDb().userRepository.delete({});
+    },
     userRepository: em.getRepository(User),
     laundromatRepository: em.getRepository(Laundromat),
     washingMachineRepository: em.getRepository(WashingMachine),

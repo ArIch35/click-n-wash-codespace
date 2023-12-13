@@ -17,9 +17,28 @@ test-format:
 
 test-integration:
   stage: test
+  variables:
+    POSTGRES_DB: cnw-db
+    POSTGRES_USER: cnw-user
+    POSTGRES_PASSWORD: cnw-password
+    POSTGRES_HOST_AUTH_METHOD: trust
+    DB_HOST: postgres
+    FIREBASE_CLIENT_EMAIL: $FIREBASE_CLIENT_EMAIL
+    FIREBASE_PRIVATE_KEY: $FIREBASE_PRIVATE_KEY
+    FIREBASE_PROJECT_ID: $FIREBASE_PROJECT_ID
+    VITE_FIREBASE_API_KEY: $VITE_FIREBASE_API_KEY
+    VITE_FIREBASE_AUTH_DOMAIN: $VITE_FIREBASE_AUTH_DOMAIN
+    VITE_FIREBASE_PROJECT_ID: $VITE_FIREBASE_PROJECT_ID
+    VITE_FIREBASE_STORAGE_BUCKET: $VITE_FIREBASE_STORAGE_BUCKET
+    VITE_FIREBASE_MESSAGING_SENDER_ID: $VITE_FIREBASE_MESSAGING_SENDER_ID
+    VITE_FIREBASE_APP_ID: $VITE_FIREBASE_APP_ID
+    VITE_FIREBASE_MEASUREMENT_ID: $VITE_FIREBASE_MEASUREMENT_ID
+  services:
+    - postgres:latest
   script:
+    - echo "TestId:$VITE_FIREBASE_APP_ID"
     - cd backend
-    # - npm install
-    # - npm run test
+    - npm install
+    - npm run test
     - cd ../frontend
     # TODO: Add frontend tests

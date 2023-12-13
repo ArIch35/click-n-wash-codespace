@@ -12,9 +12,7 @@ import WashingMachine from './entities/washing-machine';
 const seed = async () => {
   // Delete all data from the database
   console.log('Deleting all data from the database...');
-  await getDb().washingMachineRepository.delete({});
-  await getDb().laundromatRepository.delete({});
-  await getDb().userRepository.delete({});
+  await getDb().dropDatabase();
   console.log('All data deleted from the database');
 
   console.log('Seeding database...');
