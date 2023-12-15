@@ -22,11 +22,13 @@ const NotificationProvider = ({ children }: NotificationProviderProps) => {
       socket.disconnect();
     }
 
-    //Handle socket connection here
-    socket.on("message", (data) => {console.log("hallo",data)});
+    // Handle socket connection here
+    socket.on('message', (data) => {
+      console.log('hallo', data);
+    });
 
     return () => endConnection();
-  }, [userIdFromReducer]);
+  }, [userIdFromReducer, socket]);
 
   return <NotificationContext.Provider value={null}>{children}</NotificationContext.Provider>;
 };
