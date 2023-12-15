@@ -10,10 +10,9 @@ interface NotificationProviderProps {
 
 const NotificationProvider = ({ children }: NotificationProviderProps) => {
   const userIdFromReducer = useSelector((state: RootState) => state.notificationState.userId);
+  const socket: Socket = io(import.meta.env.VITE_SERVER_ADDRESS as string);
 
   useEffect(() => {
-    const socket: Socket = io(import.meta.env.VITE_SERVER_ADDRESS as string);
-
     if (userIdFromReducer) {
       socket.emit('registerUserToSocket', userIdFromReducer);
     }
@@ -22,7 +21,9 @@ const NotificationProvider = ({ children }: NotificationProviderProps) => {
       socket.emit('deleteUserFromSocket', userIdFromReducer);
       socket.disconnect();
     }
-    console.log('socket', socket);
+
+    //Handle socket connection here
+    socket.on("message", (data) => {console.log("hallo",data)});
 
     return () => endConnection();
   }, [userIdFromReducer]);
