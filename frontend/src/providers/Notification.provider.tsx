@@ -14,6 +14,7 @@ const NotificationProvider = ({ children }: NotificationProviderProps) => {
 
   useEffect(() => {
     if (userIdFromReducer) {
+      console.log('registering user to socket', userIdFromReducer)
       socket.emit('registerUserToSocket', userIdFromReducer);
     }
 
