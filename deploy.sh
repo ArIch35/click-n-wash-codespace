@@ -38,7 +38,7 @@ fi
 # Read parameters --domain and --port
 while [[ "$#" -gt 0 ]]; do
     case $1 in
-        -d|--domain) domain="$2"; shift ;;
+        -d|--domain) DOMAIN="$2"; shift ;;
         -p|--port) PORT="$2"; shift ;;
         *) echo "Unknown parameter passed: $1"; exit 1 ;;
     esac
@@ -54,13 +54,13 @@ fi
 GITHUB_GIST=https://gist.github.com/nicanderhery/2c06fb6f5688a59ce29046dd5ed3a512
 NGINX_HTML_ADDRESS=/var/www/html
 DIR_NAME=${PWD##*/}
-FILE_DIR="$NGINX_HTML_ADDRESS/$domain/$DIR_NAME"
-FILE_CONFIG=/etc/nginx/domain_routes/$domain.$DIR_NAME.conf
+FILE_DIR="$NGINX_HTML_ADDRESS/$DOMAIN/$DIR_NAME"
+FILE_CONFIG=/etc/nginx/domain_routes/$DOMAIN.$DIR_NAME.conf
 FRONTEND_DIR=frontend/dist
 
 # DON'T FORGET TO SET THE CONFIG
 CONFIG="location / {
-    root $file_dir;
+    root $FILE_DIR;
     index index.html;
     try_files \$uri \$uri/ =404;
 }
@@ -80,14 +80,14 @@ if [ -z "$CONFIG" ]; then
 fi
 
 # Check whether domain is empty, then set FILE_DIR to $NGINX_HTML_ADDRESS/$DIR_NAME
-if [ -z "$domain" ]; then
+if [ -z "$DOMAIN" ]; then
     FILE_DIR="$NGINX_HTML_ADDRESS/$DIR_NAME"
     FILE_CONFIG=/etc/nginx/domain_routes/$DIR_NAME.conf
 fi
 
-# Check if the /var/www/html/$domain directory exists
-if [ ! -d "$NGINX_HTML_ADDRESS/$domain" ]; then
-    echo "The /var/www/html/$domain directory does not exist. Please run the script from $GITHUB_GIST."
+# Check if the /var/www/html/$DOMAIN directory exists
+if [ ! -d "$NGINX_HTML_ADDRESS/$DOMAIN" ]; then
+    echo "The /var/www/html/$DOMAIN directory does not exist. Please run the script from $GITHUB_GIST."
     exit 1
 fi
 
