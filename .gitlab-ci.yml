@@ -41,7 +41,7 @@ deploy:
     name: production
     url: https://clicknwash.pro
   only:
-    - "13-add-cd"
+    - "main"
   tags:
     - server
   before_script:
