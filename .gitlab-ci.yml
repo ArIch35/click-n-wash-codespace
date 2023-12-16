@@ -47,12 +47,14 @@ deploy:
   before_script:
     - cp ${ENV_PROD} .env
   script:
+    - PORT=$(sudo cat .env | grep -oP '^PORT=\K[0-9]+')
+    - if [ -z "$PORT" ]; then PORT=8080; fi
     - curl https://gist.githubusercontent.com/nicanderhery/4687d9f9d94590b77ea8c5227a23b3b6/raw/c4c481d4b6668d0601c2414807644c19a6c6f3e8/node-install-latest.sh > node-install-latest.sh
     - chmod +x node-install-latest.sh
     - NODE_VERSION=$(./node-install-latest.sh | grep -oP 'Now using node \Kv[0-9\.]+')
     - export PATH=$PATH:/home/ubuntu/.nvm/versions/node/$NODE_VERSION/bin
     - npm install -g pm2
-    - sudo docker compose up -d
+    - sudo docker compose down && sudo docker compose up -d
     - cd backend
     - npm install
     - npm run build
