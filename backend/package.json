@@ -10,7 +10,7 @@
     "clean": "tsc --build --clean",
     "dev": "tsc-watch --onSuccess \"node ./dist/index.js\"",
     "start": "node ./dist/index.js",
-    "start:background": "pm2 start ./dist/index.js --name backend-services",
+    "start:background": "pm2 start ./dist/index.js --name click-n-wash-backend -f",
     "production": "npm run clean && npm run build && npm run start:background",
     "seed": "tsc && node ./dist/seed.js",
     "lint": "eslint .",
