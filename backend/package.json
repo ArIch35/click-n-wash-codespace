@@ -7,8 +7,11 @@
   "scripts": {
     "test": "ts-mocha src/**/*.spec.ts --exit",
     "build": "tsc",
+    "clean": "tsc --build --clean",
     "dev": "tsc-watch --onSuccess \"node ./dist/index.js\"",
     "start": "node ./dist/index.js",
+    "start:background": "if pm2 status | grep -q 'click-n-wash-backend'; then pm2 restart click-n-wash-backend --update-env; else pm2 start dist/index.js --name click-n-wash-backend; fi",
+    "production": "npm run clean && npm run build && npm run start:background",
     "seed": "tsc && node ./dist/seed.js",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
