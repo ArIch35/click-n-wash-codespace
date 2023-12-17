@@ -1,11 +1,12 @@
-import { EntityManager, Repository } from 'typeorm';
-import AppDataSource from './data-source';
+import { DataSource, EntityManager, Repository } from 'typeorm';
+import createDataSource from './data-source';
 import Contract from './entities/contract';
 import Laundromat from './entities/laundromat';
 import User from './entities/user';
 import WashingMachine from './entities/washing-machine';
 
 interface Db {
+  dataSource: DataSource;
   entityManager: EntityManager;
   dropDatabase: () => Promise<void>;
   userRepository: Repository<User>;
@@ -19,19 +20,21 @@ let currentDb: Db | null = null;
 
 /**
  * Connects to the database and initializes the repositories.
+ * @param test Whether to use the test schema.
  */
 export const connectToDb = async (test?: boolean): Promise<void> => {
-  if (test) {
-    process.env['DB_NAME'] = 'unit-test-db';
+  try {
+    // Destroy the old data source if it exists
+    await getDb().dataSource.destroy();
+  } catch (error) {
+    // Do nothing
   }
 
-  if (AppDataSource.isInitialized) {
-    await AppDataSource.destroy();
-  }
-
-  const orm = await AppDataSource.initialize();
-  const em = orm.createEntityManager();
+  const schema = test ? 'cnw-schema-test' : undefined;
+  const dataSource = await createDataSource(schema);
+  const em = dataSource.createEntityManager();
   currentDb = {
+    dataSource: dataSource,
     entityManager: em,
     dropDatabase: async () => {
       await getDb().washingMachineRepository.delete({});
