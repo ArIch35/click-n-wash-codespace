@@ -13,6 +13,7 @@ services:
       POSTGRES_PASSWORD: ${DB_PASSWORD:-cnw-password}
     volumes:
       - click-n-wash-db-data:/var/lib/postgresql/data
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql
 
 volumes:
   click-n-wash-db-data:
