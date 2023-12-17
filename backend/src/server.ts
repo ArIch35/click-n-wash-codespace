@@ -3,7 +3,9 @@ import express from 'express';
 import 'reflect-metadata';
 import { connectToDb } from './db';
 
+import http from 'http';
 import checkToken from './middleware/auth.middleware';
+import createSocket from './middleware/socket.middleware';
 import contractRouter from './router/contract.router';
 import generateTokenRouter from './router/generate-token.router';
 import laundromatRouter from './router/laundromat.router';
@@ -11,8 +13,7 @@ import userRouter from './router/user.router';
 import washingMachineRouter from './router/washing-machine.router';
 import { customMessage } from './utils/http-return-messages';
 import { STATUS_NOT_FOUND, STATUS_OK } from './utils/http-status-codes';
-import http from 'http';
-import createSocket from './middleware/socket.middleware';
+import loadEnv from './utils/load-env';
 
 /**
  * Starts the server.
@@ -21,7 +22,7 @@ import createSocket from './middleware/socket.middleware';
  */
 const server = async (test?: boolean) => {
   await connectToDb(test);
-  console.log(`Connected to DB ${process.env.DB_NAME || 'cnw-db'}`);
+  console.log(`Connected to DB ${loadEnv().DB_NAME}`);
 
   const app = express();
   const server = http.createServer(app);

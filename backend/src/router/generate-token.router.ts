@@ -4,6 +4,7 @@ import { RequestHandler, Router } from 'express';
 import admin from '../firebase-admin';
 import { MESSAGE_SERVER_ERROR } from '../utils/http-return-messages';
 import { STATUS_OK, STATUS_SERVER_ERROR } from '../utils/http-status-codes';
+import loadEnv from '../utils/load-env';
 
 dotenv.config({
   path: '../.env',
@@ -21,7 +22,7 @@ router.get('/:uid', (async (req, res) => {
   const { uid } = req.params;
   try {
     const customToken = await admin.auth().createCustomToken(uid);
-    const apiKey = process.env.VITE_FIREBASE_API_KEY; // Replace with your Firebase API Key
+    const apiKey = loadEnv().VITE_FIREBASE_API_KEY; // Replace with your Firebase API Key
 
     // Exchange the custom token for an ID token
     const response = await axios.post(
