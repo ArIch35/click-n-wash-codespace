@@ -5,10 +5,16 @@ import supertest from 'supertest';
 import '../utils/load-env';
 import server from '../server';
 import firebaseAuth from '../utils/firebase';
-import { User, createUserWithEmailAndPassword, deleteUser } from 'firebase/auth';
+import {
+  User,
+  createUserWithEmailAndPassword,
+  deleteUser,
+  signInWithEmailAndPassword,
+} from 'firebase/auth';
 import getDb from '../db';
 
-const api = supertest('http://localhost:5000');
+const TEST_PORT = 5050;
+const api = supertest(`http://localhost:${TEST_PORT}`);
 
 mocha.describe('UserController', () => {
   let testServer: Server<typeof IncomingMessage, typeof ServerResponse> | null = null;
@@ -16,8 +22,8 @@ mocha.describe('UserController', () => {
   let userTest1: User | null = null;
 
   mocha.before(async () => {
-    testServer = (await server(true)).listen(5000, () => {
-      console.log('Test server is running on port 5000');
+    testServer = (await server(true)).listen(TEST_PORT, () => {
+      console.log('Test server is running on port ' + TEST_PORT);
     });
 
     await getDb().dropDatabase();
@@ -36,6 +42,19 @@ mocha.describe('UserController', () => {
    * Test the POST /users endpoint.
    */
   mocha.it('should create a new user', async () => {
+    try {
+      // If able to sign in then delete the user
+      const existingUserCredential = await signInWithEmailAndPassword(
+        firebaseAuth,
+        'testuser1@gmail.com',
+        'testuser1',
+      );
+
+      await deleteUser(existingUserCredential.user);
+    } catch (e) {
+      console.log(e);
+    }
+
     const userCredential = await createUserWithEmailAndPassword(
       firebaseAuth,
       'testuser1@gmail.com',
@@ -61,6 +80,25 @@ mocha.describe('UserController', () => {
   });
 
   /**
+   * Test to POST /users endpoint with an already existing user.
+   */
+  mocha.it('should return a conflict error', async () => {
+    const userToken = await userTest1!.getIdToken();
+    const res = await api
+      .post('/users')
+      .auth(userToken, { type: 'bearer' })
+      .send({
+        name: 'TestUser1',
+      })
+      .expect(409);
+
+    expect(res.body).to.be.an('object').contains({
+      success: false,
+      message: 'Entry Already Exist!, Cancelling....',
+    });
+  });
+
+  /**
    * Test the GET /users/:idOrEmail endpoint.
    */
   mocha.it('should return the user created in the previous test', async () => {
@@ -77,6 +115,19 @@ mocha.describe('UserController', () => {
         email: 'testuser1@gmail.com',
         id: userTest1?.uid,
       });
+  });
+
+  /**
+   * Test the GET /users/:idOrEmail endpoint with an invalid id.
+   */
+  mocha.it('should return a not found error', async () => {
+    const userToken = await userTest1!.getIdToken();
+    const res = await api.get('/users/123456').auth(userToken, { type: 'bearer' }).expect(404);
+
+    expect(res.body).to.be.an('object').contains({
+      success: false,
+      message: 'Entry Does Not Exist!',
+    });
   });
 
   /**
@@ -102,6 +153,20 @@ mocha.describe('UserController', () => {
   });
 
   /**
+   * Test the PUT /users endpoint with an invalid id.
+   */
+  mocha.it('should return a not found error', async () => {
+    const userToken = '123456';
+    await api
+      .put('/users')
+      .auth(userToken, { type: 'bearer' })
+      .send({
+        name: 'TestUser1Updated',
+      })
+      .expect(401);
+  });
+
+  /**
    * Test the DELETE /users endpoint.
    */
   mocha.it('should delete the user created in the previous test', async () => {
@@ -114,13 +179,20 @@ mocha.describe('UserController', () => {
     });
   });
 
-  mocha.after(async () => {
+  /**
+   * Test the DELETE /users endpoint with an invalid id.
+   */
+  mocha.it('should return a not found error', async () => {
+    const userToken = await userTest1!.getIdToken();
+    const res = await api.delete('/users').auth(userToken, { type: 'bearer' }).expect(404);
+
+    expect(res.body).to.be.an('object').contains({
+      success: false,
+      message: 'Entry Does Not Exist!',
+    });
+  });
+
+  mocha.after(() => {
     testServer?.close();
-
-    if (!userTest1) {
-      throw new Error('User not created');
-    }
-
-    await deleteUser(userTest1);
   });
 });
