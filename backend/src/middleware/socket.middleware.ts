@@ -15,14 +15,29 @@ const createSocket = (server: HttpServer): RequestHandler => {
 
   socket.on('connection', (client) => {
     console.log(client.id, 'connected');
-    client.on('registerUser', (userId: string) => {
+
+    client.on('registerUserToSocket', (userId: string) => {
       users[userId] = client.id;
       console.log(`${userId}:${client.id} registered`);
+      console.log(users);
+    });
+
+    client.on('deleteUserFromSocket', (userId: string | undefined) => {
+      if (!userId) {
+        return;
+      }
+      delete users[userId];
+      console.log(`${userId}:${client.id} deleted`);
+      console.log(users);
     });
   });
 
   return ((_, res, next) => {
-    res.locals.socket = socket;
+    res.locals.sendNotification = (userId: string, message: string) => {
+      if (users[userId]) {
+        socket.to(users[userId]).emit('notification', message);
+      }
+    };
     next();
   }) as RequestHandler;
 };

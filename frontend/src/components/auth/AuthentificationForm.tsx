@@ -14,11 +14,14 @@ import {
   ModalProps,
 } from '@mantine/core';
 import { GoogleButton } from './GoogleButton';
-import { createUserWithEmailAndPassword } from 'firebase/auth';
+import { createUserWithEmailAndPassword, signInWithEmailAndPassword } from 'firebase/auth';
 import firebaseAuth from '../../firebase';
+import { setUserId } from '../../reducers/notification.reducer';
+import { useDispatch } from 'react-redux';
 
 export function AuthenticationForm(props: ModalProps) {
   const [type, toggle] = useToggle(['login', 'register']);
+  const dispatch = useDispatch();
   const isMobile = useMediaQuery('(max-width: 50em)');
   const form = useForm({
     initialValues: {
@@ -102,8 +105,20 @@ export function AuthenticationForm(props: ModalProps) {
             type="submit"
             radius="xl"
             onClick={() => {
+              if (type === 'login') {
+                signInWithEmailAndPassword(firebaseAuth, form.values.email, form.values.password)
+                  .then((result) => {
+                    dispatch(setUserId(result.user?.uid || null));
+                    console.log(result);
+                  })
+                  .catch((error) => {
+                    console.error(error);
+                  });
+                return;
+              }
               createUserWithEmailAndPassword(firebaseAuth, form.values.email, form.values.password)
                 .then((result) => {
+                  dispatch(setUserId(result.user?.uid || null));
                   console.log(result);
                 })
                 .catch((error) => {
