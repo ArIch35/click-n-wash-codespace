@@ -33,7 +33,11 @@ const createSocket = (server: HttpServer): RequestHandler => {
   });
 
   return ((_, res, next) => {
-    res.locals.socket = socket;
+    res.locals.sendNotification = (userId: string, message: string) => {
+      if (users[userId]) {
+        socket.to(users[userId]).emit('notification', message);
+      }
+    };
     next();
   }) as RequestHandler;
 };

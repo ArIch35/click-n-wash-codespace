@@ -23,7 +23,7 @@ const NotificationProvider = ({ children }: NotificationProviderProps) => {
     }
 
     // Handle socket connection here
-    socket.on('message', (data) => {
+    socket.on('notification', (data) => {
       console.log('hallo', data);
     });
 
