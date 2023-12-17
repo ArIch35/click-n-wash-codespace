@@ -27,7 +27,7 @@ test-integration:
     - postgres:latest
   before_script:
     - cp ${ENV_TEST} .env
-    - yum update -y && yum install postgresql -y
+    - apk update && apk add postgresql-client
     - psql -h "postgres" -U "$POSTGRES_USER" -d "$POSTGRES_DB" -f init.sql
   script:
     - cd backend
