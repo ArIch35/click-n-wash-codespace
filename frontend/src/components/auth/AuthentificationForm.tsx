@@ -14,12 +14,17 @@ import {
   ModalProps,
 } from '@mantine/core';
 import { GoogleButton } from './GoogleButton';
-import { createUserWithEmailAndPassword, signInWithEmailAndPassword } from 'firebase/auth';
+import { User, createUserWithEmailAndPassword, signInWithEmailAndPassword } from 'firebase/auth';
 import firebaseAuth from '../../firebase';
 import { setUserId } from '../../reducers/notification.reducer';
 import { useDispatch } from 'react-redux';
+import { setAuthToken } from '../../reducers/authentication.reducer';
 
-export function AuthenticationForm(props: ModalProps) {
+interface AuthenticationFormProps extends ModalProps {
+  onSignInComplete: (email: string) => void;
+}
+
+export function AuthenticationForm({ onSignInComplete, ...props }: AuthenticationFormProps) {
   const [type, toggle] = useToggle(['login', 'register']);
   const dispatch = useDispatch();
   const isMobile = useMediaQuery('(max-width: 50em)');
@@ -37,6 +42,19 @@ export function AuthenticationForm(props: ModalProps) {
     },
   });
 
+  function onSuccessfulSignIn(user: User) {
+    dispatch(setUserId(user.uid));
+    user
+      .getIdToken()
+      .then((token) => {
+        dispatch(setAuthToken(token));
+      })
+      .catch((error) => {
+        console.error(error);
+      });
+    onSignInComplete(user.email!);
+  }
+
   return (
     <Modal
       withCloseButton={isMobile}
@@ -51,7 +69,9 @@ export function AuthenticationForm(props: ModalProps) {
       </Text>
 
       <Group grow mb="md" mt="md">
-        <GoogleButton radius="xl">Google</GoogleButton>
+        <GoogleButton radius="xl" onSuccessfulSignIn={onSuccessfulSignIn}>
+          Google
+        </GoogleButton>
       </Group>
 
       <Divider label="Or continue with email" labelPosition="center" my="lg" />
@@ -108,7 +128,7 @@ export function AuthenticationForm(props: ModalProps) {
               if (type === 'login') {
                 signInWithEmailAndPassword(firebaseAuth, form.values.email, form.values.password)
                   .then((result) => {
-                    dispatch(setUserId(result.user?.uid || null));
+                    onSuccessfulSignIn(result.user);
                     console.log(result);
                   })
                   .catch((error) => {
@@ -118,7 +138,7 @@ export function AuthenticationForm(props: ModalProps) {
               }
               createUserWithEmailAndPassword(firebaseAuth, form.values.email, form.values.password)
                 .then((result) => {
-                  dispatch(setUserId(result.user?.uid || null));
+                  onSuccessfulSignIn(result.user);
                   console.log(result);
                 })
                 .catch((error) => {
