@@ -20,8 +20,11 @@ import {
 const router: Router = Router();
 
 router.get('/', (async (_, res) => {
+  const id = res.locals.uid as string;
   try {
-    const contracts = await getDb().contractRepository.find();
+    const contracts = await getDb().contractRepository.find({
+      where: [{ user: { id } }, { washingMachine: { laundromat: { owner: { id } } } }],
+    });
     return res.status(STATUS_OK).json(contracts);
   } catch (error) {
     return res.status(STATUS_SERVER_ERROR).json(MESSAGE_SERVER_ERROR);
@@ -29,9 +32,13 @@ router.get('/', (async (_, res) => {
 }) as RequestHandler);
 
 router.get('/:id', (async (req, res) => {
+  const id = res.locals.uid as string;
   try {
     const contract = await getDb().contractRepository.findOne({
-      where: { id: req.params.id },
+      where: [
+        { id: req.params.id, user: { id } },
+        { id: req.params.id, washingMachine: { laundromat: { owner: { id } } } },
+      ],
     });
     if (!contract) {
       return res.status(STATUS_NOT_FOUND).json(MESSAGE_NOT_FOUND);

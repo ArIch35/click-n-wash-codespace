@@ -13,6 +13,7 @@ import {
   STATUS_BAD_REQUEST,
   STATUS_CONFLICT,
   STATUS_CREATED,
+  STATUS_FORBIDDEN,
   STATUS_NOT_FOUND,
   STATUS_OK,
   STATUS_SERVER_ERROR,
@@ -20,15 +21,11 @@ import {
 
 const router: Router = Router();
 
-router.get('/', (async (_, res) => {
-  try {
-    //! To be removed or made unauthorized
-    const users = await getDb().userRepository.find();
-    return res.status(STATUS_OK).json(users);
-  } catch (error) {
-    return res.status(STATUS_SERVER_ERROR).json(MESSAGE_SERVER_ERROR);
-  }
-}) as RequestHandler);
+router.get('/', (_, res) => {
+  return res
+    .status(STATUS_FORBIDDEN)
+    .json(customMessage(false, 'You are not allowed to see lists of users!'));
+});
 
 router.get('/:idOrEmail', (async (req, res) => {
   try {
@@ -91,6 +88,23 @@ router.put('/', (async (req, res) => {
     if (!userExists) {
       return res.status(STATUS_NOT_FOUND).json(MESSAGE_NOT_FOUND);
     }
+
+    // Check whether the user was a vendor, and trying to disable it
+    if (userExists.isAlsoVendor && !validated.isAlsoVendor) {
+      const laundromatExists = await getDb().laundromatRepository.findOne({
+        where: {
+          owner: {
+            id: uid,
+          },
+        },
+      });
+      if (laundromatExists) {
+        return res
+          .status(STATUS_BAD_REQUEST)
+          .json(customMessage(false, 'Cannot disable vendor status while owning a laundromat'));
+      }
+    }
+
     getDb().userRepository.merge(userExists, validated);
     const result = await getDb().userRepository.save(userExists);
     return res.status(STATUS_OK).json(result);

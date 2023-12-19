@@ -1,7 +1,7 @@
 import { RequestHandler } from 'express';
-import { Server } from 'socket.io';
 import { Server as HttpServer } from 'http';
-import { users } from './users';
+import { Server } from 'socket.io';
+import { users } from '../utils/constants';
 
 // Middleware
 const createSocket = (server: HttpServer): RequestHandler => {
