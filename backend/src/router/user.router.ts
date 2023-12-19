@@ -88,6 +88,23 @@ router.put('/', (async (req, res) => {
     if (!userExists) {
       return res.status(STATUS_NOT_FOUND).json(MESSAGE_NOT_FOUND);
     }
+
+    // Check whether the user was a vendor, and trying to disable it
+    if (userExists.isAlsoVendor && !validated.isAlsoVendor) {
+      const laundromatExists = await getDb().laundromatRepository.findOne({
+        where: {
+          owner: {
+            id: uid,
+          },
+        },
+      });
+      if (laundromatExists) {
+        return res
+          .status(STATUS_BAD_REQUEST)
+          .json(customMessage(false, 'Cannot disable vendor status while owning a laundromat'));
+      }
+    }
+
     getDb().userRepository.merge(userExists, validated);
     const result = await getDb().userRepository.save(userExists);
     return res.status(STATUS_OK).json(result);
