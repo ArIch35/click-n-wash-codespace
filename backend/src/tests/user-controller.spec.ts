@@ -1,17 +1,17 @@
 import { expect } from 'chai';
-import { IncomingMessage, Server, ServerResponse } from 'http';
-import mocha from 'mocha';
-import supertest from 'supertest';
-import '../utils/load-env';
-import server from '../server';
-import firebaseAuth from '../utils/firebase';
 import {
   User,
   createUserWithEmailAndPassword,
   deleteUser,
   signInWithEmailAndPassword,
 } from 'firebase/auth';
+import { IncomingMessage, Server, ServerResponse } from 'http';
+import mocha from 'mocha';
+import supertest from 'supertest';
 import getDb from '../db';
+import server from '../server';
+import firebaseAuth from '../utils/firebase';
+import '../utils/load-env';
 
 const TEST_PORT = 5050;
 const api = supertest(`http://localhost:${TEST_PORT}`);
@@ -32,10 +32,12 @@ mocha.describe('UserController', () => {
   /**
    * Test the GET /users endpoint.
    */
-  mocha.it('should return an empty list of users', async () => {
-    const res = await api.get('/users').expect(200);
-    console.log(res.body);
-    expect(res.body).to.be.an('array');
+  mocha.it('should return a 401 unauthorized', async () => {
+    const res = await api.get('/users').expect(401);
+    expect(res.body).to.be.an('object').contains({
+      success: false,
+      message: 'Authorization Header is Missing!',
+    });
   });
 
   /**
@@ -76,6 +78,18 @@ mocha.describe('UserController', () => {
       name: 'TestUser1',
       email: 'testuser1@gmail.com',
       id: userTest1.uid,
+    });
+  });
+
+  /**
+   * Test the GET /users endpoint with a token.
+   */
+  mocha.it('should return a 403 forbidden', async () => {
+    const userToken = await userTest1!.getIdToken();
+    const res = await api.get('/users').auth(userToken, { type: 'bearer' }).expect(403);
+    expect(res.body).to.be.an('object').contains({
+      success: false,
+      message: 'You are not allowed to see lists of users!',
     });
   });
 
