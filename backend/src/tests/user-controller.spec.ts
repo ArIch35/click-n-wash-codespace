@@ -206,6 +206,35 @@ mocha.describe('UserController', () => {
     });
   });
 
+  /**
+   * Test the POST /users/restore endpoint.
+   */
+  mocha.it('should restore the user created in the previous test', async () => {
+    const userToken = await userTest1!.getIdToken();
+    const res = await api.post('/users/restore').auth(userToken, { type: 'bearer' }).expect(200);
+
+    expect(res.body)
+      .to.be.an('object')
+      .contains({
+        name: 'TestUser1Updated',
+        email: 'testuser1@gmail.com',
+        id: userTest1?.uid,
+      });
+  });
+
+  /**
+   * Test the POST /users/restore endpoint with a restored user.
+   */
+  mocha.it('should return a conflict error', async () => {
+    const userToken = await userTest1!.getIdToken();
+    const res = await api.post('/users/restore').auth(userToken, { type: 'bearer' }).expect(409);
+
+    expect(res.body).to.be.an('object').contains({
+      success: false,
+      message: 'User is not deleted',
+    });
+  });
+
   mocha.after(() => {
     testServer?.close();
   });
