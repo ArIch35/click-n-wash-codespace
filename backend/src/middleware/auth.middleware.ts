@@ -1,13 +1,18 @@
 import { RequestHandler } from 'express';
 import { FirebaseError } from 'firebase-admin';
 import admin from '../firebase-admin';
+import { routesWithoutAuth } from '../utils/constants';
 import { customMessage } from '../utils/http-return-messages';
 import { STATUS_UNAUTHORIZED } from '../utils/http-status-codes';
 
 // Middleware
 const checkToken: RequestHandler = (async (req, res, next) => {
-  // Skip authentication on GET requests
-  if (req.method === 'GET') {
+  const skipAuth = routesWithoutAuth.some(
+    (route) =>
+      route.path.toLocaleLowerCase() === req.path.toLocaleLowerCase() &&
+      route.method.toLocaleLowerCase() === req.method.toLocaleLowerCase(),
+  );
+  if (skipAuth) {
     return next();
   }
 
