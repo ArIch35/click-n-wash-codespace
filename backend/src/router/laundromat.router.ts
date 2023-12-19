@@ -48,11 +48,14 @@ router.post('/', (async (req, res) => {
       strict: true,
     });
 
-    // Check whether the owner exists
+    // Check whether the owner exists and is a vendor
     const uid = res.locals.uid as string;
     const user = await getDb().userRepository.findOne({ where: { id: uid } });
     if (!user) {
       return res.status(STATUS_BAD_REQUEST).json(customMessage(false, 'User does not exist'));
+    }
+    if (!user.isAlsoVendor) {
+      return res.status(STATUS_FORBIDDEN).json(customMessage(false, 'User is not a vendor'));
     }
 
     const laundromat = getDb().laundromatRepository.create({
@@ -87,10 +90,13 @@ router.put('/:id', (async (req, res) => {
       return res.status(STATUS_NOT_FOUND).json(MESSAGE_NOT_FOUND);
     }
 
-    // Check whether the owner of the laundromat is the same as the user
+    // Check whether the owner of the laundromat is the same as the user and is a vendor
     const uid = res.locals.uid as string;
     if (laundromatExists.owner.id !== uid) {
       return res.status(STATUS_FORBIDDEN).json(MESSAGE_FORBIDDEN_NOT_OWNER);
+    }
+    if (!laundromatExists.owner.isAlsoVendor) {
+      return res.status(STATUS_FORBIDDEN).json(customMessage(false, 'User is not a vendor'));
     }
 
     getDb().laundromatRepository.merge(laundromatExists, validated);
@@ -116,10 +122,13 @@ router.delete('/:id', (async (req, res) => {
       return res.status(STATUS_NOT_FOUND).json(MESSAGE_NOT_FOUND);
     }
 
-    // Check whether the owner of the laundromat is the same as the user
+    // Check whether the owner of the laundromat is the same as the user and is a vendor
     const uid = res.locals.uid as string;
     if (laundromatExists.owner.id !== uid) {
       return res.status(STATUS_FORBIDDEN).json(MESSAGE_FORBIDDEN_NOT_OWNER);
+    }
+    if (!laundromatExists.owner.isAlsoVendor) {
+      return res.status(STATUS_FORBIDDEN).json(customMessage(false, 'User is not a vendor'));
     }
 
     await getDb().laundromatRepository.delete({ id: req.params.id });
