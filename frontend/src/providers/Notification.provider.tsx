@@ -3,7 +3,8 @@ import { useSelector } from 'react-redux';
 import { Socket, io } from 'socket.io-client';
 import { RootState } from '../reducers/root.reducer';
 import loadEnv from '../utils/load-env';
-export const NotificationContext = createContext<null>(null);
+
+const NotificationContext = createContext<null>(null);
 
 interface NotificationProviderProps {
   children: React.ReactNode;
