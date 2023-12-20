@@ -2,7 +2,9 @@ import React, { createContext, useEffect } from 'react';
 import { useSelector } from 'react-redux';
 import { Socket, io } from 'socket.io-client';
 import { RootState } from '../reducers/root.reducer';
-export const NotificationContext = createContext<null>(null);
+import loadEnv from '../utils/load-env';
+
+const NotificationContext = createContext<null>(null);
 
 interface NotificationProviderProps {
   children: React.ReactNode;
@@ -10,7 +12,7 @@ interface NotificationProviderProps {
 
 const NotificationProvider = ({ children }: NotificationProviderProps) => {
   const userIdFromReducer = useSelector((state: RootState) => state.notificationState.userId);
-  const socket: Socket = io(import.meta.env.VITE_SERVER_ADDRESS as string);
+  const socket: Socket = io(loadEnv().VITE_SERVER_ADDRESS);
 
   useEffect(() => {
     if (userIdFromReducer) {

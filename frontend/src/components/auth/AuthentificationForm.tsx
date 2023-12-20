@@ -1,32 +1,24 @@
-import { useToggle, upperFirst, useMediaQuery } from '@mantine/hooks';
-import { useForm } from '@mantine/form';
 import {
-  TextInput,
-  PasswordInput,
-  Text,
-  Group,
-  Button,
-  Divider,
-  Checkbox,
   Anchor,
-  Stack,
+  Button,
+  Checkbox,
+  Divider,
+  Group,
   Modal,
   ModalProps,
+  PasswordInput,
+  Stack,
+  Text,
+  TextInput,
 } from '@mantine/core';
-import { GoogleButton } from './GoogleButton';
-import { User, createUserWithEmailAndPassword, signInWithEmailAndPassword } from 'firebase/auth';
+import { useForm } from '@mantine/form';
+import { upperFirst, useMediaQuery, useToggle } from '@mantine/hooks';
+import { createUserWithEmailAndPassword, signInWithEmailAndPassword } from 'firebase/auth';
 import firebaseAuth from '../../firebase';
-import { setUserId } from '../../reducers/notification.reducer';
-import { useDispatch } from 'react-redux';
-import { setAuthToken } from '../../reducers/authentication.reducer';
+import { GoogleButton } from './GoogleButton';
 
-interface AuthenticationFormProps extends ModalProps {
-  onSignInComplete: (email: string) => void;
-}
-
-export function AuthenticationForm({ onSignInComplete, ...props }: AuthenticationFormProps) {
+export function AuthenticationForm({ ...props }: ModalProps) {
   const [type, toggle] = useToggle(['login', 'register']);
-  const dispatch = useDispatch();
   const isMobile = useMediaQuery('(max-width: 50em)');
   const form = useForm({
     initialValues: {
@@ -42,19 +34,6 @@ export function AuthenticationForm({ onSignInComplete, ...props }: Authenticatio
     },
   });
 
-  function onSuccessfulSignIn(user: User) {
-    dispatch(setUserId(user.uid));
-    user
-      .getIdToken()
-      .then((token) => {
-        dispatch(setAuthToken(token));
-      })
-      .catch((error) => {
-        console.error(error);
-      });
-    onSignInComplete(user.email!);
-  }
-
   return (
     <Modal
       withCloseButton={isMobile}
@@ -69,7 +48,7 @@ export function AuthenticationForm({ onSignInComplete, ...props }: Authenticatio
       </Text>
 
       <Group grow mb="md" mt="md">
-        <GoogleButton radius="xl" onSuccessfulSignIn={onSuccessfulSignIn}>
+        <GoogleButton radius="xl" onSuccessfulSignIn={() => props.onClose()}>
           Google
         </GoogleButton>
       </Group>
@@ -126,24 +105,18 @@ export function AuthenticationForm({ onSignInComplete, ...props }: Authenticatio
             radius="xl"
             onClick={() => {
               if (type === 'login') {
-                signInWithEmailAndPassword(firebaseAuth, form.values.email, form.values.password)
-                  .then((result) => {
-                    onSuccessfulSignIn(result.user);
-                    console.log(result);
-                  })
-                  .catch((error) => {
-                    console.error(error);
-                  });
+                signInWithEmailAndPassword(
+                  firebaseAuth,
+                  form.values.email,
+                  form.values.password,
+                ).catch((error) => console.error(error));
                 return;
               }
-              createUserWithEmailAndPassword(firebaseAuth, form.values.email, form.values.password)
-                .then((result) => {
-                  onSuccessfulSignIn(result.user);
-                  console.log(result);
-                })
-                .catch((error) => {
-                  console.error(error);
-                });
+              createUserWithEmailAndPassword(
+                firebaseAuth,
+                form.values.email,
+                form.values.password,
+              ).catch((error) => console.error(error));
             }}
           >
             {upperFirst(type)}

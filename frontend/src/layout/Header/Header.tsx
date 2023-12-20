@@ -1,8 +1,13 @@
-import { Group, Burger, Button, Anchor } from '@mantine/core';
-import classes from './Header.module.css';
-import { AuthenticationForm } from '../../components/auth/AuthentificationForm';
+import { Burger, Button, Group } from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
-import { useState } from 'react';
+import { signOut } from 'firebase/auth';
+import React from 'react';
+import { useSelector } from 'react-redux';
+import AuthAnchor from '../../components/auth/AuthAnchor';
+import { AuthenticationForm } from '../../components/auth/AuthentificationForm';
+import firebaseAuth from '../../firebase';
+import { RootState } from '../../reducers/root.reducer';
+import classes from './Header.module.css';
 
 const links = [{ link: '/about', label: 'Login / Register' }];
 
@@ -12,43 +17,40 @@ interface HeaderProps {
 }
 
 const Header = ({ toggle, setVisible }: HeaderProps) => {
+  const user = useSelector((state: RootState) => state.authenticationState.user);
   const [modalOpened, modalHandlers] = useDisclosure(false);
-  const [loggedIn, setLoggedIn] = useState(false);
-  const [email, setEmail] = useState('');
+
+  const loggedIn = React.useMemo(() => user, [user]);
 
   const items = links.map((link) =>
     !loggedIn ? (
-      <Anchor
+      <AuthAnchor
         key={link.label}
-        underline="hover"
+        link={link}
         className={classes.link}
         onClick={(event) => {
           event.preventDefault();
           modalHandlers.open();
         }}
-      >
-        {link.label}
-      </Anchor>
+      />
     ) : (
-      <p key={'email'}>{email}</p>
+      <AuthAnchor
+        key={'Logout'}
+        link={{ label: 'Logout' }}
+        className={classes.link}
+        onClick={() => {
+          signOut(firebaseAuth).catch((error) => {
+            console.error(error);
+          });
+        }}
+      />
     ),
   );
-  function onSignInComplete(email: string): void {
-    setLoggedIn(true);
-    setEmail(email);
-    modalHandlers.close();
-  }
 
   return (
     <header className={classes.header}>
       <div className={classes.inner}>
-        {!loggedIn && (
-          <AuthenticationForm
-            opened={modalOpened}
-            onClose={modalHandlers.close}
-            onSignInComplete={onSignInComplete}
-          />
-        )}
+        {!loggedIn && <AuthenticationForm opened={modalOpened} onClose={modalHandlers.close} />}
         <Group>
           <Burger
             onClick={() => {
