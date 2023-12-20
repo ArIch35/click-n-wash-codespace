@@ -35,7 +35,8 @@ const loadEnv = () => {
     VITE_FIREBASE_MESSAGING_SENDER_ID: import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID as string,
     VITE_FIREBASE_APP_ID: import.meta.env.VITE_FIREBASE_APP_ID as string,
     VITE_FIREBASE_MEASUREMENT_ID: import.meta.env.VITE_FIREBASE_MEASUREMENT_ID as string,
-    VITE_SERVER_ADDRESS: (import.meta.env.VITE_SERVER_ADDRESS as string) || 'http://localhost:8080',
+    VITE_SERVER_ADDRESS:
+      (import.meta.env.VITE_SERVER_ADDRESS as string) || 'http://localhost:8080/api',
   };
 };
 

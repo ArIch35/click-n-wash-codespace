@@ -20,7 +20,7 @@ const createDataSource = (schema?: string) => {
     database: loadEnv().DB_NAME,
     schema: schema || 'cnw-schema',
     synchronize: true,
-    logging: true,
+    logging: false,
     entities: [User, Laundromat, WashingMachine, Contract],
     subscribers: [],
     migrations: [],

@@ -62,7 +62,7 @@ const loadEnv = () => {
     VITE_FIREBASE_MESSAGING_SENDER_ID: process.env.VITE_FIREBASE_MESSAGING_SENDER_ID,
     VITE_FIREBASE_APP_ID: process.env.VITE_FIREBASE_APP_ID,
     VITE_FIREBASE_MEASUREMENT_ID: process.env.VITE_FIREBASE_MEASUREMENT_ID,
-    VITE_SERVER_ADDRESS: process.env.VITE_SERVER_ADDRESS || 'http://localhost:8080',
+    VITE_SERVER_ADDRESS: process.env.VITE_SERVER_ADDRESS || 'http://localhost:8080/api',
   };
 };
 

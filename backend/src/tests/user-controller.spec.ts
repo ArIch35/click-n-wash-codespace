@@ -14,7 +14,7 @@ import firebaseAuth from '../utils/firebase';
 import '../utils/load-env';
 
 const TEST_PORT = 5050;
-const api = supertest(`http://localhost:${TEST_PORT}`);
+const api = supertest(`http://localhost:${TEST_PORT}/api`);
 
 mocha.describe('UserController', () => {
   let testServer: Server<typeof IncomingMessage, typeof ServerResponse> | null = null;

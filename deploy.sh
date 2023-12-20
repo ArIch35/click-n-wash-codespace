@@ -70,7 +70,7 @@ location /api {
     proxy_set_header    X-Real-IP        \$remote_addr;
     proxy_set_header    X-Forwarded-For  \$proxy_add_x_forwarded_for;
     proxy_set_header    X-Forwarded-Proto https;
-    proxy_pass http://localhost:$PORT/;
+    proxy_pass http://localhost:$PORT/api;
 }"
 
 # Check whether config is empty

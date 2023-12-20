@@ -1,16 +1,16 @@
 import { expect } from 'chai';
+import { User, UserCredential, createUserWithEmailAndPassword, deleteUser } from 'firebase/auth';
 import { IncomingMessage, Server, ServerResponse } from 'http';
 import mocha from 'mocha';
 import supertest from 'supertest';
-import '../utils/load-env';
+import getDb from '../db';
 import server from '../server';
 import firebaseAuth from '../utils/firebase';
-import { User, UserCredential, createUserWithEmailAndPassword, deleteUser } from 'firebase/auth';
-import getDb from '../db';
+import '../utils/load-env';
 
 const TEST_PORT = 5050;
 const ROUTER_NAME = '/laundromats';
-const api = supertest(`http://localhost:${TEST_PORT}`);
+const api = supertest(`http://localhost:${TEST_PORT}/api`);
 
 mocha.describe('LaudromatController', () => {
   let testServer: Server<typeof IncomingMessage, typeof ServerResponse> | null = null;
