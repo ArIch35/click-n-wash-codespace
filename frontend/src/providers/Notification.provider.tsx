@@ -11,26 +11,36 @@ interface NotificationProviderProps {
 }
 
 const NotificationProvider = ({ children }: NotificationProviderProps) => {
-  const userIdFromReducer = useSelector((state: RootState) => state.notificationState.userId);
-  const socket: Socket = io(loadEnv().VITE_SERVER_ADDRESS);
+  const user = useSelector((state: RootState) => state.authenticationState.user);
+  const socket: Socket = io(loadEnv().VITE_SERVER_ADDRESS.replace('/api', ''), {
+    autoConnect: false,
+  });
+
+  // Handle socket connection here
+  socket.on('notification', (data) => {
+    console.log('Message from server:', data);
+  });
+
+  socket.on('connect', () => {
+    socket.emit('registerUserToSocket', user?.id);
+    console.log('Connected to server');
+  });
+
+  socket.on('disconnect', () => {
+    console.log('Disconnected from server');
+  });
 
   useEffect(() => {
-    if (userIdFromReducer) {
-      socket.emit('registerUserToSocket', userIdFromReducer);
+    if (!user) {
+      return;
     }
+    socket.connect();
 
-    function endConnection(): void {
-      socket.emit('deleteUserFromSocket', userIdFromReducer);
+    return () => {
+      socket.emit('deleteUserFromSocket', user?.id);
       socket.disconnect();
-    }
-
-    // Handle socket connection here
-    socket.on('notification', (data) => {
-      console.log('hallo', data);
-    });
-
-    return () => endConnection();
-  }, [userIdFromReducer, socket]);
+    };
+  }, [user, socket]);
 
   return <NotificationContext.Provider value={null}>{children}</NotificationContext.Provider>;
 };
