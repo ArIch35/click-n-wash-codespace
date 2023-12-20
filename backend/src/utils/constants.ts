@@ -6,11 +6,11 @@ interface RoutePair {
 export const users: Record<string, string> = {};
 
 export const routesWithoutAuth: RoutePair[] = [
-  { path: '/laundromats', method: 'GET' },
+  { path: '/api/laundromats', method: 'GET' },
   {
-    path: '/washingmachine',
+    path: '/api/washingmachine',
     method: 'GET',
   },
-  { path: '/generateToken', method: 'GET' },
+  { path: '/api/generateToken', method: 'GET' },
   // Add more routes that should be accessible without auth here
 ];
