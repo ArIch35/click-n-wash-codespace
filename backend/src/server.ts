@@ -34,14 +34,14 @@ const server = async (test?: boolean) => {
   app.use(createSocket(server));
   // Add middleware here
 
-  app.use('/users', userRouter);
-  app.use('/laundromats', laundromatRouter);
-  app.use('/washingmachines', washingMachineRouter);
-  app.use('/contracts', contractRouter);
-  app.use('/generateToken', generateTokenRouter);
+  app.use('/api/users', userRouter);
+  app.use('/api/laundromats', laundromatRouter);
+  app.use('/api/washingmachines', washingMachineRouter);
+  app.use('/api/contracts', contractRouter);
+  app.use('/api/generateToken', generateTokenRouter);
   // Add routes here
 
-  app.get('/', (_req, res) => {
+  app.use('/', (_req, res) => {
     res.status(STATUS_OK).send(customMessage(true, 'Server is running'));
   });
 
