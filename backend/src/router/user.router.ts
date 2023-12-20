@@ -58,8 +58,19 @@ router.post('/', (async (req, res) => {
 
     const userExists = await getDb().userRepository.findOne({
       where: [{ id: uid }, { email }],
+      withDeleted: true,
     });
     if (userExists) {
+      if (userExists.deletedAt) {
+        return res
+          .status(STATUS_CONFLICT)
+          .json(
+            customMessage(
+              false,
+              'User already deleted, please restore it first by requesting POST /users/restore',
+            ),
+          );
+      }
       return res.status(STATUS_CONFLICT).json(MESSAGE_CONFLICT_UNRESOLVED);
     }
 
@@ -71,6 +82,27 @@ router.post('/', (async (req, res) => {
     } else {
       return res.status(STATUS_SERVER_ERROR).json(MESSAGE_SERVER_ERROR);
     }
+  }
+}) as RequestHandler);
+
+router.post('/restore', (async (_req, res) => {
+  try {
+    const uid = res.locals.uid as string;
+    const userExists = await getDb().userRepository.findOne({
+      where: { id: uid },
+      withDeleted: true,
+    });
+    if (!userExists) {
+      return res.status(STATUS_NOT_FOUND).json(MESSAGE_NOT_FOUND);
+    }
+    if (!userExists.deletedAt) {
+      return res.status(STATUS_CONFLICT).json(customMessage(false, 'User is not deleted'));
+    }
+    await getDb().userRepository.restore({ id: uid });
+    userExists.deletedAt = undefined;
+    return res.status(STATUS_OK).json(userExists);
+  } catch (error: unknown) {
+    return res.status(STATUS_SERVER_ERROR).json(MESSAGE_SERVER_ERROR);
   }
 }) as RequestHandler);
 
@@ -124,7 +156,24 @@ router.delete('/', (async (_req, res) => {
     if (!userExists) {
       return res.status(STATUS_NOT_FOUND).json(MESSAGE_NOT_FOUND);
     }
-    await getDb().userRepository.delete({ id: uid });
+
+    // Check whether the user is a vendor, and owns a laundromat
+    if (userExists.isAlsoVendor) {
+      const laundromatExists = await getDb().laundromatRepository.findOne({
+        where: {
+          owner: {
+            id: uid,
+          },
+        },
+      });
+      if (laundromatExists) {
+        return res
+          .status(STATUS_CONFLICT)
+          .json(customMessage(false, 'Cannot delete user while owning a laundromat'));
+      }
+    }
+
+    await getDb().userRepository.softDelete({ id: uid });
     return res.status(STATUS_OK).json(MESSAGE_OK);
   } catch (error: unknown) {
     return res.status(STATUS_SERVER_ERROR).json(MESSAGE_SERVER_ERROR);

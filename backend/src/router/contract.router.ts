@@ -24,6 +24,7 @@ router.get('/', (async (_, res) => {
   try {
     const contracts = await getDb().contractRepository.find({
       where: [{ user: { id } }, { washingMachine: { laundromat: { owner: { id } } } }],
+      withDeleted: true,
     });
     return res.status(STATUS_OK).json(contracts);
   } catch (error) {
@@ -39,6 +40,7 @@ router.get('/:id', (async (req, res) => {
         { id: req.params.id, user: { id } },
         { id: req.params.id, washingMachine: { laundromat: { owner: { id } } } },
       ],
+      withDeleted: true,
     });
     if (!contract) {
       return res.status(STATUS_NOT_FOUND).json(MESSAGE_NOT_FOUND);

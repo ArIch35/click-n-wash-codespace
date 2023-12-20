@@ -12,6 +12,7 @@ import {
 } from '../utils/http-return-messages';
 import {
   STATUS_BAD_REQUEST,
+  STATUS_CONFLICT,
   STATUS_FORBIDDEN,
   STATUS_NOT_FOUND,
   STATUS_OK,
@@ -116,7 +117,7 @@ router.delete('/:id', (async (req, res) => {
   try {
     const laundromatExists = await getDb().laundromatRepository.findOne({
       where: { id: req.params.id },
-      relations: ['owner'],
+      relations: ['owner', 'washingMachines'],
     });
     if (!laundromatExists) {
       return res.status(STATUS_NOT_FOUND).json(MESSAGE_NOT_FOUND);
@@ -131,7 +132,14 @@ router.delete('/:id', (async (req, res) => {
       return res.status(STATUS_FORBIDDEN).json(customMessage(false, 'User is not a vendor'));
     }
 
-    await getDb().laundromatRepository.delete({ id: req.params.id });
+    // Check whether the laundromat still has washing machines
+    if (laundromatExists.washingMachines && laundromatExists.washingMachines.length > 0) {
+      return res
+        .status(STATUS_CONFLICT)
+        .json(customMessage(false, 'Laundromat still has washing machines'));
+    }
+
+    await getDb().laundromatRepository.softDelete({ id: req.params.id });
     return res.status(STATUS_OK).json(MESSAGE_OK);
   } catch (error: unknown) {
     return res.status(STATUS_SERVER_ERROR).json(MESSAGE_SERVER_ERROR);

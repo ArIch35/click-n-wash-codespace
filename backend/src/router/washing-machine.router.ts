@@ -15,6 +15,7 @@ import {
 } from '../utils/http-return-messages';
 import {
   STATUS_BAD_REQUEST,
+  STATUS_CONFLICT,
   STATUS_FORBIDDEN,
   STATUS_NOT_FOUND,
   STATUS_OK,
@@ -131,7 +132,24 @@ router.delete('/:id', (async (req, res) => {
       return res.status(STATUS_FORBIDDEN).json(MESSAGE_FORBIDDEN_NOT_OWNER);
     }
 
-    await getDb().washingMachineRepository.delete({ id: req.params.id });
+    // Check whether the washing machine has any reservations
+    const reservations = await getDb().contractRepository.find({
+      where: {
+        washingMachine: {
+          id: req.params.id,
+        },
+        status: 'ongoing',
+      },
+    });
+    if (reservations.length > 0) {
+      return res
+        .status(STATUS_CONFLICT)
+        .json(
+          customMessage(false, `Washing machine has ${reservations.length} ongoing reservations`),
+        );
+    }
+
+    await getDb().washingMachineRepository.softDelete({ id: req.params.id });
     return res.status(STATUS_OK).json(MESSAGE_OK);
   } catch (error: unknown) {
     return res.status(STATUS_SERVER_ERROR).json(MESSAGE_SERVER_ERROR);
