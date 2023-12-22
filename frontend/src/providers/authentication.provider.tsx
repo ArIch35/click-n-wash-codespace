@@ -39,35 +39,40 @@ const signInToBackend = async (name: string) => {
 
 const AuthenticationProvider = ({ children }: AuthenticationProviderProps) => {
   const dispatch = useDispatch();
+  const [fetched, setFetched] = React.useState(false);
+
   React.useEffect(() => {
     const unsubscribe = firebaseAuth.onAuthStateChanged((user) => {
       const firebaseUser = user;
       if (!firebaseUser) {
         dispatch(setAuth(null));
         dispatch(setUser(null));
+        setFetched(true);
         return;
       }
       firebaseUser
         .getIdToken()
-        .then((token) => {
-          const { providerId, email, displayName } = user;
-          signInToBackend(displayName || email || 'No name')
-            .then((user) => {
-              dispatch(setUser(user));
-              dispatch(setAuth({ token, providerId }));
-            })
-            .catch((error) => {
-              console.error(error);
-            });
+        .then(async (token) => {
+          const { providerId, email, displayName } = firebaseUser;
+          const user = await signInToBackend(displayName || email || 'No name');
+          dispatch(setUser(user));
+          dispatch(setAuth({ token, providerId }));
         })
         .catch((error) => {
           console.error(error);
+        })
+        .finally(() => {
+          setFetched(true);
         });
     });
     return () => unsubscribe();
   }, [dispatch]);
 
-  return <AuthenticationContext.Provider value={null}>{children}</AuthenticationContext.Provider>;
+  return (
+    <AuthenticationContext.Provider value={null}>
+      {fetched && children}
+    </AuthenticationContext.Provider>
+  );
 };
 
 export default AuthenticationProvider;
