@@ -1,5 +1,12 @@
 import { Group, Text } from '@mantine/core';
-import { IconBook2, IconHome, IconSettings, IconTransactionEuro } from '@tabler/icons-react';
+import {
+  IconBook2,
+  IconBuildingStore,
+  IconHome,
+  IconSettings,
+  IconTransactionEuro,
+  TablerIconsProps,
+} from '@tabler/icons-react';
 import { useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
@@ -10,10 +17,18 @@ import { RootState } from '../../reducers/root.reducer';
 import { updateUser } from '../../utils/api-functions';
 import classes from './Navbar.module.css';
 
-const data = [
+interface NavbarItem {
+  link: string;
+  label: string;
+  icon: (props: TablerIconsProps) => JSX.Element;
+  vendorOnly?: boolean;
+}
+
+const data: NavbarItem[] = [
   { link: '/', label: 'Home', icon: IconHome },
   { link: '/bookings', label: 'Manage bookings', icon: IconBook2 },
   { link: '/balance', label: 'Balance', icon: IconTransactionEuro },
+  { link: '/laundromats', label: 'Manage laundromats', icon: IconBuildingStore, vendorOnly: true },
 ];
 
 const Navbar = ({ toggle, setVisible }: NavbarControllerProps) => {
@@ -52,6 +67,7 @@ const Navbar = ({ toggle, setVisible }: NavbarControllerProps) => {
       data-active={item.label === active || undefined}
       href={item.link}
       key={item.label}
+      style={{ display: item.vendorOnly && !user?.isAlsoVendor ? 'none' : 'inherit' }}
       onClick={(event) => {
         event.preventDefault();
         navOnClick(item.label, item.link);
