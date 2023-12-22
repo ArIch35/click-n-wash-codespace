@@ -20,7 +20,8 @@ const HomePage = () => {
         console.error(e);
       }
     }
-  });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   useEffect(() => {
     localStorage.setItem('location-form', form.values.location);
