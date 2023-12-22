@@ -1,7 +1,6 @@
-import BaseLayout from '../layout/BaseLayout';
-import InputSelect from '../components/inputs/InputSelect';
 import { useForm } from '@mantine/form';
 import { useEffect } from 'react';
+import InputSelect from '../components/inputs/InputSelect';
 
 const HomePage = () => {
   const form = useForm({
@@ -28,16 +27,14 @@ const HomePage = () => {
   }, [form.values]);
 
   return (
-    <BaseLayout>
-      <InputSelect
-        name="test"
-        options={[
-          { value: 'test', label: 'test' },
-          { value: 'test2', label: 'test2' },
-        ]}
-        {...form.getInputProps('location')}
-      />
-    </BaseLayout>
+    <InputSelect
+      name="test"
+      options={[
+        { value: 'test', label: 'test' },
+        { value: 'test2', label: 'test2' },
+      ]}
+      {...form.getInputProps('location')}
+    />
   );
 };
 
