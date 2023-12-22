@@ -50,6 +50,10 @@ const Header = ({ toggle, setVisible }: NavbarControllerProps) => {
         <Group>
           <Burger
             onClick={() => {
+              if (!loggedIn) {
+                modalHandlers.open();
+                return;
+              }
               toggle();
               setVisible(true);
             }}
