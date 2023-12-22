@@ -1,7 +1,7 @@
 import React from 'react';
 import { useDispatch } from 'react-redux';
 import firebaseAuth from '../firebase';
-import User from '../interfaces/entities/user';
+import User, { CreateUser } from '../interfaces/entities/user';
 import { setAuth, setUser } from '../reducers/authentication.reducer';
 import { createUser, getUser } from '../utils/api-functions';
 
@@ -22,7 +22,7 @@ const signInToBackend = async (name: string) => {
     throw new Error('User is not logged in');
   }
 
-  const body: Pick<User, 'name'> = {
+  const body: CreateUser = {
     name: name || 'No name',
   };
   let user: User;
