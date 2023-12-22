@@ -1,30 +1,26 @@
-import { useState } from 'react';
 import { Group, Text } from '@mantine/core';
-import {
-  IconBellRinging,
-  IconFingerprint,
-  IconKey,
-  IconSettings,
-  Icon2fa,
-  IconDatabaseImport,
-  IconReceipt2,
-  IconSwitchHorizontal,
-  IconLogout,
-} from '@tabler/icons-react';
+import { IconBook2, IconHome, IconSettings, IconTransactionEuro } from '@tabler/icons-react';
+import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import NavbarControllerProps from '../../interfaces/navbar-controller-props';
 import classes from './Navbar.module.css';
 
 const data = [
-  { link: '', label: 'Notifications', icon: IconBellRinging },
-  { link: '', label: 'Billing', icon: IconReceipt2 },
-  { link: '', label: 'Security', icon: IconFingerprint },
-  { link: '', label: 'SSH Keys', icon: IconKey },
-  { link: '', label: 'Databases', icon: IconDatabaseImport },
-  { link: '', label: 'Authentication', icon: Icon2fa },
-  { link: '', label: 'Other Settings', icon: IconSettings },
+  { link: '/', label: 'Home', icon: IconHome },
+  { link: '/bookings', label: 'Manage bookings', icon: IconBook2 },
+  { link: '/balance', label: 'Balance', icon: IconTransactionEuro },
 ];
 
-const Navbar = () => {
-  const [active, setActive] = useState('Billing');
+const Navbar = ({ toggle, setVisible }: NavbarControllerProps) => {
+  const navigate = useNavigate();
+  const [active, setActive] = useState('Balance');
+
+  const navOnClick = (label: string, link: string) => {
+    setActive(label);
+    navigate(link);
+    toggle();
+    setVisible(false);
+  };
 
   const links = data.map((item) => (
     <a
@@ -34,7 +30,7 @@ const Navbar = () => {
       key={item.label}
       onClick={(event) => {
         event.preventDefault();
-        setActive(item.label);
+        navOnClick(item.label, item.link);
       }}
     >
       <item.icon className={classes.linkIcon} stroke={1.5} />
@@ -54,14 +50,16 @@ const Navbar = () => {
       </div>
 
       <div className={classes.footer}>
-        <a href="#" className={classes.link} onClick={(event) => event.preventDefault()}>
-          <IconSwitchHorizontal className={classes.linkIcon} stroke={1.5} />
-          <span>Change account</span>
-        </a>
-
-        <a href="#" className={classes.link} onClick={(event) => event.preventDefault()}>
-          <IconLogout className={classes.linkIcon} stroke={1.5} />
-          <span>Logout</span>
+        <a
+          href="/settings"
+          className={classes.link}
+          onClick={(event) => {
+            event.preventDefault();
+            navOnClick('/settings', '/settings');
+          }}
+        >
+          <IconSettings className={classes.linkIcon} stroke={1.5} />
+          <span>Settings</span>
         </a>
       </div>
     </nav>
