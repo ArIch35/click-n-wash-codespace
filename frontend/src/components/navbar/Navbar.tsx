@@ -5,6 +5,8 @@ import {
   IconHome,
   IconSettings,
   IconTransactionEuro,
+  IconUser,
+  IconUserCheck,
   TablerIconsProps,
 } from '@tabler/icons-react';
 import { useState } from 'react';
@@ -110,7 +112,11 @@ const Navbar = ({ toggle, setVisible }: NavbarControllerProps) => {
             toggleVendorMode();
           }}
         >
-          <IconSettings className={classes.linkIcon} stroke={1.5} />
+          {user?.isAlsoVendor ? (
+            <IconUserCheck className={classes.linkIcon} stroke={1.5} />
+          ) : (
+            <IconUser className={classes.linkIcon} stroke={1.5} />
+          )}
           <span>Is a vendor? {user?.isAlsoVendor ? 'Yes' : 'No'}</span>
         </a>
       </div>
