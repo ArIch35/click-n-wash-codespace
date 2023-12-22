@@ -35,7 +35,9 @@ const Navbar = ({ toggle, setVisible }: NavbarControllerProps) => {
   const user = useSelector((state: RootState) => state.authenticationState.user);
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  const [active, setActive] = useState('Balance');
+  const [active, setActive] = useState(
+    data.find((item) => item.link === window.location.pathname)?.label || '',
+  );
 
   const toggleVendorMode = () => {
     if (!user) {
