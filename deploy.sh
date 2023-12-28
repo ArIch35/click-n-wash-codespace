@@ -62,7 +62,7 @@ FRONTEND_DIR=frontend/dist
 CONFIG="location / {
     root $FILE_DIR;
     index index.html;
-    try_files \$uri \$uri/ =404;
+    try_files \$uri \$uri/ /index.html;
 }
 
 location /api {
