@@ -8,4 +8,7 @@ interface User extends BaseEntity {
   laundromats: Laundromat[];
 }
 
+export type CreateUser = Pick<User, 'name'>;
+export type UpdateUser = Partial<Pick<User, 'name' | 'isAlsoVendor'>>;
+
 export default User;

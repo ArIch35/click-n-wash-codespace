@@ -1,30 +1,69 @@
-import { useState } from 'react';
 import { Group, Text } from '@mantine/core';
 import {
-  IconBellRinging,
-  IconFingerprint,
-  IconKey,
+  IconBook2,
+  IconBuildingStore,
+  IconHome,
   IconSettings,
-  Icon2fa,
-  IconDatabaseImport,
-  IconReceipt2,
-  IconSwitchHorizontal,
-  IconLogout,
+  IconTransactionEuro,
+  IconUser,
+  IconUserCheck,
+  TablerIconsProps,
 } from '@tabler/icons-react';
+import { useState } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import { useNavigate } from 'react-router-dom';
+import { UpdateUser } from '../../interfaces/entities/user';
+import NavbarControllerProps from '../../interfaces/navbar-controller-props';
+import { setUser } from '../../reducers/authentication.reducer';
+import { RootState } from '../../reducers/root.reducer';
+import { updateUser } from '../../utils/api-functions';
 import classes from './Navbar.module.css';
 
-const data = [
-  { link: '', label: 'Notifications', icon: IconBellRinging },
-  { link: '', label: 'Billing', icon: IconReceipt2 },
-  { link: '', label: 'Security', icon: IconFingerprint },
-  { link: '', label: 'SSH Keys', icon: IconKey },
-  { link: '', label: 'Databases', icon: IconDatabaseImport },
-  { link: '', label: 'Authentication', icon: Icon2fa },
-  { link: '', label: 'Other Settings', icon: IconSettings },
+interface NavbarItem {
+  link: string;
+  label: string;
+  icon: (props: TablerIconsProps) => JSX.Element;
+  vendorOnly?: boolean;
+}
+
+const data: NavbarItem[] = [
+  { link: '/', label: 'Home', icon: IconHome },
+  { link: '/bookings', label: 'Manage bookings', icon: IconBook2 },
+  { link: '/balance', label: 'Balance', icon: IconTransactionEuro },
+  { link: '/laundromats', label: 'Manage laundromats', icon: IconBuildingStore, vendorOnly: true },
 ];
 
-const Navbar = () => {
-  const [active, setActive] = useState('Billing');
+const Navbar = ({ toggle, setVisible }: NavbarControllerProps) => {
+  const user = useSelector((state: RootState) => state.authenticationState.user);
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
+  const [active, setActive] = useState(
+    data.find((item) => item.link === window.location.pathname)?.label || '',
+  );
+
+  const toggleVendorMode = () => {
+    if (!user) {
+      throw new Error('User is not logged in');
+    }
+
+    const body: UpdateUser = {
+      isAlsoVendor: !user.isAlsoVendor,
+    };
+    updateUser(body)
+      .then((user) => {
+        dispatch(setUser(user));
+      })
+      .catch((error) => {
+        console.error(error);
+      });
+  };
+
+  const navOnClick = (label: string, link: string) => {
+    setActive(label);
+    navigate(link);
+    toggle();
+    setVisible(false);
+  };
 
   const links = data.map((item) => (
     <a
@@ -32,9 +71,10 @@ const Navbar = () => {
       data-active={item.label === active || undefined}
       href={item.link}
       key={item.label}
+      style={{ display: item.vendorOnly && !user?.isAlsoVendor ? 'none' : 'inherit' }}
       onClick={(event) => {
         event.preventDefault();
-        setActive(item.label);
+        navOnClick(item.label, item.link);
       }}
     >
       <item.icon className={classes.linkIcon} stroke={1.5} />
@@ -54,14 +94,30 @@ const Navbar = () => {
       </div>
 
       <div className={classes.footer}>
-        <a href="#" className={classes.link} onClick={(event) => event.preventDefault()}>
-          <IconSwitchHorizontal className={classes.linkIcon} stroke={1.5} />
-          <span>Change account</span>
+        <a
+          href="/settings"
+          className={classes.link}
+          onClick={(event) => {
+            event.preventDefault();
+            navOnClick('/settings', '/settings');
+          }}
+        >
+          <IconSettings className={classes.linkIcon} stroke={1.5} />
+          <span>Settings</span>
         </a>
-
-        <a href="#" className={classes.link} onClick={(event) => event.preventDefault()}>
-          <IconLogout className={classes.linkIcon} stroke={1.5} />
-          <span>Logout</span>
+        <a
+          className={classes.link}
+          onClick={(event) => {
+            event.preventDefault();
+            toggleVendorMode();
+          }}
+        >
+          {user?.isAlsoVendor ? (
+            <IconUserCheck className={classes.linkIcon} stroke={1.5} />
+          ) : (
+            <IconUser className={classes.linkIcon} stroke={1.5} />
+          )}
+          <span>Is a vendor? {user?.isAlsoVendor ? 'Yes' : 'No'}</span>
         </a>
       </div>
     </nav>

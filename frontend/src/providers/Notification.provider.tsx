@@ -1,3 +1,4 @@
+import { Notifications } from '@mantine/notifications';
 import React, { createContext, useEffect } from 'react';
 import { useSelector } from 'react-redux';
 import { Socket, io } from 'socket.io-client';
@@ -42,7 +43,14 @@ const NotificationProvider = ({ children }: NotificationProviderProps) => {
     };
   }, [user, socket]);
 
-  return <NotificationContext.Provider value={null}>{children}</NotificationContext.Provider>;
+  return (
+    <NotificationContext.Provider value={null}>
+      <div>
+        <Notifications position="top-right" mt="xl" />
+        {children}
+      </div>
+    </NotificationContext.Provider>
+  );
 };
 
 export default NotificationProvider;

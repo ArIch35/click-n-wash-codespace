@@ -1,8 +1,8 @@
-import { useDisclosure } from '@mantine/hooks';
 import { AppShell, Overlay, Transition } from '@mantine/core';
+import { useDisclosure } from '@mantine/hooks';
 import { ReactNode, useState } from 'react';
-import Header from './Header/Header';
 import Navbar from '../components/navbar/Navbar';
+import Header from './Header/Header';
 
 const BaseLayout = ({ children }: { children: ReactNode }) => {
   const [navbarOpened, navbarHandlers] = useDisclosure();
@@ -32,7 +32,7 @@ const BaseLayout = ({ children }: { children: ReactNode }) => {
           >
             {(transitionStyle) => (
               <div style={transitionStyle}>
-                <Navbar />
+                <Navbar toggle={navbarHandlers.close} setVisible={setVisible} />
               </div>
             )}
           </Transition>

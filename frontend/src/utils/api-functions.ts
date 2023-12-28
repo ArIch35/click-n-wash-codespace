@@ -1,5 +1,5 @@
 import firebaseAuth from '../firebase';
-import User from '../interfaces/entities/user';
+import User, { CreateUser, UpdateUser } from '../interfaces/entities/user';
 import loadEnv from './load-env';
 
 interface Message {
@@ -41,18 +41,40 @@ export const getUser = async (id: string): Promise<User> => {
 
 /**
  * Creates a user on the server.
- * @param user The user to create.
+ * @param body the values to create the user with.
  * @returns The created user.
  * @throws An error if the user could not be created.
  */
-export const createUser = async (user: Pick<User, 'name'>): Promise<User> => {
+export const createUser = async (body: CreateUser): Promise<User> => {
   const response = await fetch(`${loadEnv().VITE_SERVER_ADDRESS}/users`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
       ...(await headers()),
     },
-    body: JSON.stringify(user),
+    body: JSON.stringify(body),
+  });
+  const data = (await response.json()) as unknown;
+  if (!response.ok) {
+    throw new Error((data as Message).message);
+  }
+  return data as User;
+};
+
+/**
+ * Updates a user on the server.
+ * @param body The values to update the user with.
+ * @returns The updated user.
+ * @throws An error if the user could not be updated.
+ */
+export const updateUser = async (body: UpdateUser): Promise<User> => {
+  const response = await fetch(`${loadEnv().VITE_SERVER_ADDRESS}/users`, {
+    method: 'PUT',
+    headers: {
+      'Content-Type': 'application/json',
+      ...(await headers()),
+    },
+    body: JSON.stringify(body),
   });
   const data = (await response.json()) as unknown;
   if (!response.ok) {

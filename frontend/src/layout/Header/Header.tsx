@@ -6,17 +6,13 @@ import { useSelector } from 'react-redux';
 import AuthAnchor from '../../components/auth/AuthAnchor';
 import { AuthenticationForm } from '../../components/auth/AuthentificationForm';
 import firebaseAuth from '../../firebase';
+import NavbarControllerProps from '../../interfaces/navbar-controller-props';
 import { RootState } from '../../reducers/root.reducer';
 import classes from './Header.module.css';
 
 const links = [{ link: '/about', label: 'Login / Register' }];
 
-interface HeaderProps {
-  toggle: () => void;
-  setVisible: (visible: boolean) => void;
-}
-
-const Header = ({ toggle, setVisible }: HeaderProps) => {
+const Header = ({ toggle, setVisible }: NavbarControllerProps) => {
   const user = useSelector((state: RootState) => state.authenticationState.user);
   const [modalOpened, modalHandlers] = useDisclosure(false);
 
@@ -54,6 +50,10 @@ const Header = ({ toggle, setVisible }: HeaderProps) => {
         <Group>
           <Burger
             onClick={() => {
+              if (!loggedIn) {
+                modalHandlers.open();
+                return;
+              }
               toggle();
               setVisible(true);
             }}

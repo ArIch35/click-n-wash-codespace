@@ -1,7 +1,6 @@
-import BaseLayout from '../layout/BaseLayout';
-import InputSelect from '../components/inputs/InputSelect';
 import { useForm } from '@mantine/form';
 import { useEffect } from 'react';
+import InputSelect from '../components/inputs/InputSelect';
 
 const HomePage = () => {
   const form = useForm({
@@ -21,23 +20,22 @@ const HomePage = () => {
         console.error(e);
       }
     }
-  });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   useEffect(() => {
     localStorage.setItem('location-form', form.values.location);
   }, [form.values]);
 
   return (
-    <BaseLayout>
-      <InputSelect
-        name="test"
-        options={[
-          { value: 'test', label: 'test' },
-          { value: 'test2', label: 'test2' },
-        ]}
-        {...form.getInputProps('location')}
-      />
-    </BaseLayout>
+    <InputSelect
+      name="test"
+      options={[
+        { value: 'test', label: 'test' },
+        { value: 'test2', label: 'test2' },
+      ]}
+      {...form.getInputProps('location')}
+    />
   );
 };
 

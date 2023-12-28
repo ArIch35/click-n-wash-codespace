@@ -14,25 +14,61 @@ import {
 import { useForm } from '@mantine/form';
 import { upperFirst, useMediaQuery, useToggle } from '@mantine/hooks';
 import { createUserWithEmailAndPassword, signInWithEmailAndPassword } from 'firebase/auth';
+import React from 'react';
+import { useDispatch } from 'react-redux';
 import firebaseAuth from '../../firebase';
+import { setRegisteredName } from '../../reducers/authentication.reducer';
 import { GoogleButton } from './GoogleButton';
 
+interface FormValues {
+  email: string;
+  name: string;
+  password: string;
+  terms: boolean;
+}
+
+const initialValues: FormValues = {
+  email: '',
+  name: '',
+  password: '',
+  terms: false,
+};
+
 export function AuthenticationForm({ ...props }: ModalProps) {
+  const dispatch = useDispatch();
   const [type, toggle] = useToggle(['login', 'register']);
   const isMobile = useMediaQuery('(max-width: 50em)');
   const form = useForm({
-    initialValues: {
-      email: '',
-      name: '',
-      password: '',
-      terms: true,
-    },
-
+    initialValues,
     validate: {
       email: (val) => (/^\S+@\S+$/.test(val) ? null : 'Invalid email'),
-      password: (val) => (val.length <= 6 ? 'Password should include at least 6 characters' : null),
+      password: (val) =>
+        val.length <= 6 && type === 'register'
+          ? 'Password should include at least 6 characters'
+          : null,
+      terms: (val) => (type === 'register' && !val ? 'You must accept terms and conditions' : null),
     },
   });
+
+  const handleSubmit = (values: FormValues) => {
+    if (type === 'login') {
+      signInWithEmailAndPassword(firebaseAuth, values.email, values.password).catch((error) =>
+        console.error(error),
+      );
+      return;
+    }
+    dispatch(setRegisteredName(values.name));
+    createUserWithEmailAndPassword(firebaseAuth, values.email, values.password).catch((error) =>
+      console.error(error),
+    );
+  };
+
+  React.useEffect(() => {
+    if (!props.opened) {
+      form.reset();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [props.opened]);
 
   return (
     <Modal
@@ -55,7 +91,7 @@ export function AuthenticationForm({ ...props }: ModalProps) {
 
       <Divider label="Or continue with email" labelPosition="center" my="lg" />
 
-      <form onSubmit={form.onSubmit(() => {})}>
+      <form onSubmit={form.onSubmit(handleSubmit)}>
         <Stack>
           {type === 'register' && (
             <TextInput
@@ -73,7 +109,7 @@ export function AuthenticationForm({ ...props }: ModalProps) {
             placeholder="hello@mantine.dev"
             value={form.values.email}
             onChange={(event) => form.setFieldValue('email', event.currentTarget.value)}
-            error={form.errors.email && 'Invalid email'}
+            error={form.errors.email}
             radius="md"
           />
 
@@ -83,7 +119,7 @@ export function AuthenticationForm({ ...props }: ModalProps) {
             placeholder="Your password"
             value={form.values.password}
             onChange={(event) => form.setFieldValue('password', event.currentTarget.value)}
-            error={form.errors.password && 'Password should include at least 6 characters'}
+            error={form.errors.password}
             radius="md"
           />
 
@@ -92,6 +128,7 @@ export function AuthenticationForm({ ...props }: ModalProps) {
               label="I accept terms and conditions"
               checked={form.values.terms}
               onChange={(event) => form.setFieldValue('terms', event.currentTarget.checked)}
+              error={form.errors.terms}
             />
           )}
         </Stack>
@@ -100,25 +137,7 @@ export function AuthenticationForm({ ...props }: ModalProps) {
           <Anchor component="button" type="button" c="dimmed" onClick={() => toggle()} size="xs">
             {type === 'register' ? 'Already have an account? Login' : 'Not a member yet? Register'}
           </Anchor>
-          <Button
-            type="submit"
-            radius="xl"
-            onClick={() => {
-              if (type === 'login') {
-                signInWithEmailAndPassword(
-                  firebaseAuth,
-                  form.values.email,
-                  form.values.password,
-                ).catch((error) => console.error(error));
-                return;
-              }
-              createUserWithEmailAndPassword(
-                firebaseAuth,
-                form.values.email,
-                form.values.password,
-              ).catch((error) => console.error(error));
-            }}
-          >
+          <Button type="submit" radius="xl">
             {upperFirst(type)}
           </Button>
         </Group>
