@@ -9,11 +9,13 @@ interface Auth {
 interface AuthenticationState {
   firebaseData: Auth | null;
   user: User | null;
+  registeredName: string;
 }
 
 const initialState: AuthenticationState = {
   firebaseData: null,
   user: null,
+  registeredName: '',
 };
 
 const authenticationSlice = createSlice({
@@ -26,9 +28,12 @@ const authenticationSlice = createSlice({
     setUser(state, action: PayloadAction<User | null>) {
       state.user = action.payload;
     },
+    setRegisteredName(state, action: PayloadAction<string>) {
+      state.registeredName = action.payload;
+    },
   },
 });
 
-export const { setAuth, setUser } = authenticationSlice.actions;
+export const { setAuth, setUser, setRegisteredName } = authenticationSlice.actions;
 
 export default authenticationSlice.reducer;

@@ -1,8 +1,9 @@
 import React from 'react';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import firebaseAuth from '../firebase';
 import User, { CreateUser } from '../interfaces/entities/user';
-import { setAuth, setUser } from '../reducers/authentication.reducer';
+import { setAuth, setRegisteredName, setUser } from '../reducers/authentication.reducer';
+import { RootState } from '../reducers/root.reducer';
 import { createUser, getUser } from '../utils/api-functions';
 
 const AuthenticationContext = React.createContext<null>(null);
@@ -39,6 +40,9 @@ const signInToBackend = async (name: string) => {
 
 const AuthenticationProvider = ({ children }: AuthenticationProviderProps) => {
   const dispatch = useDispatch();
+  const registeredName = useSelector(
+    (state: RootState) => state.authenticationState.registeredName,
+  );
   const [fetched, setFetched] = React.useState(false);
 
   React.useEffect(() => {
@@ -54,7 +58,8 @@ const AuthenticationProvider = ({ children }: AuthenticationProviderProps) => {
         .getIdToken()
         .then(async (token) => {
           const { providerId, email, displayName } = firebaseUser;
-          const user = await signInToBackend(displayName || email || 'No name');
+          const name = registeredName || displayName || email || 'No name';
+          const user = await signInToBackend(name);
           dispatch(setUser(user));
           dispatch(setAuth({ token, providerId }));
         })
@@ -63,10 +68,11 @@ const AuthenticationProvider = ({ children }: AuthenticationProviderProps) => {
         })
         .finally(() => {
           setFetched(true);
+          dispatch(setRegisteredName(''));
         });
     });
     return () => unsubscribe();
-  }, [dispatch]);
+  }, [dispatch, registeredName]);
 
   return (
     <AuthenticationContext.Provider value={null}>
