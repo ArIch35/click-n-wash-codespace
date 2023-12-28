@@ -14,6 +14,7 @@ import {
 import { useForm } from '@mantine/form';
 import { upperFirst, useMediaQuery, useToggle } from '@mantine/hooks';
 import { createUserWithEmailAndPassword, signInWithEmailAndPassword } from 'firebase/auth';
+import React from 'react';
 import firebaseAuth from '../../firebase';
 import { GoogleButton } from './GoogleButton';
 
@@ -57,6 +58,13 @@ export function AuthenticationForm({ ...props }: ModalProps) {
       console.error(error),
     );
   };
+
+  React.useEffect(() => {
+    if (!props.opened) {
+      form.reset();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [props.opened]);
 
   return (
     <Modal
