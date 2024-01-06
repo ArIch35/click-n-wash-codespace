@@ -14,3 +14,5 @@ export const routesWithoutAuth: RoutePair[] = [
   { path: '/api/generateToken', method: 'GET' },
   // Add more routes that should be accessible without auth here
 ];
+
+export const timeBuffer = 15 * 60000; // 15 minutes
