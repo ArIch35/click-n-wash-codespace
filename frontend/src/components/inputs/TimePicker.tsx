@@ -1,4 +1,4 @@
-import { Indicator, Select } from '@mantine/core';
+import { Button, Indicator, Select } from '@mantine/core';
 import { DatesProvider, DatePicker } from '@mantine/dates';
 import '@mantine/dates/styles.css';
 import { useState } from 'react';
@@ -11,6 +11,7 @@ enum BookingStatus {
 
 interface CustomCalendarProps {
   bookedDates: Map<string, Date[]>;
+  onWashingMachineBooked: (date: Date) => void;
 }
 
 // Declare the maximum booking hours per day, 12 means that the booking can be done every 2 hours
@@ -31,8 +32,10 @@ const VALID_BOOKING_HOURS_AS_STRING = [
   '22:00',
 ];
 
-const CustomCalendar = ({ bookedDates }: CustomCalendarProps) => {
+const CustomCalendar = ({ bookedDates, onWashingMachineBooked }: CustomCalendarProps) => {
   const [selectedDate, setSelectedDate] = useState<Date | null>(null);
+  const [selectedTime, setSelectedTime] = useState<string | null>(null);
+
   const excludedDates = Array.from(bookedDates.keys()).filter((date) => {
     return bookedDates.get(date)!.length === MAX_BOOKING_HOURS;
   });
@@ -87,6 +90,19 @@ const CustomCalendar = ({ bookedDates }: CustomCalendarProps) => {
     }
   };
 
+  const book = () => {
+    if (!selectedDate || !selectedTime) {
+      return;
+    }
+    const dateHolder = new Date(selectedDate);
+    const [hours, minutes] = selectedTime.split(':');
+    dateHolder.setHours(parseInt(hours));
+    dateHolder.setMinutes(parseInt(minutes));
+    onWashingMachineBooked(dateHolder);
+    setSelectedDate(null);
+    setSelectedTime(null);
+  };
+
   return (
     <DatesProvider
       settings={{ locale: 'de', firstDayOfWeek: 0, weekendDays: [0], timezone: 'UTC' }}
@@ -116,8 +132,11 @@ const CustomCalendar = ({ bookedDates }: CustomCalendarProps) => {
           data={getValidBookingHours(selectedDate)}
           placeholder="10:00"
           label="Pick Time"
+          value={selectedTime}
+          onChange={setSelectedTime}
         />
       )}
+      {selectedDate && selectedTime && <Button onClick={book}>Book</Button>}
     </DatesProvider>
   );
 };
