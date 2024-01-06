@@ -1,6 +1,7 @@
 import { AfterLoad, BeforeInsert, Column, Entity, ManyToOne } from 'typeorm';
 import { date, object, string } from 'yup';
 import getDb from '../db';
+import { timeBuffer } from '../utils/constants';
 import StatusError from '../utils/error-with-status';
 import BaseEntity from './base-entity';
 import User from './user';
@@ -65,9 +66,8 @@ const checkAvailability = async (
   startDate: Date,
   endDate: Date,
 ) => {
-  const bufferDuration = 15 * 60000; // 15 minutes
-  const startDateBuffer = new Date(startDate.getTime() - bufferDuration);
-  const endDateBuffer = new Date(endDate.getTime() + bufferDuration);
+  const startDateBuffer = new Date(startDate.getTime() - timeBuffer);
+  const endDateBuffer = new Date(endDate.getTime() + timeBuffer);
   const conflictingContract = await getDb()
     .contractRepository.createQueryBuilder('contract')
     .where('contract.washingMachine = :washingMachine', { washingMachine: washingMachine.id })
