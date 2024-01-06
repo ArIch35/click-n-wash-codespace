@@ -4,15 +4,19 @@ import { getLaundromats, getWashingMachinesByLaundromatId } from '../utils/api-f
 import BaseList from '../components/ui/BaseList.component';
 import IndividualLaundromat from '../components/ui/IndividualLaundromat.component';
 import WashingMachine from '../interfaces/entities/washing-machine';
+import WashingMachinePicker from '../components/booking/WashingMachinePicker';
 
 const BookingsPage = () => {
   const [allLaundromats, setAllLaundromats] = useState<Laundromat[]>([]);
+  const [chosenWashingMachines, setChosenWashingMachines] = useState<WashingMachine[] | null>(null);
+  const [isOpen, setIsOpen] = useState<boolean>(false);
 
-  const getWM = (id: string) => {
+  const getWaschingMachinesFromLaundromat = (id: string) => {
     getWashingMachinesByLaundromatId(id)
       .then((laundromat: Laundromat) => {
         const washingMachines: WashingMachine[] | undefined = laundromat.washingMachines;
-        console.log(washingMachines);
+        setChosenWashingMachines(washingMachines!);
+        setIsOpen(true);
       })
       .catch((error) => {
         console.error(error);
@@ -30,15 +34,26 @@ const BookingsPage = () => {
   }, []);
 
   return (
-    allLaundromats && (
-      <BaseList
-        items={allLaundromats}
-        IndividualComponent={IndividualLaundromat}
-        onItemClick={(item: Laundromat) => {
-          getWM(item.id);
-        }}
-      />
-    )
+    <div>
+      {allLaundromats && (
+        <BaseList
+          items={allLaundromats}
+          IndividualComponent={IndividualLaundromat}
+          onItemClick={(item: Laundromat) => {
+            getWaschingMachinesFromLaundromat(item.id);
+          }}
+        />
+      )}
+      {chosenWashingMachines && (
+        <WashingMachinePicker
+          isOpen={isOpen}
+          onClose={() => {
+            setIsOpen(false);
+          }}
+          washingMachines={chosenWashingMachines}
+        />
+      )}
+    </div>
   );
 };
 

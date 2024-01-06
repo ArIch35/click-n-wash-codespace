@@ -9,7 +9,7 @@ enum BookingStatus {
   FullyBooked,
 }
 
-interface CustomCalendarProps {
+interface TimePickerProps {
   bookedDates: Map<string, Date[]>;
   onWashingMachineBooked: (date: Date) => void;
 }
@@ -32,7 +32,7 @@ const VALID_BOOKING_HOURS_AS_STRING = [
   '22:00',
 ];
 
-const CustomCalendar = ({ bookedDates, onWashingMachineBooked }: CustomCalendarProps) => {
+const TimePicker = ({ bookedDates, onWashingMachineBooked }: TimePickerProps) => {
   const [selectedDate, setSelectedDate] = useState<Date | null>(null);
   const [selectedTime, setSelectedTime] = useState<string | null>(null);
 
@@ -136,4 +136,4 @@ const CustomCalendar = ({ bookedDates, onWashingMachineBooked }: CustomCalendarP
   );
 };
 
-export default CustomCalendar;
+export default TimePicker;
