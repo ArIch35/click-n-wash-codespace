@@ -36,10 +36,6 @@ const CustomCalendar = ({ bookedDates, onWashingMachineBooked }: CustomCalendarP
   const [selectedDate, setSelectedDate] = useState<Date | null>(null);
   const [selectedTime, setSelectedTime] = useState<string | null>(null);
 
-  const excludedDates = Array.from(bookedDates.keys()).filter((date) => {
-    return bookedDates.get(date)!.length === MAX_BOOKING_HOURS;
-  });
-
   const getDateStringRepresentation = (date: Date) => {
     return (
       date.getFullYear() +
@@ -121,8 +117,7 @@ const CustomCalendar = ({ bookedDates, onWashingMachineBooked }: CustomCalendarP
           );
         }}
         excludeDate={(date: Date) => {
-          const dateString: string = getDateStringRepresentation(date);
-          return excludedDates.includes(dateString);
+          return getBookedStatus(date) === BookingStatus.FullyBooked;
         }}
       />
       {selectedDate && (
