@@ -1,14 +1,15 @@
 import { notifications } from '@mantine/notifications';
 import React from 'react';
 import { useSelector } from 'react-redux';
-import { Navigate, Route, Routes, useLocation } from 'react-router-dom';
+import { Navigate, Route, Routes } from 'react-router-dom';
 import { RootState } from './reducers/root.reducer';
 import { routes } from './routeConstants';
 import { autoCloseDuration } from './utils/constants';
 
-interface AuthRequiredProps {
+interface CheckRoute {
   children: React.ReactNode;
-  to?: string;
+  requireAuth?: boolean;
+  requireVendor?: boolean;
 }
 
 /**
@@ -25,18 +26,38 @@ const showAuthRequiredOnce = () => {
   });
 };
 
-const AuthRequired = ({ children, to = '/' }: AuthRequiredProps) => {
+/**
+ * Show vendor required notification only once by hiding previous notification
+ */
+const showVendorRequiredOnce = () => {
+  notifications.hide('vendor-required');
+  notifications.show({
+    id: 'vendor-required',
+    title: 'Vendor Required',
+    message: 'You must be a vendor to view this page',
+    color: 'red',
+    autoClose: autoCloseDuration,
+  });
+};
+
+const CheckRoute = ({ children, requireAuth, requireVendor }: CheckRoute) => {
   const auth = useSelector((state: RootState) => state.authenticationState.firebaseData);
-  const { pathname } = useLocation();
+  const user = useSelector((state: RootState) => state.authenticationState.user);
 
   React.useEffect(() => {
-    if (!auth && pathname !== to) {
+    if (requireAuth && !auth) {
       showAuthRequiredOnce();
+    } else if (requireVendor && !user?.isAlsoVendor) {
+      showVendorRequiredOnce();
     }
-  }, [auth, pathname, to]);
+  }, [auth, requireAuth, requireVendor, user?.isAlsoVendor]);
 
-  if (!auth && pathname !== to) {
-    return <Navigate to={to} replace />;
+  if (requireAuth && !auth) {
+    return <Navigate to={'/'} replace />;
+  }
+
+  if (requireVendor && !user?.isAlsoVendor) {
+    return <Navigate to={'/'} replace />;
   }
 
   return <>{children}</>;
@@ -45,14 +66,13 @@ const AuthRequired = ({ children, to = '/' }: AuthRequiredProps) => {
 const AppRoutes = () => {
   return (
     <Routes>
-      {routes.map((route, index) => {
-        const element = route.requireAuth ? (
-          <AuthRequired>{route.element}</AuthRequired>
-        ) : (
-          route.element
-        );
-        return <Route key={index} path={route.path} element={element} />;
-      })}
+      {routes.map((route, index) => (
+        <Route
+          key={index}
+          path={route.path}
+          element={<CheckRoute {...route}>{route.element}</CheckRoute>}
+        />
+      ))}
     </Routes>
   );
 };
