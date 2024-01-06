@@ -5,6 +5,7 @@ import {
   createWashingMaschineSchema,
   updateWashingMaschineSchema,
 } from '../entities/washing-machine';
+import { timeBuffer } from '../utils/constants';
 import StatusError from '../utils/error-with-status';
 import {
   MESSAGE_FORBIDDEN_NOT_OWNER,
@@ -42,6 +43,33 @@ router.get('/:id', (async (req, res) => {
       return res.status(STATUS_NOT_FOUND).json(MESSAGE_NOT_FOUND);
     }
     return res.status(STATUS_OK).json(washingMachine);
+  } catch (error) {
+    return res.status(STATUS_SERVER_ERROR).json(MESSAGE_SERVER_ERROR);
+  }
+}) as RequestHandler);
+
+router.get('/:id/occupied-slots', (async (req, res) => {
+  try {
+    const washingMachine = await getDb().washingMachineRepository.findOne({
+      where: { id: req.params.id },
+    });
+    if (!washingMachine) {
+      return res.status(STATUS_NOT_FOUND).json(MESSAGE_NOT_FOUND);
+    }
+    const contracts = await getDb().contractRepository.find({
+      where: {
+        status: 'ongoing',
+        washingMachine: { id: req.params.id },
+      },
+    });
+
+    const occupiedTimeSlots = contracts.map((contract) => {
+      return {
+        start: new Date(contract.startDate.getTime() - timeBuffer),
+        end: new Date(contract.endDate.getTime() + timeBuffer),
+      };
+    });
+    return res.status(STATUS_OK).json(occupiedTimeSlots);
   } catch (error) {
     return res.status(STATUS_SERVER_ERROR).json(MESSAGE_SERVER_ERROR);
   }
