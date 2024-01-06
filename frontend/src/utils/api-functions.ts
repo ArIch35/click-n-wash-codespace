@@ -1,4 +1,5 @@
 import firebaseAuth from '../firebase';
+import Laundromat from '../interfaces/entities/laundromat';
 import User, { CreateUser, UpdateUser } from '../interfaces/entities/user';
 import loadEnv from './load-env';
 
@@ -81,4 +82,33 @@ export const updateUser = async (body: UpdateUser): Promise<User> => {
     throw new Error((data as Message).message);
   }
   return data as User;
+};
+
+/**
+ * Gets all laundromats from the server.
+ * @returns The laundromats.
+ * @throws An error if the laundromats could not be retrieved.
+ **/
+export const getLaundromats = async () => {
+  const response = await fetch(`${loadEnv().VITE_SERVER_ADDRESS}/laundromats`, {
+    headers: { ...(await headers()) },
+  });
+
+  const data = (await response.json()) as unknown;
+  if (!response.ok) {
+    throw new Error((data as Message).message);
+  }
+  return data as Laundromat[];
+};
+
+export const getWashingMachinesByLaundromatId = async (id: string) => {
+  const response = await fetch(`${loadEnv().VITE_SERVER_ADDRESS}/laundromats/${id}`, {
+    headers: { ...(await headers()) },
+  });
+
+  const data = (await response.json()) as unknown;
+  if (!response.ok) {
+    throw new Error((data as Message).message);
+  }
+  return data as Laundromat;
 };
