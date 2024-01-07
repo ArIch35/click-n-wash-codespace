@@ -46,6 +46,20 @@ const TimePicker = ({ bookedDates, onWashingMachineBooked }: TimePickerProps) =>
     );
   };
 
+  const getTodayDate = () => {
+    const date = new Date();
+    date.setHours(0, 0, 0, 0);
+    return date;
+  };
+
+  const getTimeStringRepresentation = (date: Date) => {
+    return (
+      date.getHours().toString().padStart(2, '0') +
+      ':' +
+      date.getMinutes().toString().padStart(2, '0')
+    );
+  };
+
   const getBookedStatus = (date: Date) => {
     const dateString: string = getDateStringRepresentation(date);
     if (!bookedDates.has(dateString)) {
@@ -59,20 +73,22 @@ const TimePicker = ({ bookedDates, onWashingMachineBooked }: TimePickerProps) =>
 
   const getValidBookingHours = (date: Date) => {
     const dateString: string = getDateStringRepresentation(date);
+    const dateNow: Date = new Date();
+    const validHoursNow: string[] =
+      getDateStringRepresentation(date) === getDateStringRepresentation(dateNow)
+        ? VALID_BOOKING_HOURS_AS_STRING.filter((hour) => {
+            return getTimeStringRepresentation(dateNow) <= hour;
+          })
+        : VALID_BOOKING_HOURS_AS_STRING;
+
     if (!bookedDates.has(dateString)) {
-      return VALID_BOOKING_HOURS_AS_STRING;
+      return validHoursNow;
     }
 
     const bookedHours: string[] = bookedDates
       .get(dateString)!
-      .map(
-        (date: Date) =>
-          `${date.getHours().toString().padStart(2, '0')}:${date
-            .getMinutes()
-            .toString()
-            .padStart(2, '0')}`,
-      );
-    return VALID_BOOKING_HOURS_AS_STRING.filter((hour) => !bookedHours.includes(hour));
+      .map((date: Date) => getTimeStringRepresentation(date));
+    return validHoursNow.filter((hour) => !bookedHours.includes(hour));
   };
 
   const decideColor = (status: BookingStatus) => {
@@ -101,7 +117,7 @@ const TimePicker = ({ bookedDates, onWashingMachineBooked }: TimePickerProps) =>
 
   return (
     <DatesProvider
-      settings={{ locale: 'de', firstDayOfWeek: 0, weekendDays: [0], timezone: 'UTC' }}
+      settings={{ locale: 'de', firstDayOfWeek: 0, weekendDays: [0], timezone: 'Europe/Berlin' }}
     >
       <DatePicker
         mt="md"
@@ -117,7 +133,7 @@ const TimePicker = ({ bookedDates, onWashingMachineBooked }: TimePickerProps) =>
           );
         }}
         excludeDate={(date: Date) => {
-          return getBookedStatus(date) === BookingStatus.FullyBooked;
+          return getBookedStatus(date) === BookingStatus.FullyBooked || date < getTodayDate();
         }}
       />
       {selectedDate && (
