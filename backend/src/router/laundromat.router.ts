@@ -21,9 +21,13 @@ import {
 
 const router: Router = Router();
 
-router.get('/', (async (_, res) => {
+router.get('/', (async (req, res) => {
   try {
-    const laundromats = await getDb().laundromatRepository.find();
+    const uid = res.locals.uid as string;
+    const onlyOwned = req.query.onlyOwned === 'true';
+    const laundromats = await getDb().laundromatRepository.find({
+      where: onlyOwned ? { owner: { id: uid } } : {},
+    });
     return res.status(STATUS_OK).json(laundromats);
   } catch (error) {
     return res.status(STATUS_SERVER_ERROR).json(MESSAGE_SERVER_ERROR);
