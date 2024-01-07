@@ -50,12 +50,6 @@ router.get('/:id', (async (req, res) => {
 
 router.get('/:id/occupied-slots', (async (req, res) => {
   try {
-    const washingMachine = await getDb().washingMachineRepository.findOne({
-      where: { id: req.params.id },
-    });
-    if (!washingMachine) {
-      return res.status(STATUS_NOT_FOUND).json(MESSAGE_NOT_FOUND);
-    }
     const contracts = await getDb().contractRepository.find({
       where: {
         status: 'ongoing',
@@ -119,7 +113,7 @@ router.put('/:id', (async (req, res) => {
 
     const washingMachineExists = await getDb().washingMachineRepository.findOne({
       where: { id: req.params.id },
-      relations: ['laundromat', 'laundromat.owner'],
+      relations: { laundromat: { owner: true } },
     });
     if (!washingMachineExists) {
       return res.status(STATUS_NOT_FOUND).json(MESSAGE_NOT_FOUND);
@@ -148,7 +142,7 @@ router.delete('/:id', (async (req, res) => {
   try {
     const washingMachineExists = await getDb().washingMachineRepository.findOne({
       where: { id: req.params.id },
-      relations: ['laundromat', 'laundromat.owner'],
+      relations: { laundromat: { owner: true } },
     });
     if (!washingMachineExists) {
       return res.status(STATUS_NOT_FOUND).json(MESSAGE_NOT_FOUND);

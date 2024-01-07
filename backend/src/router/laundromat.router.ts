@@ -27,6 +27,7 @@ router.get('/', (async (req, res) => {
     const onlyOwned = req.query.onlyOwned === 'true';
     const laundromats = await getDb().laundromatRepository.find({
       where: onlyOwned ? { owner: { id: uid } } : {},
+      relations: { washingMachines: true },
     });
     return res.status(STATUS_OK).json(laundromats);
   } catch (error) {
@@ -36,7 +37,10 @@ router.get('/', (async (req, res) => {
 
 router.get('/:id', (async (req, res) => {
   try {
-    const laundromat = await getDb().laundromatRepository.findOne({ where: { id: req.params.id } });
+    const laundromat = await getDb().laundromatRepository.findOne({
+      where: { id: req.params.id },
+      relations: { washingMachines: true },
+    });
     if (!laundromat) {
       return res.status(STATUS_NOT_FOUND).json(MESSAGE_NOT_FOUND);
     }
@@ -89,7 +93,7 @@ router.put('/:id', (async (req, res) => {
 
     const laundromatExists = await getDb().laundromatRepository.findOne({
       where: { id: req.params.id },
-      relations: ['owner'],
+      relations: { owner: true },
     });
     if (!laundromatExists) {
       return res.status(STATUS_NOT_FOUND).json(MESSAGE_NOT_FOUND);
@@ -121,7 +125,7 @@ router.delete('/:id', (async (req, res) => {
   try {
     const laundromatExists = await getDb().laundromatRepository.findOne({
       where: { id: req.params.id },
-      relations: ['owner', 'washingMachines'],
+      relations: { owner: true, washingMachines: true },
     });
     if (!laundromatExists) {
       return res.status(STATUS_NOT_FOUND).json(MESSAGE_NOT_FOUND);
