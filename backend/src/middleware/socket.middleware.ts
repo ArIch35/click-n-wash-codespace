@@ -1,6 +1,7 @@
 import { RequestHandler } from 'express';
 import { Server as HttpServer } from 'http';
 import { Server } from 'socket.io';
+import Notification from '../interfaces/notification';
 import { users } from '../utils/constants';
 
 // Middleware
@@ -33,9 +34,9 @@ const createSocket = (server: HttpServer): RequestHandler => {
   });
 
   return ((_, res, next) => {
-    res.locals.sendNotification = (userId: string, message: string) => {
+    res.locals.sendNotification = (userId: string, notification: Notification) => {
       if (users[userId]) {
-        socket.to(users[userId]).emit('notification', message);
+        socket.to(users[userId]).emit('notification', notification);
       }
     };
     next();
