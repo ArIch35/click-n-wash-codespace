@@ -24,7 +24,7 @@ router.get('/', (async (_, res) => {
   try {
     const contracts = await getDb().contractRepository.find({
       where: [{ user: { id } }, { washingMachine: { laundromat: { owner: { id } } } }],
-      relations: { washingMachine: true },
+      relations: { washingMachine: { laundromat: true } },
       withDeleted: true,
     });
     return res.status(STATUS_OK).json(contracts);
