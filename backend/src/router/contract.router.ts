@@ -2,6 +2,7 @@ import { RequestHandler, Router } from 'express';
 import { ValidationError } from 'yup';
 import getDb from '../db';
 import { createContractSchema, finalizeContract, updateContractSchema } from '../entities/contract';
+import Notification from '../interfaces/notification';
 import StatusError from '../utils/error-with-status';
 import {
   MESSAGE_FORBIDDEN_NOT_OWNER,
@@ -16,6 +17,7 @@ import {
   STATUS_OK,
   STATUS_SERVER_ERROR,
 } from '../utils/http-status-codes';
+import sendNotification from '../utils/send-notification';
 
 const router: Router = Router();
 
@@ -87,6 +89,15 @@ router.post('/', (async (req, res) => {
       washingMachine,
     });
     await finalizeContract(contract);
+    const notification: Notification = {
+      title: 'A booking for your washing machine has been made!',
+      message: `Washing machine ${washingMachine.name} in laundromat ${
+        washingMachine.laundromat.name
+      } has been booked from ${contract.startDate.toLocaleString()} to ${contract.endDate.toLocaleString()}`,
+      color: 'green',
+      autoClose: false,
+    };
+    sendNotification(contract.washingMachine.laundromat.owner.id, notification);
     return res.status(STATUS_OK).json(contract);
   } catch (error: unknown) {
     if (error instanceof ValidationError) {
@@ -128,6 +139,15 @@ router.put('/:id', (async (req, res) => {
     }
 
     await finalizeContract(contract, true);
+    const notification: Notification = {
+      title: 'A booking for your washing machine has been cancelled!',
+      message: `A booking for washing machine ${contract.washingMachine.name} in laundromat ${
+        contract.washingMachine.laundromat.name
+      } from ${contract.startDate.toLocaleString()} to ${contract.endDate.toLocaleString()} has been cancelled`,
+      color: 'blue',
+      autoClose: false,
+    };
+    sendNotification(contract.washingMachine.laundromat.owner.id, notification);
     return res.status(STATUS_OK).json(contract);
   } catch (error: unknown) {
     if (error instanceof ValidationError) {
