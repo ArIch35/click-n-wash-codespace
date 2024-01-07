@@ -132,7 +132,7 @@ export const getAllWashingMachinesContractsById = async (id: string) => {
   if (!response.ok) {
     throw new Error((data as Message).message);
   }
-  return entityParser<{ start: Date; end: Date }[]>;
+  return entityParser<{ start: Date; end: Date }[]>(data as { start: Date; end: Date }[]);
 };
 
 /**
