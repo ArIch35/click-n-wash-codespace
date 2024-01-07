@@ -14,6 +14,7 @@ import HomePage from './pages/HomePage';
 import LaundromatsPage from './pages/LaundromatsPage';
 import MissingPage from './pages/MissingPage';
 import SettingsPage from './pages/SettingsPage';
+import ManagePage from './pages/ManagePage';
 
 type Route = RouteProps & {
   label: string;
@@ -36,6 +37,10 @@ export const routes: Route[] = [
     label: 'Manage bookings',
     icon: IconBook2,
     requireAuth: true,
+  },
+  {
+    path: '/managebookings',
+    element: <ManagePage />,
   },
   {
     path: '/balance',

@@ -47,6 +47,33 @@ router.get('/:id', (async (req, res) => {
   }
 }) as RequestHandler);
 
+router.get('/:id/occupied-slots', (async (req, res) => {
+  try {
+    const washingMachine = await getDb().washingMachineRepository.findOne({
+      where: { id: req.params.id },
+    });
+    if (!washingMachine) {
+      return res.status(STATUS_NOT_FOUND).json(MESSAGE_NOT_FOUND);
+    }
+    const contracts = await getDb().contractRepository.find({
+      where: {
+        status: 'ongoing',
+        washingMachine: { id: req.params.id },
+      },
+    });
+    console.log(contracts);
+    const occupiedTimeSlots = contracts.map((contract) => {
+      return {
+        start: new Date(contract.startDate.getTime()),
+        end: new Date(contract.endDate.getTime()),
+      };
+    });
+    return res.status(STATUS_OK).json(occupiedTimeSlots);
+  } catch (error) {
+    return res.status(STATUS_SERVER_ERROR).json(MESSAGE_SERVER_ERROR);
+  }
+}) as RequestHandler);
+
 router.post('/', (async (req, res) => {
   try {
     const validated = await createWashingMaschineSchema.validate(req.body, {
