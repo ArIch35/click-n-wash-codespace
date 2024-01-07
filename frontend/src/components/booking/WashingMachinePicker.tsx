@@ -79,7 +79,7 @@ const WashingMachinePicker: React.FC<WashingMachinePickerProps> = ({
                     color: 'green',
                   });
                 })
-                .catch((error) => {
+                .catch((error: Error) => {
                   notifications.show({
                     title: 'Washing machine could not be booked!',
                     message: error.message || 'Please try again later!',
