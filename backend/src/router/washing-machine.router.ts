@@ -5,7 +5,6 @@ import {
   createWashingMaschineSchema,
   updateWashingMaschineSchema,
 } from '../entities/washing-machine';
-import { timeBuffer } from '../utils/constants';
 import StatusError from '../utils/error-with-status';
 import {
   MESSAGE_FORBIDDEN_NOT_OWNER,
@@ -62,11 +61,11 @@ router.get('/:id/occupied-slots', (async (req, res) => {
         washingMachine: { id: req.params.id },
       },
     });
-
+    console.log(contracts);
     const occupiedTimeSlots = contracts.map((contract) => {
       return {
-        start: new Date(contract.startDate.getTime() - timeBuffer),
-        end: new Date(contract.endDate.getTime() + timeBuffer),
+        start: new Date(contract.startDate.getTime()),
+        end: new Date(contract.endDate.getTime()),
       };
     });
     return res.status(STATUS_OK).json(occupiedTimeSlots);
