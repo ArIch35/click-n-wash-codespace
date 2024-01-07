@@ -5,6 +5,7 @@ import HomePage from './pages/HomePage';
 import LaundromatsPage from './pages/LaundromatsPage';
 import MissingPage from './pages/MissingPage';
 import SettingsPage from './pages/SettingsPage';
+import ManagePage from './pages/ManagePage';
 
 type Route = RouteProps & {
   requireAuth?: boolean;
@@ -19,6 +20,10 @@ export const routes: Route[] = [
   {
     path: '/bookings',
     element: <BookingsPage />,
+  },
+  {
+    path: '/managebookings',
+    element: <ManagePage />,
   },
   {
     path: '/balance',

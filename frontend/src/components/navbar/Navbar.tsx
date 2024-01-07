@@ -8,6 +8,7 @@ import {
   IconUser,
   IconUserCheck,
   TablerIconsProps,
+  IconWash,
 } from '@tabler/icons-react';
 import { useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
@@ -28,7 +29,8 @@ interface NavbarItem {
 
 const data: NavbarItem[] = [
   { link: '/', label: 'Home', icon: IconHome },
-  { link: '/bookings', label: 'Manage bookings', icon: IconBook2 },
+  { link: '/bookings', label: 'Book Washing Machine', icon: IconWash },
+  { link: '/managebookings', label: 'Manage Bookings', icon: IconBook2 },
   { link: '/balance', label: 'Balance', icon: IconTransactionEuro },
   { link: '/laundromats', label: 'Manage laundromats', icon: IconBuildingStore, vendorOnly: true },
 ];
