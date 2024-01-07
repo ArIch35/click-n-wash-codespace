@@ -4,6 +4,8 @@ import WashingMachine from '../../interfaces/entities/washing-machine';
 import BaseList from '../ui/BaseList.component';
 import IndividualWashingMachine from '../ui/IndividualWashingMachineComponent';
 import TimePicker from './TimePicker';
+import { bookWashingMachine, getAllWashingMachinesContractsById } from '../../utils/api-functions';
+import { notifications } from '@mantine/notifications';
 
 interface WashingMachinePickerProps {
   isOpen: boolean;
@@ -17,48 +19,39 @@ const WashingMachinePicker: React.FC<WashingMachinePickerProps> = ({
   washingMachines,
 }) => {
   const [timePickerOpen, setTimePickerOpen] = useState<boolean>(false);
+  const [selectedWashingMachine, setSelectedWashingMachine] = useState<WashingMachine | null>(null);
   const [bookedDates, setBookedDates] = useState<Map<string, Date[]> | null>(null);
 
-  // Change when the API is ready
+  const getDateStringRepresentation = (date: Date) => {
+    return (
+      date.getFullYear() +
+      '-' +
+      (date.getMonth() + 1).toString().padStart(2, '0') +
+      '-' +
+      date.getDate().toString().padStart(2, '0')
+    );
+  };
+
   const onWashingMachineClick = (washingMachine: WashingMachine) => {
     setTimePickerOpen(true);
-    console.log(washingMachine);
-    setBookedDates(
-      new Map([
-        [
-          '2024-01-01',
-          [
-            new Date(2024, 0, 1, 0, 0),
-            new Date(2024, 0, 1, 2, 0),
-            new Date(2024, 0, 1, 4, 0),
-            new Date(2024, 0, 1, 6, 0),
-            new Date(2024, 0, 1, 8, 0),
-            new Date(2024, 0, 1, 10, 0),
-            new Date(2024, 0, 1, 12, 0),
-            new Date(2024, 0, 1, 14, 0),
-            new Date(2024, 0, 1, 16, 0),
-            new Date(2024, 0, 1, 18, 0),
-            new Date(2024, 0, 1, 20, 0),
-            new Date(2024, 0, 1, 22, 0),
-          ],
-        ],
-        [
-          '2024-01-02',
-          [
-            new Date(2024, 0, 2, 0, 0),
-            new Date(2024, 0, 2, 4, 0),
-            new Date(2024, 0, 2, 8, 0),
-            new Date(2024, 0, 2, 12, 0),
-            new Date(2024, 0, 1, 14, 0),
-            new Date(2024, 0, 1, 16, 0),
-            new Date(2024, 0, 1, 18, 0),
-            new Date(2024, 0, 1, 20, 0),
-            new Date(2024, 0, 1, 22, 0),
-          ],
-        ],
-        ['2024-01-03', [new Date(2024, 0, 3, 0, 0), new Date(2024, 0, 3, 4, 0)]],
-      ]),
-    );
+    setSelectedWashingMachine(washingMachine);
+    getAllWashingMachinesContractsById(washingMachine.id)
+      .then((contracts) => {
+        const bookedDatesMap = new Map<string, Date[]>();
+        contracts.forEach((contract) => {
+          const date = new Date(contract.start);
+          const dateString = getDateStringRepresentation(date);
+          if (bookedDatesMap.has(dateString)) {
+            bookedDatesMap.set(dateString, [...(bookedDatesMap.get(dateString) || []), date]);
+          } else {
+            bookedDatesMap.set(dateString, [date]);
+          }
+        });
+        setBookedDates(bookedDatesMap);
+      })
+      .catch((error) => {
+        console.error(error);
+      });
   };
 
   return (
@@ -71,14 +64,29 @@ const WashingMachinePicker: React.FC<WashingMachinePickerProps> = ({
         />
       </Modal>
 
-      {bookedDates && (
+      {selectedWashingMachine && bookedDates && (
         <Modal opened={timePickerOpen} onClose={() => setTimePickerOpen(false)}>
           <TimePicker
             bookedDates={bookedDates}
             onWashingMachineBooked={(date: Date) => {
               setTimePickerOpen(false);
               onClose();
-              console.log(date);
+              bookWashingMachine(selectedWashingMachine.id, date)
+                .then(() => {
+                  notifications.show({
+                    title: 'Success!',
+                    message: 'Washing machine booked successfully',
+                    color: 'green',
+                  });
+                })
+                .catch((error) => {
+                  notifications.show({
+                    title: 'Error!',
+                    message: 'Washing machine could not be booked',
+                    color: 'red',
+                  });
+                  console.error(error);
+                });
             }}
           />
         </Modal>
