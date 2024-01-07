@@ -4,6 +4,8 @@ import 'reflect-metadata';
 import { connectToDb } from './db';
 
 import http from 'http';
+import { Server } from 'socket.io';
+import { DefaultEventsMap } from 'socket.io/dist/typed-events';
 import checkToken from './middleware/auth.middleware';
 import createSocket from './middleware/socket.middleware';
 import contractRouter from './router/contract.router';
@@ -53,3 +55,13 @@ const server = async (test?: boolean) => {
 };
 
 export default server;
+
+let socket: Server<DefaultEventsMap, DefaultEventsMap, DefaultEventsMap, unknown> | undefined;
+export const getSocket = () => {
+  return socket;
+};
+export const setSocket = (
+  newSocket: Server<DefaultEventsMap, DefaultEventsMap, DefaultEventsMap, unknown>,
+) => {
+  socket = newSocket;
+};
