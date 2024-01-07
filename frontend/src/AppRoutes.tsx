@@ -1,4 +1,5 @@
 import { notifications } from '@mantine/notifications';
+import React from 'react';
 import { useSelector } from 'react-redux';
 import { Navigate, Route, Routes, useLocation } from 'react-router-dom';
 import { RootState } from './reducers/root.reducer';
@@ -27,8 +28,14 @@ const showAuthRequiredOnce = () => {
 const AuthRequired = ({ children, to = '/' }: AuthRequiredProps) => {
   const auth = useSelector((state: RootState) => state.authenticationState.firebaseData);
   const { pathname } = useLocation();
+
+  React.useEffect(() => {
+    if (!auth && pathname !== to) {
+      showAuthRequiredOnce();
+    }
+  }, [auth, pathname, to]);
+
   if (!auth && pathname !== to) {
-    showAuthRequiredOnce();
     return <Navigate to={to} replace />;
   }
 
