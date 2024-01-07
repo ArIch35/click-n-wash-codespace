@@ -2,8 +2,10 @@ import { Notifications } from '@mantine/notifications';
 import React, { createContext, useEffect } from 'react';
 import { useSelector } from 'react-redux';
 import { Socket, io } from 'socket.io-client';
+import Notification from '../interfaces/notification';
 import { RootState } from '../reducers/root.reducer';
 import loadEnv from '../utils/load-env';
+import { showCustomNotification } from '../utils/mantine-notifications';
 
 const NotificationContext = createContext<null>(null);
 
@@ -18,8 +20,8 @@ const NotificationProvider = ({ children }: NotificationProviderProps) => {
   });
 
   // Handle socket connection here
-  socket.on('notification', (data) => {
-    console.log('Message from server:', data);
+  socket.on('notification', (data: Notification) => {
+    showCustomNotification(data);
   });
 
   socket.on('connect', () => {
