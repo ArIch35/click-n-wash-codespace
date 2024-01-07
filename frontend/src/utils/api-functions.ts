@@ -1,4 +1,5 @@
 import firebaseAuth from '../firebase';
+import Laundromat from '../interfaces/entities/laundromat';
 import User, { CreateUser, UpdateUser } from '../interfaces/entities/user';
 import loadEnv from './load-env';
 
@@ -81,4 +82,82 @@ export const updateUser = async (body: UpdateUser): Promise<User> => {
     throw new Error((data as Message).message);
   }
   return data as User;
+};
+
+/**
+ * Gets all laundromats from the server.
+ * @returns The laundromats.
+ * @throws An error if the laundromats could not be retrieved.
+ **/
+export const getLaundromats = async () => {
+  const response = await fetch(`${loadEnv().VITE_SERVER_ADDRESS}/laundromats`, {
+    headers: { ...(await headers()) },
+  });
+
+  const data = (await response.json()) as unknown;
+  if (!response.ok) {
+    throw new Error((data as Message).message);
+  }
+  return data as Laundromat[];
+};
+
+/**
+ * Gets all washing machines with laundromat id from the server.
+ * @param id The id of the laundromat.
+ * @returns The washing machines.
+ * @throws An error if the washing machines could not be retrieved.
+ */
+export const getWashingMachinesByLaundromatId = async (id: string) => {
+  const response = await fetch(`${loadEnv().VITE_SERVER_ADDRESS}/laundromats/${id}`, {
+    headers: { ...(await headers()) },
+  });
+
+  const data = (await response.json()) as unknown;
+  if (!response.ok) {
+    throw new Error((data as Message).message);
+  }
+  return data as Laundromat;
+};
+
+export const getAllWashingMachinesContractsById = async (id: string) => {
+  const response = await fetch(
+    `${loadEnv().VITE_SERVER_ADDRESS}/washingmachines/${id}/occupied-slots`,
+    {
+      headers: { ...(await headers()) },
+    },
+  );
+
+  const data = (await response.json()) as unknown;
+  if (!response.ok) {
+    throw new Error((data as Message).message);
+  }
+  return data as { start: Date; end: Date }[];
+};
+
+/**
+ * Creates a contract on the server.
+ * @param id The id of the washing machine.
+ * @param startDate The start date of the contract.
+ * @returns The created contract.
+ * @throws An error if the contract could not be created.
+ */
+const ONE_HOUR = 3600000;
+export const bookWashingMachine = async (id: string, startDate: Date) => {
+  const response = await fetch(`${loadEnv().VITE_SERVER_ADDRESS}/contracts`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      ...(await headers()),
+    },
+    body: JSON.stringify({
+      startDate: startDate,
+      endDate: new Date(startDate.getTime() + ONE_HOUR * 2),
+      washingMachine: id,
+    }),
+  });
+
+  const data = (await response.json()) as unknown;
+  if (!response.ok) {
+    throw new Error((data as Message).message);
+  }
 };
