@@ -6,7 +6,7 @@ interface Laundromat extends BaseEntity {
   street: string;
   city: string;
   country: string;
-  postalCode: number;
+  postalCode: string;
   price: number;
   owner: User;
   washingMachines?: WashingMachine[];
