@@ -1,7 +1,11 @@
 import { RequestHandler, Router } from 'express';
 import { ValidationError } from 'yup';
 import getDb from '../db';
-import { createContractSchema, finalizeContract, updateContractSchema } from '../entities/contract';
+import Contract, {
+  createContractSchema,
+  finalizeContract,
+  updateContractSchema,
+} from '../entities/contract';
 import Notification from '../interfaces/notification';
 import StatusError from '../utils/error-with-status';
 import {
@@ -17,6 +21,7 @@ import {
   STATUS_OK,
   STATUS_SERVER_ERROR,
 } from '../utils/http-status-codes';
+import propertiesRemover from '../utils/properties-remover';
 import sendNotification from '../utils/send-notification';
 
 const router: Router = Router();
@@ -92,7 +97,10 @@ router.post('/', (async (req, res) => {
       autoClose: false,
     };
     sendNotification(contract.washingMachine.laundromat.owner.id, notification);
-    return res.status(STATUS_OK).json(contract);
+    const contractWithReducedData = propertiesRemover<Contract>(contract, [
+      'washingMachine.laundromat.owner',
+    ]);
+    return res.status(STATUS_OK).json(contractWithReducedData);
   } catch (error: unknown) {
     if (error instanceof ValidationError) {
       return res.status(STATUS_BAD_REQUEST).json(customMessage(false, error.errors.join(', ')));
