@@ -12,4 +12,9 @@ interface Laundromat extends BaseEntity {
   washingMachines?: WashingMachine[];
 }
 
+export type CreateLaundromat = Pick<
+  Laundromat,
+  'name' | 'street' | 'city' | 'country' | 'postalCode' | 'price'
+>;
+
 export default Laundromat;
