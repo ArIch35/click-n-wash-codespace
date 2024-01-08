@@ -8,6 +8,7 @@ import { Server } from 'socket.io';
 import { DefaultEventsMap } from 'socket.io/dist/typed-events';
 import checkToken from './middleware/auth.middleware';
 import createSocket from './middleware/socket.middleware';
+import balanceTransactionRouter from './router/balance-transaction.router';
 import contractRouter from './router/contract.router';
 import generateTokenRouter from './router/generate-token.router';
 import laundromatRouter from './router/laundromat.router';
@@ -40,6 +41,7 @@ const server = async (test?: boolean) => {
   app.use('/api/laundromats', laundromatRouter);
   app.use('/api/washingmachines', washingMachineRouter);
   app.use('/api/contracts', contractRouter);
+  app.use('/api/balancetransactions', balanceTransactionRouter);
   app.use('/api/generateToken', generateTokenRouter);
   // Add routes here
 
