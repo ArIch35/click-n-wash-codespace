@@ -10,7 +10,7 @@ class User extends BaseEntity {
   email!: string;
 
   @Column()
-  credit: number = 100;
+  balance: number = 100;
 
   @Column()
   isAlsoVendor: boolean = false;

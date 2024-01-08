@@ -103,22 +103,22 @@ const setName = (contract: Contract): void => {
 };
 
 /**
- * Finalize a contract by using transaction to update both user and laundromat owner credit and contract status
+ * Finalize a contract by using transaction to update both user and laundromat owner balance and contract status
  * @param contract The contract to be finalized
  * @param cancel Whether the contract is gonna be cancelled
  */
 export const finalizeContract = async (contract: Contract, cancel?: boolean) => {
   await getDb().entityManager.transaction(async (transactionalEntityManager) => {
-    // Update user credit if the user is not the owner of the laundromat
+    // Update user balance if the user is not the owner of the laundromat
     if (contract.user.id !== contract.washingMachine.laundromat.owner.id) {
       // Check whether the contract is gonna be cancelled
       if (cancel) {
         contract.status = 'cancelled';
-        contract.user.credit += contract.price;
-        contract.washingMachine.laundromat.owner.credit -= contract.price;
+        contract.user.balance += contract.price;
+        contract.washingMachine.laundromat.owner.balance -= contract.price;
       } else {
-        contract.user.credit -= contract.price;
-        contract.washingMachine.laundromat.owner.credit += contract.price;
+        contract.user.balance -= contract.price;
+        contract.washingMachine.laundromat.owner.balance += contract.price;
       }
     }
     await transactionalEntityManager.save(contract.user);

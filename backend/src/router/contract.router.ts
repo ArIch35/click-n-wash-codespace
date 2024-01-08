@@ -79,9 +79,9 @@ router.post('/', (async (req, res) => {
         .json(customMessage(false, 'Washing machine does not exist'));
     }
 
-    // Check whether user credit is sufficient
-    if (user.credit < washingMachine.laundromat.price) {
-      return res.status(STATUS_FORBIDDEN).json(customMessage(false, 'Insufficient credit'));
+    // Check whether user balance is sufficient
+    if (user.balance < washingMachine.laundromat.price) {
+      return res.status(STATUS_FORBIDDEN).json(customMessage(false, 'Insufficient balance'));
     }
 
     const contract = getDb().contractRepository.create({
