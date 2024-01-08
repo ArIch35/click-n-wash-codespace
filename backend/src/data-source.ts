@@ -1,4 +1,5 @@
 import { DataSource } from 'typeorm';
+import BalanceTransaction from './entities/balance-transaction';
 import Contract from './entities/contract';
 import Laundromat from './entities/laundromat';
 import User from './entities/user';
@@ -21,7 +22,7 @@ const createDataSource = (schema?: string) => {
     schema: schema || 'cnw-schema',
     synchronize: true,
     logging: false,
-    entities: [User, Laundromat, WashingMachine, Contract],
+    entities: [User, Laundromat, WashingMachine, Contract, BalanceTransaction],
     subscribers: [],
     migrations: [],
   }).initialize();
