@@ -21,7 +21,7 @@
 }
 
 .link {
-  display: flex;
+  display: flex !important;
   align-items: center;
   text-decoration: none;
   font-size: var(--mantine-font-size-sm);
