@@ -1,4 +1,5 @@
 import firebaseAuth from '../firebase';
+import BalanceTransaction from '../interfaces/entities/balance-transaction';
 import Contract from '../interfaces/entities/contract';
 import Laundromat, { CreateLaundromat } from '../interfaces/entities/laundromat';
 import User, { CreateUser, UpdateUser } from '../interfaces/entities/user';
@@ -253,4 +254,21 @@ export const cancelContract = async (id: string) => {
   if (!response.ok) {
     throw new Error((data as Message).message);
   }
+};
+
+/**
+ * Retrieves the balance transactions from the server.
+ * @returns A promise that resolves to an array of BalanceTransaction objects.
+ * @throws An error if the server response is not successful.
+ */
+export const getBalanceTransactions = async () => {
+  const response = await fetch(`${loadEnv().VITE_SERVER_ADDRESS}/balancetransactions`, {
+    headers: { ...(await headers()) },
+  });
+
+  const data = (await response.json()) as unknown;
+  if (!response.ok) {
+    throw new Error((data as Message).message);
+  }
+  return entityParser<BalanceTransaction[]>(data as BalanceTransaction[]);
 };
