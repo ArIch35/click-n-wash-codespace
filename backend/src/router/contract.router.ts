@@ -79,11 +79,6 @@ router.post('/', (async (req, res) => {
         .json(customMessage(false, 'Washing machine does not exist'));
     }
 
-    // Check whether user balance is sufficient
-    if (user.balance < washingMachine.laundromat.price) {
-      return res.status(STATUS_FORBIDDEN).json(customMessage(false, 'Insufficient balance'));
-    }
-
     const contract = getDb().contractRepository.create({
       ...validated,
       price: washingMachine.laundromat.price,
@@ -92,7 +87,7 @@ router.post('/', (async (req, res) => {
     });
     await finalizeContract(contract);
     const notification: Notification = {
-      title: 'A booking for your washing machine has been made!',
+      title: 'Someone has booked your washing machine!',
       message: `Washing machine ${washingMachine.name} in laundromat ${
         washingMachine.laundromat.name
       } has been booked from ${contract.startDate.toLocaleString()} to ${contract.endDate.toLocaleString()}`,
@@ -137,7 +132,7 @@ router.put('/:id', (async (req, res) => {
 
     await finalizeContract(contract, true);
     const notification: Notification = {
-      title: 'A booking for your washing machine has been cancelled!',
+      title: 'Someone has cancelled a booking for your washing machine!',
       message: `A booking for washing machine ${contract.washingMachine.name} in laundromat ${
         contract.washingMachine.laundromat.name
       } from ${contract.startDate.toLocaleString()} to ${contract.endDate.toLocaleString()} has been cancelled`,
