@@ -1,5 +1,6 @@
 import { DataSource, EntityManager, Repository } from 'typeorm';
 import createDataSource from './data-source';
+import BalanceTransaction from './entities/balance-transaction';
 import Contract from './entities/contract';
 import Laundromat from './entities/laundromat';
 import User from './entities/user';
@@ -13,6 +14,7 @@ interface Db {
   laundromatRepository: Repository<Laundromat>;
   washingMachineRepository: Repository<WashingMachine>;
   contractRepository: Repository<Contract>;
+  balanceTransactionRepository: Repository<BalanceTransaction>;
   // Add other repositories here
 }
 
@@ -37,6 +39,8 @@ export const connectToDb = async (test?: boolean): Promise<void> => {
     dataSource: dataSource,
     entityManager: em,
     dropDatabase: async () => {
+      await getDb().contractRepository.delete({});
+      await getDb().balanceTransactionRepository.delete({});
       await getDb().washingMachineRepository.delete({});
       await getDb().laundromatRepository.delete({});
       await getDb().userRepository.delete({});
@@ -45,6 +49,7 @@ export const connectToDb = async (test?: boolean): Promise<void> => {
     laundromatRepository: em.getRepository(Laundromat),
     washingMachineRepository: em.getRepository(WashingMachine),
     contractRepository: em.getRepository(Contract),
+    balanceTransactionRepository: em.getRepository(BalanceTransaction),
     // Add other repositories here
   };
 };
