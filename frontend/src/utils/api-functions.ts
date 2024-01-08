@@ -1,4 +1,5 @@
 import firebaseAuth from '../firebase';
+import Contract from '../interfaces/entities/contract';
 import Laundromat from '../interfaces/entities/laundromat';
 import User, { CreateUser, UpdateUser } from '../interfaces/entities/user';
 import entityParser from './entity-parser';
@@ -136,6 +137,23 @@ export const getAllWashingMachinesContractsById = async (id: string) => {
 };
 
 /**
+ * Gets all contracts created by the user from the server.
+ * @returns The contracts.
+ * @throws An error if the contracts could not be retrieved.
+ */
+export const getContracts = async () => {
+  const response = await fetch(`${loadEnv().VITE_SERVER_ADDRESS}/contracts`, {
+    headers: { ...(await headers()) },
+  });
+
+  const data = (await response.json()) as unknown;
+  if (!response.ok) {
+    throw new Error((data as Message).message);
+  }
+  return entityParser<Contract[]>(data as Contract[]);
+};
+
+/**
  * Creates a contract on the server.
  * @param id The id of the washing machine.
  * @param startDate The start date of the contract.
@@ -154,6 +172,28 @@ export const bookWashingMachine = async (id: string, startDate: Date) => {
       startDate: startDate,
       endDate: new Date(startDate.getTime() + ONE_HOUR * 2),
       washingMachine: id,
+    }),
+  });
+
+  const data = (await response.json()) as unknown;
+  if (!response.ok) {
+    throw new Error((data as Message).message);
+  }
+};
+
+/**
+ * Cancels a contract on the server.
+ * @param id The id of the contract.
+ */
+export const cancelContract = async (id: string) => {
+  const response = await fetch(`${loadEnv().VITE_SERVER_ADDRESS}/contracts/${id}`, {
+    method: 'PUT',
+    headers: {
+      'Content-Type': 'application/json',
+      ...(await headers()),
+    },
+    body: JSON.stringify({
+      status: 'cancelled',
     }),
   });
 

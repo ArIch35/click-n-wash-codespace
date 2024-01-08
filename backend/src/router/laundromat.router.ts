@@ -21,9 +21,14 @@ import {
 
 const router: Router = Router();
 
-router.get('/', (async (_, res) => {
+router.get('/', (async (req, res) => {
   try {
-    const laundromats = await getDb().laundromatRepository.find();
+    const uid = res.locals.uid as string;
+    const onlyOwned = req.query.onlyOwned === 'true';
+    const laundromats = await getDb().laundromatRepository.find({
+      where: onlyOwned ? { owner: { id: uid } } : {},
+      relations: { washingMachines: true },
+    });
     return res.status(STATUS_OK).json(laundromats);
   } catch (error) {
     return res.status(STATUS_SERVER_ERROR).json(MESSAGE_SERVER_ERROR);
@@ -34,7 +39,7 @@ router.get('/:id', (async (req, res) => {
   try {
     const laundromat = await getDb().laundromatRepository.findOne({
       where: { id: req.params.id },
-      relations: ['washingMachines'],
+      relations: { washingMachines: true },
     });
     if (!laundromat) {
       return res.status(STATUS_NOT_FOUND).json(MESSAGE_NOT_FOUND);
@@ -88,7 +93,7 @@ router.put('/:id', (async (req, res) => {
 
     const laundromatExists = await getDb().laundromatRepository.findOne({
       where: { id: req.params.id },
-      relations: ['owner'],
+      relations: { owner: true },
     });
     if (!laundromatExists) {
       return res.status(STATUS_NOT_FOUND).json(MESSAGE_NOT_FOUND);
@@ -120,7 +125,7 @@ router.delete('/:id', (async (req, res) => {
   try {
     const laundromatExists = await getDb().laundromatRepository.findOne({
       where: { id: req.params.id },
-      relations: ['owner', 'washingMachines'],
+      relations: { owner: true, washingMachines: true },
     });
     if (!laundromatExists) {
       return res.status(STATUS_NOT_FOUND).json(MESSAGE_NOT_FOUND);
