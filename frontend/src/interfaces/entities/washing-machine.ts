@@ -9,4 +9,8 @@ interface WashingMachine extends BaseEntity {
   laundromat: Laundromat;
 }
 
+export type CreateWashingMachine = Pick<WashingMachine, 'name' | 'brand' | 'description'> & {
+  laundromat: string;
+};
+
 export default WashingMachine;
