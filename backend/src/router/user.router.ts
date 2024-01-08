@@ -1,7 +1,9 @@
 import { RequestHandler, Router } from 'express';
 import { ValidationError } from 'yup';
 import getDb from '../db';
+import { createTopupSchema, finalizeBalanceTransaction } from '../entities/balance-transaction';
 import { createUserSchema, updateUserSchema } from '../entities/user';
+import StatusError from '../utils/error-with-status';
 import {
   MESSAGE_CONFLICT_UNRESOLVED,
   MESSAGE_NOT_FOUND,
@@ -102,6 +104,36 @@ router.post('/restore', (async (_req, res) => {
     userExists.deletedAt = undefined;
     return res.status(STATUS_OK).json(userExists);
   } catch (error: unknown) {
+    return res.status(STATUS_SERVER_ERROR).json(MESSAGE_SERVER_ERROR);
+  }
+}) as RequestHandler);
+
+router.post('/topup', (async (req, res) => {
+  try {
+    const validated = await createTopupSchema.validate(req.body, { abortEarly: false });
+
+    // Check whether user exists
+    const uid = res.locals.uid as string;
+    const user = await getDb().userRepository.findOne({
+      where: { id: uid },
+    });
+    if (!user) {
+      return res.status(STATUS_BAD_REQUEST).json(customMessage(false, 'User does not exist'));
+    }
+
+    const balanceTransaction = getDb().balanceTransactionRepository.create({
+      ...validated,
+      type: 'topup',
+      to: user,
+    });
+    await finalizeBalanceTransaction(balanceTransaction);
+    return res.status(STATUS_OK).json(balanceTransaction);
+  } catch (error: unknown) {
+    if (error instanceof ValidationError) {
+      return res.status(STATUS_BAD_REQUEST).json(customMessage(false, error.errors.join(', ')));
+    } else if (error instanceof StatusError) {
+      return res.status(error.status).json(customMessage(false, error.message));
+    }
     return res.status(STATUS_SERVER_ERROR).json(MESSAGE_SERVER_ERROR);
   }
 }) as RequestHandler);
