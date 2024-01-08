@@ -25,7 +25,7 @@ router.get('/', (async (_, res) => {
   const id = res.locals.uid as string;
   try {
     const contracts = await getDb().contractRepository.find({
-      where: [{ user: { id } }, { washingMachine: { laundromat: { owner: { id } } } }],
+      where: { user: { id } },
       relations: { washingMachine: { laundromat: true } },
       withDeleted: true,
     });
@@ -39,10 +39,7 @@ router.get('/:id', (async (req, res) => {
   const id = res.locals.uid as string;
   try {
     const contract = await getDb().contractRepository.findOne({
-      where: [
-        { id: req.params.id, user: { id } },
-        { id: req.params.id, washingMachine: { laundromat: { owner: { id } } } },
-      ],
+      where: { id: req.params.id, user: { id } },
       relations: { washingMachine: true },
       withDeleted: true,
     });
