@@ -1,6 +1,7 @@
 import firebaseAuth from '../firebase';
 import Laundromat from '../interfaces/entities/laundromat';
 import User, { CreateUser, UpdateUser } from '../interfaces/entities/user';
+import entityParser from './entity-parser';
 import loadEnv from './load-env';
 
 interface Message {
@@ -98,7 +99,7 @@ export const getLaundromats = async () => {
   if (!response.ok) {
     throw new Error((data as Message).message);
   }
-  return data as Laundromat[];
+  return entityParser<Laundromat[]>(data as Laundromat[]);
 };
 
 /**
@@ -116,7 +117,7 @@ export const getWashingMachinesByLaundromatId = async (id: string) => {
   if (!response.ok) {
     throw new Error((data as Message).message);
   }
-  return data as Laundromat;
+  return entityParser<Laundromat>(data as Laundromat);
 };
 
 export const getAllWashingMachinesContractsById = async (id: string) => {
@@ -131,7 +132,7 @@ export const getAllWashingMachinesContractsById = async (id: string) => {
   if (!response.ok) {
     throw new Error((data as Message).message);
   }
-  return data as { start: Date; end: Date }[];
+  return entityParser<{ start: Date; end: Date }[]>(data as { start: Date; end: Date }[]);
 };
 
 /**

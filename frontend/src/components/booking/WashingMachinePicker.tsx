@@ -1,11 +1,11 @@
-import React, { useState } from 'react';
 import { Modal } from '@mantine/core';
+import { notifications } from '@mantine/notifications';
+import React, { useState } from 'react';
 import WashingMachine from '../../interfaces/entities/washing-machine';
+import { bookWashingMachine, getAllWashingMachinesContractsById } from '../../utils/api-functions';
 import BaseList from '../ui/BaseList.component';
 import IndividualWashingMachine from '../ui/IndividualWashingMachineComponent';
 import TimePicker from './TimePicker';
-import { bookWashingMachine, getAllWashingMachinesContractsById } from '../../utils/api-functions';
-import { notifications } from '@mantine/notifications';
 
 interface WashingMachinePickerProps {
   isOpen: boolean;
@@ -39,7 +39,7 @@ const WashingMachinePicker: React.FC<WashingMachinePickerProps> = ({
       .then((contracts) => {
         const bookedDatesMap = new Map<string, Date[]>();
         contracts.forEach((contract) => {
-          const date = new Date(contract.start);
+          const date = contract.start;
           const dateString = getDateStringRepresentation(date);
           if (bookedDatesMap.has(dateString)) {
             bookedDatesMap.set(dateString, [...(bookedDatesMap.get(dateString) || []), date]);
