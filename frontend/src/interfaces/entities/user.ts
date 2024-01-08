@@ -3,7 +3,7 @@ import Laundromat from './laundromat';
 
 interface User extends BaseEntity {
   email: string;
-  credit: number;
+  balance: number;
   isAlsoVendor: boolean;
   laundromats: Laundromat[];
 }

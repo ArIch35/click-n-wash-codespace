@@ -3,6 +3,7 @@ import { date, object, string } from 'yup';
 import getDb from '../db';
 import { timeBuffer } from '../utils/constants';
 import StatusError from '../utils/error-with-status';
+import { finalizeBalanceTransaction } from './balance-transaction';
 import BaseEntity from './base-entity';
 import User from './user';
 import WashingMachine from './washing-machine';
@@ -103,26 +104,30 @@ const setName = (contract: Contract): void => {
 };
 
 /**
- * Finalize a contract by using transaction to update both user and laundromat owner credit and contract status
- * @param contract The contract to be finalized
- * @param cancel Whether the contract is gonna be cancelled
+ * Finalizes a contract by creating a balance transaction and updating the contract status.
+ * If the contract is cancelled, a refund balance transaction is created.
+ * @param contract - The contract to be finalized.
+ * @param cancel - Optional. Specifies whether the contract is being cancelled.
  */
 export const finalizeContract = async (contract: Contract, cancel?: boolean) => {
   await getDb().entityManager.transaction(async (transactionalEntityManager) => {
-    // Update user credit if the user is not the owner of the laundromat
-    if (contract.user.id !== contract.washingMachine.laundromat.owner.id) {
-      // Check whether the contract is gonna be cancelled
-      if (cancel) {
-        contract.status = 'cancelled';
-        contract.user.credit += contract.price;
-        contract.washingMachine.laundromat.owner.credit -= contract.price;
-      } else {
-        contract.user.credit -= contract.price;
-        contract.washingMachine.laundromat.owner.credit += contract.price;
-      }
+    // Create balance transaction
+    const balanceTransaction = getDb().balanceTransactionRepository.create({
+      type: 'payment',
+      from: contract.user,
+      to: contract.washingMachine.laundromat.owner,
+      amount: contract.price,
+    });
+
+    // Check whether the contract is gonna be cancelled
+    if (cancel) {
+      contract.status = 'cancelled';
+      balanceTransaction.type = 'refund';
+      balanceTransaction.from = contract.washingMachine.laundromat.owner;
+      balanceTransaction.to = contract.user;
     }
-    await transactionalEntityManager.save(contract.user);
-    await transactionalEntityManager.save(contract.washingMachine.laundromat.owner);
+
+    await finalizeBalanceTransaction(balanceTransaction, transactionalEntityManager);
     await transactionalEntityManager.save(contract);
   });
 };
