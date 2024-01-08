@@ -1,7 +1,8 @@
 import firebaseAuth from '../firebase';
 import Contract from '../interfaces/entities/contract';
-import Laundromat from '../interfaces/entities/laundromat';
+import Laundromat, { CreateLaundromat } from '../interfaces/entities/laundromat';
 import User, { CreateUser, UpdateUser } from '../interfaces/entities/user';
+import WashingMachine, { CreateWashingMachine } from '../interfaces/entities/washing-machine';
 import entityParser from './entity-parser';
 import loadEnv from './load-env';
 
@@ -88,19 +89,46 @@ export const updateUser = async (body: UpdateUser): Promise<User> => {
 
 /**
  * Gets all laundromats from the server.
+ * @param onlyOwned Whether to only get the laundromats owned by the current user.
  * @returns The laundromats.
  * @throws An error if the laundromats could not be retrieved.
  **/
-export const getLaundromats = async () => {
-  const response = await fetch(`${loadEnv().VITE_SERVER_ADDRESS}/laundromats`, {
-    headers: { ...(await headers()) },
-  });
+export const getLaundromats = async (onlyOwned?: boolean) => {
+  const response = await fetch(
+    `${loadEnv().VITE_SERVER_ADDRESS}/laundromats/?onlyOwned=${onlyOwned}`,
+    {
+      headers: { ...(await headers()) },
+    },
+  );
 
   const data = (await response.json()) as unknown;
   if (!response.ok) {
     throw new Error((data as Message).message);
   }
   return entityParser<Laundromat[]>(data as Laundromat[]);
+};
+
+/**
+ * Creates a laundromat on the server.
+ * @param body The values to create the laundromat with.
+ * @throws An error if the laundromat could not be created.
+ */
+export const createLaundromat = async (body: CreateLaundromat) => {
+  const response = await fetch(`${loadEnv().VITE_SERVER_ADDRESS}/laundromats`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      ...(await headers()),
+    },
+    body: JSON.stringify(body),
+  });
+
+  const data = (await response.json()) as unknown;
+  if (!response.ok) {
+    throw new Error((data as Message).message);
+  }
+
+  return entityParser<Laundromat>(data as Laundromat);
 };
 
 /**
@@ -119,6 +147,30 @@ export const getWashingMachinesByLaundromatId = async (id: string) => {
     throw new Error((data as Message).message);
   }
   return entityParser<Laundromat>(data as Laundromat);
+};
+
+/**
+ * Creates a washing machine on the server.
+ * @param id The id of the laundromat.
+ * @param body The values to create the washing machine with.
+ * @throws An error if the washing machine could not be created.
+ */
+export const createWashingMachine = async (body: CreateWashingMachine) => {
+  const response = await fetch(`${loadEnv().VITE_SERVER_ADDRESS}/washingmachines`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      ...(await headers()),
+    },
+    body: JSON.stringify(body),
+  });
+
+  const data = (await response.json()) as unknown;
+  if (!response.ok) {
+    throw new Error((data as Message).message);
+  }
+
+  return entityParser<WashingMachine>(data as WashingMachine);
 };
 
 export const getAllWashingMachinesContractsById = async (id: string) => {
