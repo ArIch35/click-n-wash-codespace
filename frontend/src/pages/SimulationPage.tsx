@@ -1,16 +1,36 @@
+import { useEffect } from 'react';
 import { useParams } from 'react-router-dom';
+import { getContactById } from '../utils/api-functions';
+import React from 'react';
+import WashingMachine from '../interfaces/entities/washing-machine';
+import { Card, Text } from '@mantine/core';
+import Timer from '../components/simulation/Timer';
+import Contract from '../interfaces/entities/contract';
 
 const SimulationPage: React.FC = () => {
-    const { contractId } = useParams<string>();
+  const { contractId } = useParams<string>();
+  const [contract, setContract] = React.useState<Contract | null>(null);
 
-    // Rest of the component code
+  useEffect(() => {
+    getContactById(contractId!)
+      .then((contract) => {
+        setContract(contract);
+      })
+      .catch((error) => {
+        console.log(error);
+      });
+  }, [contractId]);
 
-    return (
-        <div>
-            <h1>Simulation Page</h1>
-            <p>Contract ID: {contractId}</p>
-        </div>
-    );
+  return (
+    <>
+      {contract && (
+        <Card>
+          <Timer startTime={contract.startDate} endTime={contract.endDate} />
+          <Text>{`${contract.washingMachine.name} ${contract.washingMachine.brand}`}</Text>
+        </Card>
+      )}
+    </>
+  );
 };
 
 export default SimulationPage;
