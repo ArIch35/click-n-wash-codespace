@@ -2,11 +2,13 @@ import React from 'react';
 import { RingProgress, Stack, Text } from '@mantine/core';
 
 interface TimerProps {
+  label: string;
   startTime: Date;
   endTime: Date;
+  callbackFinish: () => void;
 }
 
-const Timer: React.FC<TimerProps> = ({ startTime, endTime }) => {
+const Timer: React.FC<TimerProps> = ({ label, startTime, endTime, callbackFinish }) => {
   const [hour, setHour] = React.useState<number>(0);
   const [minute, setMinute] = React.useState<number>(0);
   const [second, setSecond] = React.useState<number>(0);
@@ -39,8 +41,13 @@ const Timer: React.FC<TimerProps> = ({ startTime, endTime }) => {
       setSecond(diffSeconds % 60);
     };
 
+    if (progress >= 100) {
+      clearInterval(interval);
+      callbackFinish();
+    }
+
     return () => clearInterval(interval);
-  }, [second]);
+  }, [second, progress, startTime, endTime, callbackFinish]);
 
   const getColor = () => {
     if (progress < 50) {
@@ -57,11 +64,16 @@ const Timer: React.FC<TimerProps> = ({ startTime, endTime }) => {
       size={170}
       sections={[{ value: progress, color: getColor() }]}
       label={
-        <Text c="blue" fw={700} ta="center" size="xl">
-          {`${hour.toString().padStart(2, '0')}:${minute.toString().padStart(2, '0')}:${second
-            .toString()
-            .padStart(2, '0')}`}
-        </Text>
+        <Stack>
+          <Text c={getColor()} fw={400} ta="center" size="lg">
+            {label}
+          </Text>
+          <Text c={getColor()} fw={700} ta="center" size="xl">
+            {`${hour.toString().padStart(2, '0')}:${minute.toString().padStart(2, '0')}:${second
+              .toString()
+              .padStart(2, '0')}`}
+          </Text>
+        </Stack>
       }
     />
   );

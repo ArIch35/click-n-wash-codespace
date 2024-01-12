@@ -1,15 +1,59 @@
 import { useEffect } from 'react';
-import { useParams } from 'react-router-dom';
-import { getContactById } from '../utils/api-functions';
+import { useNavigate, useParams } from 'react-router-dom';
+import { completeContract, getContactById } from '../utils/api-functions';
 import React from 'react';
-import WashingMachine from '../interfaces/entities/washing-machine';
 import { Card, Text } from '@mantine/core';
 import Timer from '../components/simulation/Timer';
 import Contract from '../interfaces/entities/contract';
+import { showCustomNotification } from '../utils/mantine-notifications';
+import { Activities } from '../components/simulation/activities/SimulationActivity.interface';
+import InsertLaundry from '../components/simulation/activities/InsertLaundry';
+import ChooseProgram from '../components/simulation/activities/ChooseProgram';
+import TakeOutLaundry from '../components/simulation/activities/TakeOutLaundry';
+
+const initialActivities: Activities = {
+  insertLaundry: 'idle',
+  chooseProgram: { status: 'idle' },
+  washingCompleted: 'idle',
+};
 
 const SimulationPage: React.FC = () => {
+  const navigate = useNavigate();
   const { contractId } = useParams<string>();
   const [contract, setContract] = React.useState<Contract | null>(null);
+  const [activities, setActivities] = React.useState<Activities>(initialActivities);
+
+  const getTimeNow = () => {
+    return new Date();
+  };
+
+  const getTimePlusMinute = (minute: number) => {
+    const now = new Date();
+    now.setMinutes(now.getMinutes() + minute);
+    return now;
+  };
+
+  const washingCompleted = () => {
+    completeContract(contractId!)
+      .then(() => {
+        showCustomNotification({
+          title: 'Washing Complete',
+          message: 'Washing machine is done',
+          color: 'green',
+          autoClose: false,
+        });
+        navigate('/bookings');
+      })
+      .catch((error) => {
+        showCustomNotification({
+          title: 'Washing Failed',
+          message: 'Something went wrong',
+          color: 'red',
+          autoClose: false,
+        });
+        console.log(error);
+      });
+  };
 
   useEffect(() => {
     getContactById(contractId!)
@@ -25,8 +69,32 @@ const SimulationPage: React.FC = () => {
     <>
       {contract && (
         <Card>
-          <Timer startTime={contract.startDate} endTime={contract.endDate} />
+          <Timer
+            label="Max Timer"
+            startTime={contract.startDate}
+            endTime={contract.endDate}
+            callbackFinish={washingCompleted}
+          />
           <Text>{`${contract.washingMachine.name} ${contract.washingMachine.brand}`}</Text>
+          <InsertLaundry
+            start={getTimeNow()}
+            end={getTimePlusMinute(5)}
+            activities={activities}
+            setActivities={setActivities}
+          />
+          <ChooseProgram
+            start={getTimeNow()}
+            end={getTimePlusMinute(activities.chooseProgram.program!.duration)}
+            activities={activities}
+            setActivities={setActivities}
+          />
+          <TakeOutLaundry
+            start={getTimeNow()}
+            end={getTimePlusMinute(3)}
+            activities={activities}
+            setActivities={setActivities}
+            callback={washingCompleted}
+          />
         </Card>
       )}
     </>

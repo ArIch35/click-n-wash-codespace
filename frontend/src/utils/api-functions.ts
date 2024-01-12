@@ -255,6 +255,28 @@ export const cancelContract = async (id: string) => {
   }
 };
 
+/**
+ * Finish a contract on the server.
+ * @param id The id of the contract.
+ */
+export const completeContract = async (id: string) => {
+  const response = await fetch(`${loadEnv().VITE_SERVER_ADDRESS}/contracts/${id}`, {
+    method: 'PUT',
+    headers: {
+      'Content-Type': 'application/json',
+      ...(await headers()),
+    },
+    body: JSON.stringify({
+      status: 'finished',
+    }),
+  });
+
+  const data = (await response.json()) as unknown;
+  if (!response.ok) {
+    throw new Error((data as Message).message);
+  }
+};
+
 export const getContactById = async (id: string) => {
   const response = await fetch(`${loadEnv().VITE_SERVER_ADDRESS}/contracts/${id}`, {
     headers: { ...(await headers()) },
@@ -266,4 +288,4 @@ export const getContactById = async (id: string) => {
   }
 
   return entityParser<Contract>(data as Contract);
-}
+};
