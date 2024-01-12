@@ -18,6 +18,12 @@ Click n' Wash is a student-led initiative aimed at simplifying the laundry exper
 - **Check the availability of a Washing machine**: a user can check the availability for a washing machine direct from the website, without the need to go to the laundromat.
 - **Report a Problem**: a user can report a problem to the technician or the owner of the laundromat,when the washing machine has an issue.
 - **search the nearest Laundromat**: the user can search for the nearest Laundromat from their location.
+- **Manage a Laundromat**: a vendor can manage their own laundromat.
+- **Manage a Booking**: a user can manage or cancel their own booking.
+- **Top up balance**: a user can top up their own balance for the payment method for the washing machine.
+- **Balance History**: user can see their own balance history.
+- **Become a Vendor**: user can become a vendor to open their own laundromat.
+-
 
 ## Database Structures <a name="database-structures"></a>
 
