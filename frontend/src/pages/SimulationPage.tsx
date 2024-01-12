@@ -1,6 +1,7 @@
 import { useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { completeContract, getContactById } from '../utils/api-functions';
+import { getContactById } from '../utils/api-functions';
+import Notification from '../interfaces/notification';
 import React from 'react';
 import { Card, Text } from '@mantine/core';
 import Timer from '../components/simulation/Timer';
@@ -23,26 +24,9 @@ const SimulationPage: React.FC = () => {
   const [contract, setContract] = React.useState<Contract | null>(null);
   const [activities, setActivities] = React.useState<Activities>(initialActivities);
 
-  const washingCompleted = () => {
-    completeContract(contractId!)
-      .then(() => {
-        showCustomNotification({
-          title: 'Washing Complete',
-          message: 'Washing machine is done',
-          color: 'green',
-          autoClose: false,
-        });
-        navigate('/bookings');
-      })
-      .catch((error) => {
-        showCustomNotification({
-          title: 'Washing Failed',
-          message: 'Something went wrong',
-          color: 'red',
-          autoClose: false,
-        });
-        console.log(error);
-      });
+  const washingCompleted = (notification: Notification) => {
+    showCustomNotification(notification);
+    navigate('/bookings');
   };
 
   useEffect(() => {
@@ -63,7 +47,14 @@ const SimulationPage: React.FC = () => {
             label="Max Timer"
             startTime={contract.startDate}
             endTime={contract.endDate}
-            callbackFinish={washingCompleted}
+            callbackFinish={() =>
+              washingCompleted({
+                title: 'Washing Complete',
+                message: 'Time is up! Simulation is complete.',
+                color: 'green',
+                autoClose: false,
+              })
+            }
           />
           <Text>{`${contract.washingMachine.name} ${contract.washingMachine.brand}`}</Text>
           <InsertLaundry activities={activities} setActivities={setActivities} />
@@ -71,7 +62,14 @@ const SimulationPage: React.FC = () => {
           <TakeOutLaundry
             activities={activities}
             setActivities={setActivities}
-            callback={washingCompleted}
+            callback={() =>
+              washingCompleted({
+                title: 'Washing Complete',
+                message: 'Washing machine is done',
+                color: 'green',
+                autoClose: false,
+              })
+            }
           />
         </Card>
       )}
