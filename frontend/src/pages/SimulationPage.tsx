@@ -23,16 +23,6 @@ const SimulationPage: React.FC = () => {
   const [contract, setContract] = React.useState<Contract | null>(null);
   const [activities, setActivities] = React.useState<Activities>(initialActivities);
 
-  const getTimeNow = () => {
-    return new Date();
-  };
-
-  const getTimePlusMinute = (minute: number) => {
-    const now = new Date();
-    now.setMinutes(now.getMinutes() + minute);
-    return now;
-  };
-
   const washingCompleted = () => {
     completeContract(contractId!)
       .then(() => {
@@ -76,21 +66,9 @@ const SimulationPage: React.FC = () => {
             callbackFinish={washingCompleted}
           />
           <Text>{`${contract.washingMachine.name} ${contract.washingMachine.brand}`}</Text>
-          <InsertLaundry
-            start={getTimeNow()}
-            end={getTimePlusMinute(5)}
-            activities={activities}
-            setActivities={setActivities}
-          />
-          <ChooseProgram
-            start={getTimeNow()}
-            end={getTimePlusMinute(activities.chooseProgram.program!.duration)}
-            activities={activities}
-            setActivities={setActivities}
-          />
+          <InsertLaundry activities={activities} setActivities={setActivities} />
+          <ChooseProgram activities={activities} setActivities={setActivities} />
           <TakeOutLaundry
-            start={getTimeNow()}
-            end={getTimePlusMinute(3)}
             activities={activities}
             setActivities={setActivities}
             callback={washingCompleted}

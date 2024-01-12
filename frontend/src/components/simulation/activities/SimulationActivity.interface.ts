@@ -10,9 +10,17 @@ export interface Activities {
 }
 
 export interface SimulationActivity {
-  start: Date;
-  end: Date;
   activities: Activities;
   setActivities: (activities: Activities) => void;
   callback?: () => void;
 }
+
+export const getTimeNow = () => {
+  return new Date();
+};
+
+export const getTimePlusMinute = (minute: number) => {
+  const now = new Date();
+  now.setMinutes(now.getMinutes() + minute);
+  return now;
+};

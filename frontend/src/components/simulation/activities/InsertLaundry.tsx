@@ -1,9 +1,9 @@
 import { Button } from '@mantine/core';
 import React from 'react';
 import Timer from '../Timer';
-import { SimulationActivity } from './SimulationActivity.interface';
+import { SimulationActivity, getTimeNow, getTimePlusMinute } from './SimulationActivity.interface';
 
-const InsertLaundry: React.FC<SimulationActivity> = ({ start, end, activities, setActivities }) => {
+const InsertLaundry: React.FC<SimulationActivity> = ({ activities, setActivities }) => {
   return (
     <>
       {activities.insertLaundry === 'idle' ? (
@@ -14,8 +14,8 @@ const InsertLaundry: React.FC<SimulationActivity> = ({ start, end, activities, s
         activities.insertLaundry === 'inserting' && (
           <Timer
             label="Inserting Laundry..."
-            startTime={start}
-            endTime={end}
+            startTime={getTimeNow()}
+            endTime={getTimePlusMinute(3)}
             callbackFinish={() => setActivities({ ...activities, insertLaundry: 'done' })}
           ></Timer>
         )

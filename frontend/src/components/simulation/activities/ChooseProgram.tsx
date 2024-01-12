@@ -1,7 +1,12 @@
 import { Button, Group } from '@mantine/core';
 import React from 'react';
 import Timer from '../Timer';
-import { Program, SimulationActivity } from './SimulationActivity.interface';
+import {
+  Program,
+  SimulationActivity,
+  getTimeNow,
+  getTimePlusMinute,
+} from './SimulationActivity.interface';
 
 const validPrograms: Program[] = [
   { name: 'Quick Wash', duration: 30 },
@@ -9,7 +14,7 @@ const validPrograms: Program[] = [
   { name: 'Heavy Wash', duration: 90 },
 ];
 
-const ChooseProgram: React.FC<SimulationActivity> = ({ start, end, activities, setActivities }) => {
+const ChooseProgram: React.FC<SimulationActivity> = ({ activities, setActivities }) => {
   return (
     <>
       {activities.insertLaundry === 'done' && activities.chooseProgram.status === 'idle' ? (
@@ -39,9 +44,9 @@ const ChooseProgram: React.FC<SimulationActivity> = ({ start, end, activities, s
       )}
       {activities.chooseProgram.status === 'done' && (
         <Timer
-          label="Washing..."
-          startTime={start}
-          endTime={end}
+          label={`${activities.chooseProgram.program!.name}`}
+          startTime={getTimeNow()}
+          endTime={getTimePlusMinute(activities.chooseProgram.program!.duration)}
           callbackFinish={() =>
             setActivities({ ...activities, chooseProgram: { status: 'programFinished' } })
           }
