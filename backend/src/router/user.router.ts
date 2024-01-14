@@ -33,6 +33,9 @@ router.get('/:idOrEmail', (async (req, res) => {
   try {
     const user = await getDb().userRepository.findOne({
       where: [{ id: req.params.idOrEmail }, { email: req.params.idOrEmail }],
+      relations: {
+        inbox: true,
+      },
     });
     if (!user) {
       return res.status(STATUS_NOT_FOUND).json(MESSAGE_NOT_FOUND);
@@ -92,6 +95,7 @@ router.post('/restore', (async (_req, res) => {
     const uid = res.locals.uid as string;
     const userExists = await getDb().userRepository.findOne({
       where: { id: uid },
+      relations: { inbox: true },
       withDeleted: true,
     });
     if (!userExists) {
@@ -116,6 +120,7 @@ router.post('/topup', (async (req, res) => {
     const uid = res.locals.uid as string;
     const user = await getDb().userRepository.findOne({
       where: { id: uid },
+      relations: { inbox: true },
     });
     if (!user) {
       return res.status(STATUS_BAD_REQUEST).json(customMessage(false, 'User does not exist'));
@@ -148,6 +153,7 @@ router.put('/', (async (req, res) => {
 
     const userExists = await getDb().userRepository.findOne({
       where: { id: uid },
+      relations: { inbox: true },
     });
     if (!userExists) {
       return res.status(STATUS_NOT_FOUND).json(MESSAGE_NOT_FOUND);
