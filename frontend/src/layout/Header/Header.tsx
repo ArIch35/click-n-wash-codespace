@@ -35,6 +35,7 @@ const Header = ({ toggle, setVisible }: NavbarControllerProps) => {
         link={{ label: 'Logout' }}
         className={classes.link}
         onClick={() => {
+          window.location.href = '/';
           signOut(firebaseAuth).catch((error) => {
             console.error(error);
           });
@@ -59,7 +60,14 @@ const Header = ({ toggle, setVisible }: NavbarControllerProps) => {
             }}
             size={'sm'}
           />
-          <Button size="md" variant="transparent" fw={700}>
+          <Button
+            size="md"
+            variant="transparent"
+            fw={700}
+            onClick={() => {
+              window.location.href = '/';
+            }}
+          >
             Click n&apos; Wash
           </Button>
         </Group>
