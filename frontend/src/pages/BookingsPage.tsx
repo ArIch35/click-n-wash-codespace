@@ -1,5 +1,6 @@
 import { Badge, Box, Button, Card, Group, Stack, Text, Title } from '@mantine/core';
 import React from 'react';
+import { useNavigate } from 'react-router-dom';
 import Contract from '../interfaces/entities/contract';
 import { cancelContract, getContracts } from '../utils/api-functions';
 import formatDate from '../utils/format-date';
@@ -20,6 +21,7 @@ const getColor = (status: string) => {
 
 const BookingsPage = () => {
   const [contracts, setContracts] = React.useState<Contract[]>([]);
+  const navigate = useNavigate();
 
   const handleCancel = (contract: Contract) => {
     cancelContract(contract.id)
@@ -46,6 +48,13 @@ const BookingsPage = () => {
           autoClose: false,
         }),
       );
+  };
+
+  const isAbleToSimulate = (contract: Contract) => {
+    const now = new Date();
+    const startDate = new Date(contract.startDate);
+    const endDate = new Date(contract.endDate);
+    return now >= startDate && now <= endDate && contract.status === 'ongoing';
   };
 
   const ContractCard = (contract: Contract) => {
@@ -76,6 +85,17 @@ const BookingsPage = () => {
         >
           Cancel
         </Button>
+        {isAbleToSimulate(contract) && (
+          <Button
+            color="red"
+            mt="md"
+            radius="md"
+            disabled={contract.status !== 'ongoing'}
+            onClick={() => navigate(`/simulate/${contract.id}`)}
+          >
+            Simulate
+          </Button>
+        )}
       </Card>
     );
   };

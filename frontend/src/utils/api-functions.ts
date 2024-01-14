@@ -254,3 +254,16 @@ export const cancelContract = async (id: string) => {
     throw new Error((data as Message).message);
   }
 };
+
+export const getContactById = async (id: string) => {
+  const response = await fetch(`${loadEnv().VITE_SERVER_ADDRESS}/contracts/${id}`, {
+    headers: { ...(await headers()) },
+  });
+
+  const data = (await response.json()) as unknown;
+  if (!response.ok) {
+    throw new Error((data as Message).message);
+  }
+
+  return entityParser<Contract>(data as Contract);
+};
