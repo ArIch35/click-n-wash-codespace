@@ -109,6 +109,49 @@ export const getLaundromats = async (onlyOwned?: boolean) => {
 };
 
 /**
+ * Retrieves a laundromat by its ID from the server.
+ * @param id - The ID of the laundromat to retrieve.
+ * @returns A Promise that resolves to the retrieved laundromat.
+ * @throws An error if the server response is not successful.
+ */
+export const getLaundromatById = async (id: string) => {
+  const response = await fetch(`${loadEnv().VITE_SERVER_ADDRESS}/laundromats/${id}`, {
+    headers: { ...(await headers()) },
+  });
+
+  const data = (await response.json()) as unknown;
+  if (!response.ok) {
+    throw new Error((data as Message).message);
+  }
+  return entityParser<Laundromat>(data as Laundromat);
+};
+
+/**
+ * Updates a laundromat on the server.
+ * @param id The id of the laundromat.
+ * @param body The values to update the laundromat with.
+ * @returns The updated laundromat.
+ * @throws An error if the laundromat could not be updated.
+ */
+export const updateLaundromat = async (id: string, body: CreateLaundromat) => {
+  const response = await fetch(`${loadEnv().VITE_SERVER_ADDRESS}/laundromats/${id}`, {
+    method: 'PUT',
+    headers: {
+      'Content-Type': 'application/json',
+      ...(await headers()),
+    },
+    body: JSON.stringify(body),
+  });
+
+  const data = (await response.json()) as unknown;
+  if (!response.ok) {
+    throw new Error((data as Message).message);
+  }
+
+  return entityParser<Laundromat>(data as Laundromat);
+};
+
+/**
  * Creates a laundromat on the server.
  * @param body The values to create the laundromat with.
  * @throws An error if the laundromat could not be created.
