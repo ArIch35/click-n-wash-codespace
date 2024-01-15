@@ -4,14 +4,22 @@ import {
   Container,
   Flex,
   LoadingOverlay,
+  Modal,
   NumberInput,
+  Table,
   Text,
   TextInput,
 } from '@mantine/core';
 import { useEffect, useState } from 'react';
 import Laundromat from '../interfaces/entities/laundromat';
-import { getLaundromatById, updateLaundromat } from '../utils/api-functions';
-import { useParams } from 'react-router-dom';
+import {
+  deleteLaundromat,
+  getLaundromatById,
+  updateLaundromat,
+  deleteWashingMachine,
+  createWashingMachine,
+} from '../utils/api-functions';
+import { useNavigate, useParams } from 'react-router-dom';
 import { hasLength, isInRange, useForm } from '@mantine/form';
 import { useDisclosure } from '@mantine/hooks';
 
@@ -22,6 +30,8 @@ const ManageLaundromatsPage = () => {
   const [error, setError] = useState(false);
   const [isEdited, setIsEdited] = useState(false);
   const [visible, { toggle }] = useDisclosure(false);
+  const [opened, { open, close }] = useDisclosure(false);
+  const navigate = useNavigate();
 
   interface LaundromatForm {
     name: string;
@@ -78,9 +88,6 @@ const ManageLaundromatsPage = () => {
 
         setLoading(false);
         setError(false);
-
-        console.log(form.isDirty());
-        console.log(response);
       })
       .catch((error) => {
         console.error(error);
@@ -90,9 +97,85 @@ const ManageLaundromatsPage = () => {
       });
   }, []);
 
+  const rows = laundromat?.washingMachines?.map((element) => (
+    <Table.Tr key={element.name}>
+      <Table.Td>{element.name}</Table.Td>
+      <Table.Td>{element.description}</Table.Td>
+      <Table.Td>{element.contracts?.length ?? 0}</Table.Td>
+      <Table.Td>
+        <form
+          onSubmit={form.onSubmit(() => {
+            deleteWashingMachine(element.id)
+              .then((response) => {
+                console.log(response);
+                setTimeout(() => {
+                  toggle();
+                }, 1000);
+                window.location.reload();
+              })
+              .catch((error) => {
+                console.error(error);
+                setError(true);
+              })
+              .finally(() => {
+                navigate(`/edit-laundromat/${id}`);
+              });
+          })}
+        >
+          <Button variant="filled" color="red" type="submit" onClick={toggle}>
+            Delete
+          </Button>
+        </form>
+      </Table.Td>
+    </Table.Tr>
+  ));
+
+  const ths = (
+    <Table.Tr>
+      <Table.Th>Name</Table.Th>
+      <Table.Th>Description</Table.Th>
+      <Table.Th>Number of Contracts</Table.Th>
+      <Table.Th>Actions</Table.Th>
+    </Table.Tr>
+  );
+
   return (
     <Container pos={'relative'}>
-      <LoadingOverlay visible={visible} zIndex={1000} overlayProps={{ radius: 'sm', blur: 2 }} />
+      <Modal opened={opened} onClose={close} title="Authentication" centered>
+        <Text>Are you sure you want to delete this laundromat?</Text>
+        <Flex justify="flex-end" mt="md">
+          <form
+            onSubmit={form.onSubmit((values) => {
+              close();
+
+              if (!id) {
+                return;
+              }
+              console.log(values);
+
+              deleteLaundromat(id)
+                .then((response) => {
+                  console.log(response);
+                  setTimeout(() => {
+                    toggle();
+                  }, 1000);
+                  navigate('/manage-laundromats');
+                })
+                .catch((error) => {
+                  console.error(error);
+                  setError(true);
+                });
+            })}
+          >
+            <Button variant="filled" color="red" onClick={toggle} type="submit">
+              Delete
+            </Button>
+            <Button variant="filled" color="yellow" ml="sm" onClick={close}>
+              Cancel
+            </Button>
+          </form>
+        </Flex>
+      </Modal>
 
       {loading && (
         <LoadingOverlay
@@ -102,9 +185,14 @@ const ManageLaundromatsPage = () => {
         />
       )}
       {error && (
-        <Text py={30} c={'red'}>
-          Something went wrong!
-        </Text>
+        <>
+          <Text py={30} c={'red'}>
+            Something went wrong!
+          </Text>
+          <Button onClick={() => navigate('/manage-laundromats')}>
+            Return To All Laundromats Page
+          </Button>
+        </>
       )}
       {!loading && !error && laundromat && (
         <>
@@ -112,6 +200,12 @@ const ManageLaundromatsPage = () => {
             Laundromat {laundromat.name} Details Page
           </Text>
           <Box maw={340} mx="auto">
+            <LoadingOverlay
+              visible={visible}
+              zIndex={1000}
+              overlayProps={{ radius: 'sm', blur: 2 }}
+              loaderProps={{ color: 'blue', type: 'dots', size: 'xl' }}
+            />
             <form
               onSubmit={form.onSubmit((values) => {
                 if (!id) {
@@ -125,7 +219,7 @@ const ManageLaundromatsPage = () => {
                     setIsEdited(false);
                     setTimeout(() => {
                       toggle();
-                    }, 2000);
+                    }, 1000);
                   })
                   .catch((error) => {
                     console.error(error);
@@ -185,7 +279,14 @@ const ManageLaundromatsPage = () => {
               />
 
               <Flex justify="flex-end" mt="md">
-                <Button variant="filled" color="red">
+                <Button
+                  variant="filled"
+                  color="red"
+                  onClick={(event) => {
+                    event.preventDefault();
+                    open();
+                  }}
+                >
                   Delete
                 </Button>
                 <Button
@@ -213,6 +314,45 @@ const ManageLaundromatsPage = () => {
               </Flex>
             </form>
           </Box>
+          <>
+            <Flex justify={'space-between'} py={30}>
+              <Text size="xl">My Washing Machines</Text>
+              <form
+                onSubmit={form.onSubmit(() => {
+                  const washingMachine = {
+                    name: Math.random().toString(36).substring(7),
+                    description: Math.random().toString(36).substring(7),
+                    brand: Math.random().toString(36).substring(7),
+                    laundromat: laundromat.id,
+                  };
+
+                  createWashingMachine(washingMachine)
+                    .then((response) => {
+                      console.log(response);
+                      setTimeout(() => {
+                        toggle();
+                      }, 1000);
+                      window.location.reload();
+                    })
+                    .catch((error) => {
+                      console.error(error);
+                      setError(true);
+                    })
+                    .finally(() => {
+                      navigate(`/edit-laundromat/${id}`);
+                    });
+                })}
+              >
+                <Button radius={'100'} onClick={toggle} type="submit">
+                  + Add Random Washing Machine
+                </Button>
+              </form>
+            </Flex>
+            <Table>
+              <Table.Thead>{ths}</Table.Thead>
+              <Table.Tbody>{rows}</Table.Tbody>
+            </Table>{' '}
+          </>
         </>
       )}
     </Container>
