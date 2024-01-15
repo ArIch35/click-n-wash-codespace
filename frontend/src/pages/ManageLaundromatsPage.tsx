@@ -11,7 +11,7 @@ const ManageLaundromatsPage = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    getLaundromats()
+    getLaundromats(true)
       .then((laundromats) => {
         setLaundromats(laundromats);
         setLoading(false);
@@ -27,8 +27,21 @@ const ManageLaundromatsPage = () => {
     <Table.Tr key={element.name}>
       <Table.Td>{element.name}</Table.Td>
       <Table.Td>{element.street}</Table.Td>
-      <Table.Td>{element.postalCode + element.city}</Table.Td>
+      <Table.Td>
+        {element.postalCode} - {element.city}
+      </Table.Td>
       <Table.Td>{element.washingMachines?.length}</Table.Td>
+      <Table.Td>
+        <Button
+          radius={'100'}
+          onClick={(event) => {
+            event.preventDefault();
+            navigate(`/edit-laundromat/${element.id}`);
+          }}
+        >
+          Edit
+        </Button>
+      </Table.Td>
     </Table.Tr>
   ));
 

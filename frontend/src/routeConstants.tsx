@@ -15,6 +15,7 @@ import ManageLaundromatsPage from './pages/ManageLaundromatsPage';
 import MissingPage from './pages/MissingPage';
 import SettingsPage from './pages/SettingsPage';
 import AddLaundromatPage from './pages/AddLaundromatPage';
+import LaundromatDetailsPage from './pages/LaundromatDetailsPage';
 import SimulationPage from './pages/SimulationPage';
 
 type Route = RouteProps & {
@@ -88,5 +89,13 @@ export const routes: Route[] = [
     element: <MissingPage />,
     label: 'Missing',
     icon: IconFileUnknown,
+  },
+  {
+    path: '/edit-laundromat/:id',
+    element: <LaundromatDetailsPage />,
+    label: 'Laundromat Details',
+    icon: IconBuildingStore,
+    requireAuth: true,
+    requireVendor: true,
   },
 ];
