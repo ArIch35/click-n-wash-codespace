@@ -44,7 +44,14 @@ const UserMenu = ({ open }: UserMenuProps) => {
 
       <Menu.Dropdown>
         <Menu.Label>{user?.name}</Menu.Label>
-        <Menu.Item leftSection={<IconCash />}>Balance: {user?.balance}€</Menu.Item>
+        <Menu.Item
+          leftSection={<IconCash />}
+          onClick={() => {
+            navigate('/balance');
+          }}
+        >
+          Balance: {user?.balance}€
+        </Menu.Item>
         <Menu.Item
           leftSection={
             <Indicator inline label="New" size={16} color="red" disabled={!unreadMessages}>
