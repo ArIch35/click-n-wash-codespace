@@ -1,48 +1,19 @@
 import { Burger, Button, Group } from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
-import { signOut } from 'firebase/auth';
 import React from 'react';
 import { useSelector } from 'react-redux';
-import AuthAnchor from '../../components/auth/AuthAnchor';
+import DarkModeToggle from '../../components/DarkModeToggle';
+import UserMenu from '../../components/UserMenu';
 import { AuthenticationForm } from '../../components/auth/AuthentificationForm';
-import firebaseAuth from '../../firebase';
 import NavbarControllerProps from '../../interfaces/navbar-controller-props';
 import { RootState } from '../../reducers/root.reducer';
 import classes from './Header.module.css';
-
-const links = [{ link: '/about', label: 'Login / Register' }];
 
 const Header = ({ toggle, setVisible }: NavbarControllerProps) => {
   const user = useSelector((state: RootState) => state.authenticationState.user);
   const [modalOpened, modalHandlers] = useDisclosure(false);
 
   const loggedIn = React.useMemo(() => user, [user]);
-
-  const items = links.map((link) =>
-    !loggedIn ? (
-      <AuthAnchor
-        key={link.label}
-        link={link}
-        className={classes.link}
-        onClick={(event) => {
-          event.preventDefault();
-          modalHandlers.open();
-        }}
-      />
-    ) : (
-      <AuthAnchor
-        key={'Logout'}
-        link={{ label: 'Logout' }}
-        className={classes.link}
-        onClick={() => {
-          window.location.href = '/';
-          signOut(firebaseAuth).catch((error) => {
-            console.error(error);
-          });
-        }}
-      />
-    ),
-  );
 
   return (
     <header className={classes.header}>
@@ -73,7 +44,8 @@ const Header = ({ toggle, setVisible }: NavbarControllerProps) => {
         </Group>
         <Group>
           <Group ml={50} gap={5} className={classes.links} visibleFrom="sm">
-            {items}
+            <UserMenu open={modalHandlers.open} />
+            <DarkModeToggle />
           </Group>
         </Group>
       </div>
