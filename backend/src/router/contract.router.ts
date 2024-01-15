@@ -99,11 +99,12 @@ router.post('/', (async (req, res) => {
       autoClose: false,
     };
     sendNotification(contract.washingMachine.laundromat.owner.id, notification);
-    await getDb().messageRepository.save({
+    const newMessage = getDb().messageRepository.create({
       name: title,
       content: message,
       to: washingMachine.laundromat.owner,
     });
+    await getDb().messageRepository.save(newMessage);
     const contractWithReducedData = propertiesRemover<Contract>(contract, [
       'washingMachine.laundromat.owner',
     ]);
@@ -161,11 +162,12 @@ router.put('/:id', (async (req, res) => {
       isWmOwner ? contract.user.id : contract.washingMachine.laundromat.owner.id,
       notification,
     );
-    await getDb().messageRepository.save({
+    const newMessage = getDb().messageRepository.create({
       name: title,
       content: message,
       to: isWmOwner ? contract.user : contract.washingMachine.laundromat.owner,
     });
+    await getDb().messageRepository.save(newMessage);
     return res.status(STATUS_OK).json(contract);
   } catch (error: unknown) {
     if (error instanceof ValidationError) {
