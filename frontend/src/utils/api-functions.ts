@@ -127,6 +127,29 @@ export const getLaundromatById = async (id: string) => {
 };
 
 /**
+ * Creates a laundromat on the server.
+ * @param body The values to create the laundromat with.
+ * @throws An error if the laundromat could not be created.
+ */
+export const createLaundromat = async (body: CreateLaundromat) => {
+  const response = await fetch(`${loadEnv().VITE_SERVER_ADDRESS}/laundromats`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      ...(await headers()),
+    },
+    body: JSON.stringify(body),
+  });
+
+  const data = (await response.json()) as unknown;
+  if (!response.ok) {
+    throw new Error((data as Message).message);
+  }
+
+  return entityParser<Laundromat>(data as Laundromat);
+};
+
+/**
  * Updates a laundromat on the server.
  * @param id The id of the laundromat.
  * @param body The values to update the laundromat with.
@@ -151,27 +174,19 @@ export const updateLaundromat = async (id: string, body: CreateLaundromat) => {
   return entityParser<Laundromat>(data as Laundromat);
 };
 
-/**
- * Creates a laundromat on the server.
- * @param body The values to create the laundromat with.
- * @throws An error if the laundromat could not be created.
- */
-export const createLaundromat = async (body: CreateLaundromat) => {
-  const response = await fetch(`${loadEnv().VITE_SERVER_ADDRESS}/laundromats`, {
-    method: 'POST',
+export const deleteLaundromat = async (id: string) => {
+  const response = await fetch(`${loadEnv().VITE_SERVER_ADDRESS}/laundromats/${id}`, {
+    method: 'DELETE',
     headers: {
       'Content-Type': 'application/json',
       ...(await headers()),
     },
-    body: JSON.stringify(body),
   });
 
   const data = (await response.json()) as unknown;
   if (!response.ok) {
     throw new Error((data as Message).message);
   }
-
-  return entityParser<Laundromat>(data as Laundromat);
 };
 
 /**
@@ -214,6 +229,28 @@ export const createWashingMachine = async (body: CreateWashingMachine) => {
   }
 
   return entityParser<WashingMachine>(data as WashingMachine);
+};
+
+/**
+ * Updates a washing machine on the server.
+ * @param id The id of the washing machine.
+ * @param body The values to update the washing machine with.
+ * @returns The updated washing machine.
+ * @throws An error if the washing machine could not be updated.
+ */
+export const deleteWashingMachine = async (id: string) => {
+  const response = await fetch(`${loadEnv().VITE_SERVER_ADDRESS}/washingmachines/${id}`, {
+    method: 'DELETE',
+    headers: {
+      'Content-Type': 'application/json',
+      ...(await headers()),
+    },
+  });
+
+  const data = (await response.json()) as unknown;
+  if (!response.ok) {
+    throw new Error((data as Message).message);
+  }
 };
 
 export const getAllWashingMachinesContractsById = async (id: string) => {
