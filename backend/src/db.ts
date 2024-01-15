@@ -3,6 +3,7 @@ import createDataSource from './data-source';
 import BalanceTransaction from './entities/balance-transaction';
 import Contract from './entities/contract';
 import Laundromat from './entities/laundromat';
+import Message from './entities/message';
 import User from './entities/user';
 import WashingMachine from './entities/washing-machine';
 
@@ -15,6 +16,7 @@ interface Db {
   washingMachineRepository: Repository<WashingMachine>;
   contractRepository: Repository<Contract>;
   balanceTransactionRepository: Repository<BalanceTransaction>;
+  messageRepository: Repository<Message>;
   // Add other repositories here
 }
 
@@ -41,6 +43,7 @@ export const connectToDb = async (test?: boolean): Promise<void> => {
     dropDatabase: async () => {
       await getDb().contractRepository.delete({});
       await getDb().balanceTransactionRepository.delete({});
+      await getDb().messageRepository.delete({});
       await getDb().washingMachineRepository.delete({});
       await getDb().laundromatRepository.delete({});
       await getDb().userRepository.delete({});
@@ -50,6 +53,7 @@ export const connectToDb = async (test?: boolean): Promise<void> => {
     washingMachineRepository: em.getRepository(WashingMachine),
     contractRepository: em.getRepository(Contract),
     balanceTransactionRepository: em.getRepository(BalanceTransaction),
+    messageRepository: em.getRepository(Message),
     // Add other repositories here
   };
 };

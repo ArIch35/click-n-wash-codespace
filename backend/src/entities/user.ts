@@ -3,6 +3,7 @@ import { boolean, object, string } from 'yup';
 import BaseEntity from './base-entity';
 import Contract from './contract';
 import Laundromat from './laundromat';
+import Message from './message';
 
 @Entity()
 class User extends BaseEntity {
@@ -20,6 +21,9 @@ class User extends BaseEntity {
 
   @OneToMany(() => Contract, (contract) => contract.user)
   contracts?: Contract[];
+
+  @OneToMany(() => Message, (message) => message.to)
+  inbox?: Message[];
 }
 
 export default User;

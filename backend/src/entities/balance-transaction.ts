@@ -61,7 +61,7 @@ const setName = (balanceTransaction: BalanceTransaction) => {
   const message = balanceTransaction.from
     ? `from ${balanceTransaction.from.id} to ${balanceTransaction.to.id}`
     : `to ${balanceTransaction.to.id}`;
-  balanceTransaction.name = `${balanceTransaction.type} ${balanceTransaction.amount} ${message}`;
+  balanceTransaction.name = `${balanceTransaction.amount}€ ${message}`;
 };
 
 /**
