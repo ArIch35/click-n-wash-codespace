@@ -89,6 +89,26 @@ export const updateUser = async (body: UpdateUser): Promise<User> => {
 };
 
 /**
+ * Marks the specified messages as read.
+ * @param messageIds - An array of message IDs to mark as read.
+ * @throws {Error} If the server response is not successful.
+ */
+export const markAsRead = async (messageIds: string[]) => {
+  const response = await fetch(`${loadEnv().VITE_SERVER_ADDRESS}/users/read`, {
+    method: 'PUT',
+    headers: {
+      'Content-Type': 'application/json',
+      ...(await headers()),
+    },
+    body: JSON.stringify({ messageIds }),
+  });
+  const data = (await response.json()) as unknown;
+  if (!response.ok) {
+    throw new Error((data as Message).message);
+  }
+};
+
+/**
  * Gets all laundromats from the server.
  * @param onlyOwned Whether to only get the laundromats owned by the current user.
  * @returns The laundromats.
