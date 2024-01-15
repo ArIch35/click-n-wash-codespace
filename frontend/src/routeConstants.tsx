@@ -3,6 +3,7 @@ import {
   IconBuildingStore,
   IconFileUnknown,
   IconHome,
+  IconInbox,
   IconSettings,
   IconTransactionEuro,
   TablerIconsProps,
@@ -12,6 +13,7 @@ import AddLaundromatPage from './pages/AddLaundromatPage';
 import BalancePage from './pages/BalancePage';
 import BookingsPage from './pages/BookingsPage';
 import HomePage from './pages/HomePage';
+import InboxPage from './pages/InboxPage';
 import ManageLaundromatsPage from './pages/ManageLaundromatsPage';
 import MissingPage from './pages/MissingPage';
 import SettingsPage from './pages/SettingsPage';
@@ -33,6 +35,14 @@ export const routes: Route[] = [
     icon: IconHome,
     onNavbar: true,
     index: true,
+  },
+  {
+    path: '/inbox',
+    element: <InboxPage />,
+    label: 'Inbox',
+    icon: IconInbox,
+    onNavbar: true,
+    requireAuth: true,
   },
   {
     path: '/bookings',
