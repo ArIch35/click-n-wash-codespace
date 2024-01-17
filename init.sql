@@ -1,0 +1,2 @@
+CREATE SCHEMA IF NOT EXISTS "cnw-schema";
+CREATE SCHEMA IF NOT EXISTS "cnw-schema-test";

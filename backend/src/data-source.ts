@@ -1,21 +1,32 @@
 import { DataSource } from 'typeorm';
+import BalanceTransaction from './entities/balance-transaction';
 import Contract from './entities/contract';
 import Laundromat from './entities/laundromat';
+import Message from './entities/message';
 import User from './entities/user';
 import WashingMachine from './entities/washing-machine';
+import loadEnv from './utils/load-env';
 
-const AppDataSource = new DataSource({
-  type: 'postgres',
-  host: process.env.DB_HOST || 'localhost',
-  port: (process.env.DB_PORT as unknown as number) || 5432,
-  username: process.env.DB_USER || 'cnw-user',
-  password: process.env.DB_PASSWORD || 'cnw-password',
-  database: process.env.DB_NAME || 'cnw-db',
-  synchronize: true,
-  logging: true,
-  entities: [User, Laundromat, WashingMachine, Contract],
-  subscribers: [],
-  migrations: [],
-});
+/**
+ * Creates a new data source with the given schema and initializes it.
+ * @param schema The schema to use for the data source.
+ * @returns The created data source.
+ */
+const createDataSource = (schema?: string) => {
+  return new DataSource({
+    type: 'postgres',
+    host: loadEnv().DB_HOST,
+    port: loadEnv().DB_PORT,
+    username: loadEnv().DB_USER,
+    password: loadEnv().DB_PASSWORD,
+    database: loadEnv().DB_NAME,
+    schema: schema || 'cnw-schema',
+    synchronize: true,
+    logging: false,
+    entities: [User, Laundromat, WashingMachine, Contract, BalanceTransaction, Message],
+    subscribers: [],
+    migrations: [],
+  }).initialize();
+};
 
-export default AppDataSource;
+export default createDataSource;

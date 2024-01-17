@@ -1,7 +1,8 @@
 import { RequestHandler } from 'express';
-import { Server } from 'socket.io';
 import { Server as HttpServer } from 'http';
-import { users } from './users';
+import { Server } from 'socket.io';
+import { setSocket } from '../server';
+import { users } from '../utils/constants';
 
 // Middleware
 const createSocket = (server: HttpServer): RequestHandler => {
@@ -15,16 +16,27 @@ const createSocket = (server: HttpServer): RequestHandler => {
 
   socket.on('connection', (client) => {
     console.log(client.id, 'connected');
-    client.on('registerUser', (userId: string) => {
+
+    client.on('registerUserToSocket', (userId: string) => {
       users[userId] = client.id;
       console.log(`${userId}:${client.id} registered`);
+      console.log(users);
+    });
+
+    client.on('deleteUserFromSocket', (userId: string | undefined) => {
+      if (!userId) {
+        return;
+      }
+      delete users[userId];
+      console.log(`${userId}:${client.id} deleted`);
+      console.log(users);
     });
   });
 
-  return ((_, res, next) => {
-    res.locals.socket = socket;
+  return (_, _res, next) => {
+    setSocket(socket);
     next();
-  }) as RequestHandler;
+  };
 };
 
 export default createSocket;

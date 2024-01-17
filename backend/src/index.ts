@@ -1,7 +1,8 @@
 import 'reflect-metadata';
 import server from './server';
+import loadEnv from './utils/load-env';
 
-const PORT = process.env.PORT || 8080;
+const PORT = loadEnv().PORT;
 
 /**
  * The main entry point for the application.

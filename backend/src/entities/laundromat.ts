@@ -18,7 +18,7 @@ class Laundromat extends BaseEntity {
   country!: string;
 
   @Column()
-  postalCode!: number;
+  postalCode!: string;
 
   @Column()
   price!: number;
@@ -87,7 +87,7 @@ export const createLaundromatSchema = object({
   street: string().required(),
   city: string().required(),
   country: string().required(),
-  postalCode: number().required(),
+  postalCode: string().required(),
   price: number().required(),
 }).noUnknown(true);
 
@@ -96,7 +96,7 @@ export const updateLaundromatSchema = object({
   street: string(),
   city: string(),
   country: string(),
-  postalCode: number(),
+  postalCode: string(),
   price: number(),
 })
   .noUnknown()

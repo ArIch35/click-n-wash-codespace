@@ -1,10 +1,10 @@
-import './utils/load-env';
 import { fakerDE } from '@faker-js/faker';
-import User from './entities/user';
-import admin from './firebase-admin';
 import getDb, { connectToDb } from './db';
 import Laundromat from './entities/laundromat';
+import User from './entities/user';
 import WashingMachine from './entities/washing-machine';
+import admin from './firebase-admin';
+import './utils/load-env';
 
 /**
  * Seed the database with random data
@@ -45,7 +45,7 @@ const seed = async () => {
       street: fakerDE.location.streetAddress(),
       city: fakerDE.location.city(),
       country: fakerDE.location.country(),
-      postalCode: Number(fakerDE.location.zipCode()),
+      postalCode: fakerDE.location.zipCode(),
       price: Number(fakerDE.commerce.price()),
       owner: users[Math.floor(Math.random() * users.length)],
     });

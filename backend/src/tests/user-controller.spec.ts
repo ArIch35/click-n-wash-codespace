@@ -1,15 +1,20 @@
 import { expect } from 'chai';
+import {
+  User,
+  createUserWithEmailAndPassword,
+  deleteUser,
+  signInWithEmailAndPassword,
+} from 'firebase/auth';
 import { IncomingMessage, Server, ServerResponse } from 'http';
 import mocha from 'mocha';
 import supertest from 'supertest';
-import '../utils/load-env';
+import getDb from '../db';
 import server from '../server';
 import firebaseAuth from '../utils/firebase';
-import { User, createUserWithEmailAndPassword, deleteUser } from 'firebase/auth';
-import getDb from '../db';
+import '../utils/load-env';
 
 const TEST_PORT = 5050;
-const api = supertest(`http://localhost:${TEST_PORT}`);
+const api = supertest(`http://localhost:${TEST_PORT}/api`);
 
 mocha.describe('UserController', () => {
   let testServer: Server<typeof IncomingMessage, typeof ServerResponse> | null = null;
@@ -27,16 +32,31 @@ mocha.describe('UserController', () => {
   /**
    * Test the GET /users endpoint.
    */
-  mocha.it('should return an empty list of users', async () => {
-    const res = await api.get('/users').expect(200);
-    console.log(res.body);
-    expect(res.body).to.be.an('array');
+  mocha.it('should return a 401 unauthorized', async () => {
+    const res = await api.get('/users').expect(401);
+    expect(res.body).to.be.an('object').contains({
+      success: false,
+      message: 'Authorization Header is Missing!',
+    });
   });
 
   /**
    * Test the POST /users endpoint.
    */
   mocha.it('should create a new user', async () => {
+    try {
+      // If able to sign in then delete the user
+      const existingUserCredential = await signInWithEmailAndPassword(
+        firebaseAuth,
+        'testuser1@gmail.com',
+        'testuser1',
+      );
+
+      await deleteUser(existingUserCredential.user);
+    } catch (e) {
+      console.log(e);
+    }
+
     const userCredential = await createUserWithEmailAndPassword(
       firebaseAuth,
       'testuser1@gmail.com',
@@ -58,6 +78,18 @@ mocha.describe('UserController', () => {
       name: 'TestUser1',
       email: 'testuser1@gmail.com',
       id: userTest1.uid,
+    });
+  });
+
+  /**
+   * Test the GET /users endpoint with a token.
+   */
+  mocha.it('should return a 403 forbidden', async () => {
+    const userToken = await userTest1!.getIdToken();
+    const res = await api.get('/users').auth(userToken, { type: 'bearer' }).expect(403);
+    expect(res.body).to.be.an('object').contains({
+      success: false,
+      message: 'You are not allowed to see lists of users!',
     });
   });
 
@@ -161,16 +193,6 @@ mocha.describe('UserController', () => {
     });
   });
 
-  mocha.after(async () => {
-    testServer?.close();
-
-    if (!userTest1) {
-      throw new Error('User not created');
-    }
-
-    await deleteUser(userTest1);
-  });
-
   /**
    * Test the DELETE /users endpoint with an invalid id.
    */
@@ -182,5 +204,38 @@ mocha.describe('UserController', () => {
       success: false,
       message: 'Entry Does Not Exist!',
     });
+  });
+
+  /**
+   * Test the POST /users/restore endpoint.
+   */
+  mocha.it('should restore the user created in the previous test', async () => {
+    const userToken = await userTest1!.getIdToken();
+    const res = await api.post('/users/restore').auth(userToken, { type: 'bearer' }).expect(200);
+
+    expect(res.body)
+      .to.be.an('object')
+      .contains({
+        name: 'TestUser1Updated',
+        email: 'testuser1@gmail.com',
+        id: userTest1?.uid,
+      });
+  });
+
+  /**
+   * Test the POST /users/restore endpoint with a restored user.
+   */
+  mocha.it('should return a conflict error', async () => {
+    const userToken = await userTest1!.getIdToken();
+    const res = await api.post('/users/restore').auth(userToken, { type: 'bearer' }).expect(409);
+
+    expect(res.body).to.be.an('object').contains({
+      success: false,
+      message: 'User is not deleted',
+    });
+  });
+
+  mocha.after(() => {
+    testServer?.close();
   });
 });

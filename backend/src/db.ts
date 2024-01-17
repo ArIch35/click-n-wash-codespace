@@ -1,17 +1,22 @@
-import { EntityManager, Repository } from 'typeorm';
-import AppDataSource from './data-source';
+import { DataSource, EntityManager, Repository } from 'typeorm';
+import createDataSource from './data-source';
+import BalanceTransaction from './entities/balance-transaction';
 import Contract from './entities/contract';
 import Laundromat from './entities/laundromat';
+import Message from './entities/message';
 import User from './entities/user';
 import WashingMachine from './entities/washing-machine';
 
 interface Db {
+  dataSource: DataSource;
   entityManager: EntityManager;
   dropDatabase: () => Promise<void>;
   userRepository: Repository<User>;
   laundromatRepository: Repository<Laundromat>;
   washingMachineRepository: Repository<WashingMachine>;
   contractRepository: Repository<Contract>;
+  balanceTransactionRepository: Repository<BalanceTransaction>;
+  messageRepository: Repository<Message>;
   // Add other repositories here
 }
 
@@ -19,17 +24,26 @@ let currentDb: Db | null = null;
 
 /**
  * Connects to the database and initializes the repositories.
+ * @param test Whether to use the test schema.
  */
 export const connectToDb = async (test?: boolean): Promise<void> => {
-  if (test) {
-    process.env['DB_NAME'] = 'unit-test-db';
+  try {
+    // Destroy the old data source if it exists
+    await getDb().dataSource.destroy();
+  } catch (error) {
+    // Do nothing
   }
 
-  const orm = await AppDataSource.initialize();
-  const em = orm.createEntityManager();
+  const schema = test ? 'cnw-schema-test' : undefined;
+  const dataSource = await createDataSource(schema);
+  const em = dataSource.createEntityManager();
   currentDb = {
+    dataSource: dataSource,
     entityManager: em,
     dropDatabase: async () => {
+      await getDb().contractRepository.delete({});
+      await getDb().balanceTransactionRepository.delete({});
+      await getDb().messageRepository.delete({});
       await getDb().washingMachineRepository.delete({});
       await getDb().laundromatRepository.delete({});
       await getDb().userRepository.delete({});
@@ -38,6 +52,8 @@ export const connectToDb = async (test?: boolean): Promise<void> => {
     laundromatRepository: em.getRepository(Laundromat),
     washingMachineRepository: em.getRepository(WashingMachine),
     contractRepository: em.getRepository(Contract),
+    balanceTransactionRepository: em.getRepository(BalanceTransaction),
+    messageRepository: em.getRepository(Message),
     // Add other repositories here
   };
 };
