@@ -22,16 +22,16 @@ import {
 import { useNavigate, useParams } from 'react-router-dom';
 import { hasLength, isInRange, useForm } from '@mantine/form';
 import { useDisclosure } from '@mantine/hooks';
+import { showErrorNotification, showSuccessNotification } from '../utils/mantine-notifications';
 
 const ManageLaundromatsPage = () => {
   const { id } = useParams();
+  const navigate = useNavigate();
   const [laundromat, setLaundromat] = useState<Laundromat>();
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
-  const [isEdited, setIsEdited] = useState(false);
   const [visible, { toggle }] = useDisclosure(false);
   const [opened, { open, close }] = useDisclosure(false);
-  const navigate = useNavigate();
 
   interface LaundromatForm {
     name: string;
@@ -42,15 +42,18 @@ const ManageLaundromatsPage = () => {
     country: string;
   }
 
-  const form = useForm<LaundromatForm>({
-    initialValues: {
-      name: '',
-      street: '',
-      postalCode: '',
-      city: '',
-      price: 0,
-      country: '',
-    },
+  const initialLaundromatValues: LaundromatForm = {
+    name: '',
+    street: '',
+    postalCode: '',
+    city: '',
+    price: 0,
+    country: '',
+  };
+
+  const laundromatForm = useForm<LaundromatForm>({
+    validateInputOnChange: true,
+    initialValues: initialLaundromatValues,
     validate: {
       name: hasLength({ min: 3 }, 'Name must be at least 3 characters long'),
       street: hasLength({ min: 3 }, 'Street name must be at least 3 characters long'),
@@ -68,14 +71,10 @@ const ManageLaundromatsPage = () => {
 
     getLaundromatById(id)
       .then((response) => {
-        if (!response) {
-          throw new Error('Laundromat not found');
-        }
-
         setLaundromat(response);
 
         // Set form default values
-        form.setInitialValues({
+        laundromatForm.setInitialValues({
           name: response.name,
           street: response.street,
           city: response.city,
@@ -84,7 +83,7 @@ const ManageLaundromatsPage = () => {
           price: response.price,
         });
 
-        form.reset();
+        laundromatForm.reset();
 
         setLoading(false);
         setError(false);
@@ -104,27 +103,17 @@ const ManageLaundromatsPage = () => {
       <Table.Td>{element.description}</Table.Td>
       <Table.Td>{element.contracts?.length ?? 0}</Table.Td>
       <Table.Td>
-        <form
-          onSubmit={form.onSubmit(() => {
-            deleteWashingMachine(element.id)
-              .then((response) => {
-                console.log(response);
-                setTimeout(() => {
-                  toggle();
-                }, 1000);
-                window.location.reload();
-              })
-              .catch((error) => {
-                console.error(error);
-                setError(true);
-              })
-              .finally(() => {
-                navigate(`/edit-laundromat/${id}`);
-              });
-          })}
-        >
-          <Button variant="filled" color="red" type="submit" onClick={toggle}>
+        <form>
+          <Button
+            variant="filled"
+            color="red"
+            type="submit"
+            onClick={() => handleDeleteWashingMachine(element.id)}
+          >
             Delete
+          </Button>
+          <Button variant="filled" color="yellow" type="submit">
+            Edit
           </Button>
         </form>
       </Table.Td>
@@ -140,44 +129,142 @@ const ManageLaundromatsPage = () => {
     </Table.Tr>
   );
 
+  const handleDeleteLaundromat = () => {
+    if (laundromat?.washingMachines?.length !== 0) {
+      showErrorNotification('Laundromat', 'delete', 'Laundromat has washing machines');
+      return;
+    }
+
+    if (!id) {
+      showErrorNotification('Laundromat', 'delete', 'Laundromat not found');
+      return;
+    }
+
+    open();
+  };
+
+  const handleUpdateLaundromat = () => {
+    if (!id) {
+      showErrorNotification('Laundromat', 'delete', 'Laundromat not found');
+      return;
+    }
+
+    updateLaundromat(id, laundromatForm.values)
+      .then((response) => {
+        console.log(response);
+        setTimeout(() => {
+          toggle();
+        }, 1000);
+
+        showSuccessNotification('Laudromat', 'update');
+      })
+      .catch((error) => {
+        showErrorNotification('Laudromat', 'update', String(error));
+        setTimeout(() => {
+          toggle();
+        }, 1000);
+      });
+  };
+
+  const handleDeleteWashingMachine = (id: string) => {
+    if (!id) {
+      showErrorNotification('Laundromat', 'delete', 'Laundromat not found');
+      return;
+    }
+
+    deleteWashingMachine(id)
+      .then((response) => {
+        console.log(response);
+        setTimeout(() => {
+          toggle();
+        }, 1000);
+
+        if (!laundromat) {
+          return;
+        }
+
+        laundromat.washingMachines?.filter((element) => element.id !== id);
+        showSuccessNotification('Washing Machine', 'delete');
+      })
+      .catch((error) => {
+        console.error(error);
+        showErrorNotification('Washing Machine', 'delete', String(error));
+      });
+  };
+
+  const handleCreateRandomWashingMachine = () => {
+    if (!id || !laundromat) {
+      showErrorNotification('Laundromat', 'delete', 'Laundromat not found');
+      return;
+    }
+
+    const washingMachine = {
+      name: Math.random().toString(36).substring(7),
+      description: Math.random().toString(36).substring(7),
+      brand: Math.random().toString(36).substring(7),
+      laundromat: laundromat.id,
+    };
+
+    createWashingMachine(washingMachine)
+      .then((response) => {
+        console.log(response);
+
+        // Append to the laundromat state
+        const newLaundromat = { ...laundromat };
+        newLaundromat.washingMachines?.push(response);
+        setLaundromat(newLaundromat);
+        showSuccessNotification('Washing Machine', 'create');
+      })
+      .catch((error) => {
+        console.error(error);
+        setError(true);
+        showErrorNotification('Washing Machine', 'create', String(error));
+      });
+  };
+
+  const onDeleteModal = (
+    <Modal opened={opened} onClose={close} title="On Delete">
+      <Text>Are you sure you want to delete this laundromat?</Text>
+      <Flex justify="flex-end" mt="md">
+        <form
+          onSubmit={laundromatForm.onSubmit((values) => {
+            close();
+
+            if (!id) {
+              return;
+            }
+            console.log(values);
+
+            deleteLaundromat(id)
+              .then((response) => {
+                console.log(response);
+                setTimeout(() => {
+                  toggle();
+                }, 1000);
+                showSuccessNotification('Laudromat', 'delete');
+                navigate('/manage-laundromats');
+              })
+              .catch((error) => {
+                console.error(error);
+                showErrorNotification('Laudromat', 'delete', String(error));
+                setError(true);
+              });
+          })}
+        >
+          <Button variant="filled" color="red" onClick={toggle} type="submit">
+            Delete
+          </Button>
+          <Button variant="filled" color="yellow" ml="sm" onClick={close}>
+            Cancel
+          </Button>
+        </form>
+      </Flex>
+    </Modal>
+  );
+
   return (
     <Container pos={'relative'}>
-      <Modal opened={opened} onClose={close} title="Authentication" centered>
-        <Text>Are you sure you want to delete this laundromat?</Text>
-        <Flex justify="flex-end" mt="md">
-          <form
-            onSubmit={form.onSubmit((values) => {
-              close();
-
-              if (!id) {
-                return;
-              }
-              console.log(values);
-
-              deleteLaundromat(id)
-                .then((response) => {
-                  console.log(response);
-                  setTimeout(() => {
-                    toggle();
-                  }, 1000);
-                  navigate('/manage-laundromats');
-                })
-                .catch((error) => {
-                  console.error(error);
-                  setError(true);
-                });
-            })}
-          >
-            <Button variant="filled" color="red" onClick={toggle} type="submit">
-              Delete
-            </Button>
-            <Button variant="filled" color="yellow" ml="sm" onClick={close}>
-              Cancel
-            </Button>
-          </form>
-        </Flex>
-      </Modal>
-
+      {onDeleteModal}
       {loading && (
         <LoadingOverlay
           zIndex={1000}
@@ -207,97 +294,38 @@ const ManageLaundromatsPage = () => {
               overlayProps={{ radius: 'sm', blur: 2 }}
               loaderProps={{ color: 'blue', type: 'dots', size: 'xl' }}
             />
-            <form
-              onSubmit={form.onSubmit((values) => {
-                if (!id) {
-                  return;
-                }
-                console.log(values);
-
-                updateLaundromat(id, values)
-                  .then((response) => {
-                    console.log(response);
-                    setIsEdited(false);
-                    setTimeout(() => {
-                      toggle();
-                    }, 1000);
-                  })
-                  .catch((error) => {
-                    console.error(error);
-                    setError(true);
-                  });
-              })}
-            >
-              <TextInput
-                label="Name"
-                {...form.getInputProps('name')}
-                onChange={(event) => {
-                  setIsEdited(true);
-                  form.setFieldValue('name', event.currentTarget.value);
-                }}
-              />
-              <TextInput
-                label="Street"
-                {...form.getInputProps('street')}
-                onChange={(event) => {
-                  setIsEdited(true);
-                  form.setFieldValue('street', event.currentTarget.value);
-                }}
-              />
-              <TextInput
-                label="City"
-                {...form.getInputProps('city')}
-                onChange={(event) => {
-                  setIsEdited(true);
-                  form.setFieldValue('city', event.currentTarget.value);
-                }}
-              />
-              <TextInput
-                label="Postal Code"
-                {...form.getInputProps('postalCode')}
-                onChange={(event) => {
-                  setIsEdited(true);
-                  form.setFieldValue('postalCode', event.currentTarget.value);
-                }}
-              />
-              <TextInput
-                label="Country"
-                {...form.getInputProps('country')}
-                onChange={(event) => {
-                  setIsEdited(true);
-                  form.setFieldValue('country', event.currentTarget.value);
-                }}
-              />
-              <NumberInput
-                label="Price Per Machine"
-                suffix=" €"
-                min={1}
-                {...form.getInputProps('price')}
-                onChange={(event) => {
-                  setIsEdited(true);
-                  form.setFieldValue('price', Number(event));
-                }}
-              />
-
+            <form onSubmit={handleUpdateLaundromat}>
+              {Object.keys(laundromatForm.values).map((key, index) =>
+                index ===
+                Object.keys(laundromatForm.values).length - 1 ? null : typeof laundromatForm.values[
+                    key as keyof LaundromatForm
+                  ] === 'number' ? (
+                  <NumberInput
+                    key={key}
+                    name={key}
+                    label={key}
+                    {...laundromatForm.getInputProps(key)}
+                  />
+                ) : (
+                  <TextInput
+                    key={key}
+                    name={key}
+                    label={key}
+                    {...laundromatForm.getInputProps(key)}
+                  />
+                ),
+              )}
               <Flex justify="flex-end" mt="md">
-                <Button
-                  variant="filled"
-                  color="red"
-                  onClick={(event) => {
-                    event.preventDefault();
-                    open();
-                  }}
-                >
+                <Button variant="filled" color="red" onClick={handleDeleteLaundromat}>
                   Delete
                 </Button>
                 <Button
                   variant="filled"
                   color="yellow"
                   ml="sm"
-                  disabled={!isEdited}
+                  disabled={!laundromatForm.isDirty()}
                   onClick={() => {
-                    form.reset();
-                    setIsEdited(false);
+                    laundromatForm.reset();
                   }}
                 >
                   Cancel
@@ -306,9 +334,8 @@ const ManageLaundromatsPage = () => {
                   variant="filled"
                   color="green"
                   ml="sm"
-                  disabled={!isEdited}
+                  disabled={!laundromatForm.isValid() || !laundromatForm.isDirty()}
                   type="submit"
-                  onClick={toggle}
                 >
                   Save
                 </Button>
@@ -318,32 +345,7 @@ const ManageLaundromatsPage = () => {
           <>
             <Flex justify={'space-between'} py={30}>
               <Text size="xl">My Washing Machines</Text>
-              <form
-                onSubmit={form.onSubmit(() => {
-                  const washingMachine = {
-                    name: Math.random().toString(36).substring(7),
-                    description: Math.random().toString(36).substring(7),
-                    brand: Math.random().toString(36).substring(7),
-                    laundromat: laundromat.id,
-                  };
-
-                  createWashingMachine(washingMachine)
-                    .then((response) => {
-                      console.log(response);
-                      setTimeout(() => {
-                        toggle();
-                      }, 1000);
-                      window.location.reload();
-                    })
-                    .catch((error) => {
-                      console.error(error);
-                      setError(true);
-                    })
-                    .finally(() => {
-                      navigate(`/edit-laundromat/${id}`);
-                    });
-                })}
-              >
+              <form onSubmit={handleCreateRandomWashingMachine}>
                 <Button radius={'100'} onClick={toggle} type="submit">
                   + Add Random Washing Machine
                 </Button>

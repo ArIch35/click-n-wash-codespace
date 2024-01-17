@@ -40,3 +40,31 @@ export const showVendorRequiredOnce = () => {
     autoClose: true,
   });
 };
+
+/**
+ * Show success notification
+ * @param entityName Name of the entity
+ * @param action Action performed on the entity
+ */
+export const showSuccessNotification = (entityName: string, action: string) => {
+  showCustomNotification({
+    title: 'Success',
+    message: `${entityName} successfully ${action}d`,
+    color: 'green',
+    autoClose: true,
+  });
+};
+
+/**
+ * Show error notification
+ * @param entityName Name of the entity
+ * @param action Action performed on the entity
+ */
+export const showErrorNotification = (entityName: string, action: string, message: string) => {
+  showCustomNotification({
+    title: `Failed to ${action} ${entityName}`,
+    message: message,
+    color: 'red',
+    autoClose: true,
+  });
+};
