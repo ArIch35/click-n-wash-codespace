@@ -118,7 +118,7 @@ export const topupBalance = async (amount: number) => {
   const response = await fetch(`${loadEnv().VITE_SERVER_ADDRESS}/users/topup`, {
     method: 'POST',
     body: JSON.stringify({ amount }),
-    });
+  });
   const data = (await response.json()) as unknown;
   if (!response.ok) {
     throw new Error((data as Message).message);
