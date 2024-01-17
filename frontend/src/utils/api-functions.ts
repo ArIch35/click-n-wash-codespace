@@ -89,6 +89,26 @@ export const updateUser = async (body: UpdateUser): Promise<User> => {
 };
 
 /**
+ * Sends a request to top up the user's balance with the specified amount.
+ * @param amount - The amount to top up the balance with.
+ * @throws {Error} If the request fails, an error with the error message is thrown.
+ */
+export const topupBalance = async (amount: number) => {
+  const response = await fetch(`${loadEnv().VITE_SERVER_ADDRESS}/users/topup`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      ...(await headers()),
+    },
+    body: JSON.stringify({ amount }),
+  });
+  const data = (await response.json()) as unknown;
+  if (!response.ok) {
+    throw new Error((data as Message).message);
+  }
+};
+
+/**
  * Gets all laundromats from the server.
  * @param onlyOwned Whether to only get the laundromats owned by the current user.
  * @returns The laundromats.
