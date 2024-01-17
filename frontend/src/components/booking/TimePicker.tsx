@@ -2,6 +2,7 @@ import { Button, Indicator, Select } from '@mantine/core';
 import { DatesProvider, DatePicker } from '@mantine/dates';
 import '@mantine/dates/styles.css';
 import { useState } from 'react';
+import WashingMachine from '../../interfaces/entities/washing-machine';
 
 enum BookingStatus {
   NotBooked,
@@ -10,8 +11,10 @@ enum BookingStatus {
 }
 
 interface TimePickerProps {
-  bookedDates: Map<string, Date[]>;
-  onWashingMachineBooked: (date: Date) => void;
+  bookedDates: Map<string, Map<string, string[]>>;
+  washingMachines: WashingMachine[];
+  onDateAndTimeSelected: (date: Date, washingMachines: WashingMachine[]) => void;
+  onDateAndTimeUnselected: () => void;
 }
 
 // Declare the maximum booking hours per day, 12 means that the booking can be done every 2 hours
@@ -32,7 +35,12 @@ const VALID_BOOKING_HOURS_AS_STRING = [
   '22:00',
 ];
 
-const TimePicker = ({ bookedDates, onWashingMachineBooked }: TimePickerProps) => {
+const TimePicker = ({
+  bookedDates,
+  washingMachines,
+  onDateAndTimeSelected,
+  onDateAndTimeUnselected,
+}: TimePickerProps) => {
   const [selectedDate, setSelectedDate] = useState<Date | null>(null);
   const [selectedTime, setSelectedTime] = useState<string | null>(null);
 
@@ -65,10 +73,20 @@ const TimePicker = ({ bookedDates, onWashingMachineBooked }: TimePickerProps) =>
     if (!bookedDates.has(dateString)) {
       return BookingStatus.NotBooked;
     }
-    if (bookedDates.get(dateString)!.length === MAX_BOOKING_HOURS) {
+    let counter = 0;
+    bookedDates.get(dateString)?.forEach((timeSlot) => {
+      if (timeSlot.length >= washingMachines.length) {
+        counter++;
+      }
+    });
+
+    if (counter === MAX_BOOKING_HOURS) {
       return BookingStatus.FullyBooked;
     }
-    return BookingStatus.PartiallyBooked;
+    if (counter > 0) {
+      return BookingStatus.PartiallyBooked;
+    }
+    return BookingStatus.NotBooked;
   };
 
   const getValidBookingHours = (date: Date) => {
@@ -85,10 +103,26 @@ const TimePicker = ({ bookedDates, onWashingMachineBooked }: TimePickerProps) =>
       return validHoursNow;
     }
 
-    const bookedHours: string[] = bookedDates
-      .get(dateString)!
-      .map((date: Date) => getTimeStringRepresentation(date));
-    return validHoursNow.filter((hour) => !bookedHours.includes(hour));
+    const fullyBookedHours: string[] = [];
+    const partiallyBookedHours: string[] = [];
+    for (const [key, val] of bookedDates.get(dateString)!.entries()) {
+      if (val.length >= washingMachines.length) {
+        fullyBookedHours.push(getTimeStringRepresentation(new Date(key)));
+      }
+      if (val.length > 0) {
+        partiallyBookedHours.push(getTimeStringRepresentation(new Date(key)));
+      }
+    }
+
+    return validHoursNow
+      .filter((hour) => !fullyBookedHours.includes(hour))
+      .map((hour) => {
+        if (partiallyBookedHours.includes(hour)) {
+          console.log(hour);
+          return { value: hour, label: `${hour} (partially booked)` };
+        }
+        return { value: hour, label: hour };
+      });
   };
 
   const decideColor = (status: BookingStatus) => {
@@ -102,7 +136,7 @@ const TimePicker = ({ bookedDates, onWashingMachineBooked }: TimePickerProps) =>
     }
   };
 
-  const book = () => {
+  const bookTime = () => {
     if (!selectedDate || !selectedTime) {
       return;
     }
@@ -110,9 +144,22 @@ const TimePicker = ({ bookedDates, onWashingMachineBooked }: TimePickerProps) =>
     const [hours, minutes] = selectedTime.split(':');
     dateHolder.setHours(parseInt(hours));
     dateHolder.setMinutes(parseInt(minutes));
-    onWashingMachineBooked(dateHolder);
+    onDateAndTimeSelected(dateHolder, getValidWashingMachines(selectedDate, dateHolder));
     setSelectedDate(null);
     setSelectedTime(null);
+  };
+
+  const getValidWashingMachines = (date: Date, time: Date) => {
+    const dateString: string = getDateStringRepresentation(date);
+    const timeString: string = time.toISOString();
+
+    if (!bookedDates.has(dateString) || !bookedDates.get(dateString)!.has(timeString)) {
+      return washingMachines;
+    }
+
+    return washingMachines.filter((washingMachine) => {
+      return !bookedDates.get(dateString)!.get(timeString)!.includes(washingMachine.id);
+    });
   };
 
   return (
@@ -123,7 +170,11 @@ const TimePicker = ({ bookedDates, onWashingMachineBooked }: TimePickerProps) =>
         mt="md"
         placeholder="Pick date"
         value={selectedDate}
-        onChange={setSelectedDate}
+        onChange={(date) => {
+          setSelectedDate(date);
+          setSelectedTime(null);
+          onDateAndTimeUnselected();
+        }}
         renderDay={(date: Date) => {
           const day = date.getDate();
           return (
@@ -147,7 +198,7 @@ const TimePicker = ({ bookedDates, onWashingMachineBooked }: TimePickerProps) =>
           onChange={setSelectedTime}
         />
       )}
-      {selectedDate && selectedTime && <Button onClick={book}>Book</Button>}
+      {selectedDate && selectedTime && <Button onClick={bookTime}>Book Time</Button>}
     </DatesProvider>
   );
 };
