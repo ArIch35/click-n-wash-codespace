@@ -34,13 +34,13 @@ function AddFundsModal() {
       >
         <Flex direction="column" gap="xl">
           <Flex justify="center" direction="row" gap="xl">
-            <Button radius={100} onClick={() => setAmount(10)}>
+            <Button radius={100} onClick={() => setAmount(10)} size="md">
               $10
             </Button>
-            <Button radius={100} onClick={() => setAmount(20)}>
+            <Button radius={100} onClick={() => setAmount(20)} size="md">
               $20
             </Button>
-            <Button radius={100} onClick={() => setAmount(50)}>
+            <Button radius={100} onClick={() => setAmount(50)} size="md">
               $50
             </Button>
           </Flex>
