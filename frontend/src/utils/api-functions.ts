@@ -307,6 +307,24 @@ export const getContracts = async () => {
 };
 
 /**
+ * Retrieves a contract by its ID from the server.
+ * @param id - The ID of the contract to retrieve.
+ * @returns A Promise that resolves to the retrieved Contract object.
+ * @throws An error if the server response is not successful or if there is an error parsing the response data.
+ */
+export const getContractById = async (id: string) => {
+  const response = await fetch(`${loadEnv().VITE_SERVER_ADDRESS}/contracts/${id}`, {
+    headers: { ...(await headers()) },
+  });
+
+  const data = (await response.json()) as unknown;
+  if (!response.ok) {
+    throw new Error((data as Message).message);
+  }
+  return entityParser<Contract>(data as Contract);
+};
+
+/**
  * Creates a contract on the server.
  * @param id The id of the washing machine.
  * @param startDate The start date of the contract.
