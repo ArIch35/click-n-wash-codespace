@@ -6,12 +6,11 @@ import InputSelect from '../components/inputs/InputSelect';
 import BaseList from '../components/ui/BaseList.component';
 import IndividualLaundromat from '../components/ui/IndividualLaundromat.component';
 import Laundromat from '../interfaces/entities/laundromat';
-import WashingMachine from '../interfaces/entities/washing-machine';
 import { getLaundromats } from '../utils/api';
 
 const HomePage = () => {
   const [allLaundromats, setAllLaundromats] = useState<Laundromat[]>([]);
-  const [chosenWashingMachines, setChosenWashingMachines] = useState<WashingMachine[] | null>(null);
+  const [chosenLaundromat, setChosenLaundromat] = useState<Laundromat | null>(null);
   const [isOpen, setIsOpen] = useState<boolean>(false);
   const form = useForm({
     initialValues: {
@@ -62,18 +61,18 @@ const HomePage = () => {
           items={allLaundromats}
           IndividualComponent={IndividualLaundromat}
           onItemClick={(item: Laundromat) => {
-            setChosenWashingMachines(item.washingMachines || []);
+            setChosenLaundromat(item);
             setIsOpen(true);
           }}
         />
       )}
-      {chosenWashingMachines && (
+      {chosenLaundromat && (
         <WashingMachinePicker
           isOpen={isOpen}
           onClose={() => {
             setIsOpen(false);
           }}
-          washingMachines={chosenWashingMachines}
+          laundromat={chosenLaundromat}
         />
       )}
     </Stack>

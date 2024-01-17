@@ -1,8 +1,9 @@
 import { Modal } from '@mantine/core';
 import { notifications } from '@mantine/notifications';
 import React, { useState } from 'react';
+import Laundromat from '../../interfaces/entities/laundromat';
 import WashingMachine from '../../interfaces/entities/washing-machine';
-import { bookWashingMachine, getWashingMachineTimeSlots } from '../../utils/api';
+import { bookWashingMachine, getLaundromatTimeSlots } from '../../utils/api';
 import BaseList from '../ui/BaseList.component';
 import IndividualWashingMachine from '../ui/IndividualWashingMachineComponent';
 import TimePicker from './TimePicker';
@@ -10,13 +11,13 @@ import TimePicker from './TimePicker';
 interface WashingMachinePickerProps {
   isOpen: boolean;
   onClose: () => void;
-  washingMachines: WashingMachine[];
+  laundromat: Laundromat;
 }
 
 const WashingMachinePicker: React.FC<WashingMachinePickerProps> = ({
   isOpen,
   onClose,
-  washingMachines,
+  laundromat,
 }) => {
   const [timePickerOpen, setTimePickerOpen] = useState<boolean>(false);
   const [selectedWashingMachine, setSelectedWashingMachine] = useState<WashingMachine | null>(null);
@@ -35,17 +36,19 @@ const WashingMachinePicker: React.FC<WashingMachinePickerProps> = ({
   const onWashingMachineClick = (washingMachine: WashingMachine) => {
     setTimePickerOpen(true);
     setSelectedWashingMachine(washingMachine);
-    getWashingMachineTimeSlots(washingMachine.id)
-      .then((timeSlots) => {
+    getLaundromatTimeSlots(laundromat.id)
+      .then((laundromatTimeSlots) => {
         const bookedDatesMap = new Map<string, Date[]>();
-        timeSlots.forEach((contract) => {
-          const date = contract.start;
-          const dateString = getDateStringRepresentation(date);
-          if (bookedDatesMap.has(dateString)) {
-            bookedDatesMap.set(dateString, [...(bookedDatesMap.get(dateString) || []), date]);
-          } else {
-            bookedDatesMap.set(dateString, [date]);
-          }
+        laundromatTimeSlots.forEach((washingMachineTimeSlots) => {
+          washingMachineTimeSlots.timeSlots.forEach((timeSlot) => {
+            const date = new Date(timeSlot.start);
+            const dateString = getDateStringRepresentation(date);
+            if (bookedDatesMap.has(dateString)) {
+              bookedDatesMap.set(dateString, [...(bookedDatesMap.get(dateString) || []), date]);
+            } else {
+              bookedDatesMap.set(dateString, [date]);
+            }
+          });
         });
         setBookedDates(bookedDatesMap);
       })
@@ -58,7 +61,7 @@ const WashingMachinePicker: React.FC<WashingMachinePickerProps> = ({
     <div>
       <Modal opened={isOpen} onClose={onClose} size="md">
         <BaseList
-          items={washingMachines}
+          items={laundromat.washingMachines || []}
           IndividualComponent={IndividualWashingMachine}
           onItemClick={onWashingMachineClick}
         />

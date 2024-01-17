@@ -1,5 +1,6 @@
 import { headers, Message } from '.';
 import Laundromat, { CreateLaundromat } from '../../interfaces/entities/laundromat';
+import LaundromatTimeSlots from '../../interfaces/laundromat-time-slots';
 import entityParser from '../entity-parser';
 import loadEnv from '../load-env';
 
@@ -40,6 +41,24 @@ export const getLaundromatById = async (id: string) => {
     throw new Error((data as Message).message);
   }
   return entityParser<Laundromat>(data as Laundromat);
+};
+
+/**
+ * Retrieves the time slots for a specific laundromat.
+ * @param id - The ID of the laundromat.
+ * @returns A promise that resolves to an array of laundromat time slots.
+ * @throws An error if the API request fails or returns an error message.
+ */
+export const getLaundromatTimeSlots = async (id: string) => {
+  const response = await fetch(`${route}/${id}/occupied-slots`, {
+    headers: { ...(await headers()) },
+  });
+
+  const data = (await response.json()) as unknown;
+  if (!response.ok) {
+    throw new Error((data as Message).message);
+  }
+  return entityParser<LaundromatTimeSlots[]>(data as LaundromatTimeSlots[]);
 };
 
 /**

@@ -6,24 +6,6 @@ import loadEnv from '../load-env';
 const route = `${loadEnv().VITE_SERVER_ADDRESS}/washingmachines`;
 
 /**
- * Retrieves the time slots for a specific washing machine.
- * @param id - The ID of the washing machine.
- * @returns A promise that resolves to an array of time slots, each containing a start and end date.
- * @throws An error if the request fails or the response is not successful.
- */
-export const getWashingMachineTimeSlots = async (id: string) => {
-  const response = await fetch(`${route}/${id}/occupied-slots`, {
-    headers: { ...(await headers()) },
-  });
-
-  const data = (await response.json()) as unknown;
-  if (!response.ok) {
-    throw new Error((data as Message).message);
-  }
-  return entityParser<{ start: Date; end: Date }[]>(data as { start: Date; end: Date }[]);
-};
-
-/**
  * Creates a new washing machine.
  * @param body - The data for the new washing machine.
  * @returns A promise that resolves to the created washing machine.
