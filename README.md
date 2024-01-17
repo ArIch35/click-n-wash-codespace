@@ -1,93 +1,136 @@
-# Webapp
+# Click n' Wash
 
+## Table of Contents
 
+- [About](#about)
+- [Features](#features)
+- [Tech Stakes](tech-stakes)
+- [Database Structures](database-structure)
+- [Authors](#authors)
 
-## Getting started
+## About Click n' Wash <a name="about"></a>
 
-To make it easy for you to get started with GitLab, here's a list of recommended next steps.
+Click n' Wash is a student-led initiative aimed at simplifying the laundry experience for individuals residing in the student dormitory. Faced with the inconvenience of traditional laundry routines, the team developed a user-friendly website to transform and digitize the laundromat experience. Click n' Wash offers a seamless online platform where users can effortlessly book and monitor the availability of washing machines. This innovative solution eliminates the need for physical visits to the laundromat, providing a convenient and time-efficient alternative.
 
-Already a pro? Just edit this README.md and make it your own. Want to make it easy? [Use the template at the bottom](#editing-this-readme)!
+## Features <a name="features"></a>
 
-## Add your files
+- **Book a Washing machine**: a user can book a washing machine direct from the web, when the washing machine is available.
+- **Check the availability of a Washing machine**: a user can check the availability for a washing machine direct from the website, without the need to go to the laundromat.
+- **Report a Problem**: a user can report a problem to the technician or the owner of the laundromat,when the washing machine has an issue.
+- **search the nearest Laundromat**: the user can search for the nearest Laundromat from their location.
+- **Manage a Laundromat**: a vendor can manage their own laundromat.
+- **Manage a Booking**: a user can manage or cancel their own booking.
+- **Top up balance**: a user can top up their own balance for the payment method for the washing machine.
+- **Balance History**: user can see their own balance history.
+- **Become a Vendor**: user can become a vendor to open their own laundromat.
+-
 
-- [ ] [Create](https://docs.gitlab.com/ee/user/project/repository/web_editor.html#create-a-file) or [upload](https://docs.gitlab.com/ee/user/project/repository/web_editor.html#upload-a-file) files
-- [ ] [Add files using the command line](https://docs.gitlab.com/ee/gitlab-basics/add-file.html#add-a-file-using-the-command-line) or push an existing Git repository with the following command:
+## Database Structures <a name="database-structures"></a>
 
-```
-cd existing_repo
-git remote add origin https://code.fbi.h-da.de/click-n-wash/webapp.git
-git branch -M main
-git push -uf origin main
-```
+This website uses PostgreSQL as the database, with typeORM as the ODM. The database consists of 5 tables: `contract`, `laundromat`, `user`, `washingMachine`, and also the `baseEntity`.
 
-## Integrate with your tools
+### Contract
 
-- [ ] [Set up project integrations](https://code.fbi.h-da.de/click-n-wash/webapp/-/settings/integrations)
+The `contract` table stores a contract entity. Each contract has the following fields:
 
-## Collaborate with your team
+- `id`: a column to stores the id of a contract.
+- `createdAt`: a column to stores when the contract is created.
+- `updatedAt`: a column to stores when the contract is updated.
+- `deletedAt`: a column to stores when the contract is deleted.
+- `name`: a column to stores the name of the contract.
+- `startDate`: a column to stores when the contract starts.
+- `endDate`: a column to stores when the contract ends.
+- `status`: a column to stores the status of the contract.
+- `price`: a column to stores the price of the contract.
+- `user`: a column to stores the user information.
+- `washingMachine`: a column to stores to which washing machine the contract belongs.
 
-- [ ] [Invite team members and collaborators](https://docs.gitlab.com/ee/user/project/members/)
-- [ ] [Create a new merge request](https://docs.gitlab.com/ee/user/project/merge_requests/creating_merge_requests.html)
-- [ ] [Automatically close issues from merge requests](https://docs.gitlab.com/ee/user/project/issues/managing_issues.html#closing-issues-automatically)
-- [ ] [Enable merge request approvals](https://docs.gitlab.com/ee/user/project/merge_requests/approvals/)
-- [ ] [Set auto-merge](https://docs.gitlab.com/ee/user/project/merge_requests/merge_when_pipeline_succeeds.html)
+### Laundromat
 
-## Test and Deploy
+The `laundromat` table stores a laundromat entity. Each laundromat has the following fields:
 
-Use the built-in continuous integration in GitLab.
+- `id`: a column to stores the id of a laundromat.
+- `createdAt`: a column to stores when the laundromat is created.
+- `updatedAt`: a column to stores when the laundromat is updated.
+- `deletedAt`: a column to stores when the laundromat is deleted.
+- `name`: a column to stores the name of the laundromat.
+- `street`,`city`,`country`,`postalCode`: a column to stores the address of the laundromat.
+- `price`: a column to stores the price of the laundromat.
+- `owner`: a column to stores who is the owner of the laundromat.
+- `washingMachines`: a column to stores how many washing machines belong to a laundromat.
 
-- [ ] [Get started with GitLab CI/CD](https://docs.gitlab.com/ee/ci/quick_start/index.html)
-- [ ] [Analyze your code for known vulnerabilities with Static Application Security Testing (SAST)](https://docs.gitlab.com/ee/user/application_security/sast/)
-- [ ] [Deploy to Kubernetes, Amazon EC2, or Amazon ECS using Auto Deploy](https://docs.gitlab.com/ee/topics/autodevops/requirements.html)
-- [ ] [Use pull-based deployments for improved Kubernetes management](https://docs.gitlab.com/ee/user/clusters/agent/)
-- [ ] [Set up protected environments](https://docs.gitlab.com/ee/ci/environments/protected_environments.html)
+### User
 
-***
+The `user` table stores a user entity. Each user has the following fields:
 
-# Editing this README
+- `id`: a column to stores the id of a user.
+- `createdAt`: a column to stores when the user is created.
+- `updatedAt`: a column to stores when the user is updated.
+- `deletedAt`: a column to stores when the user is deleted.
+- `name`: a column to stores the name of the user.
+- `email`: a column to stores the user email.
+- `credit`: a column to stores the total credit a user has.
+- `isAlsoVendor`: a column to tell if the user is a vendor or not.
+- `laundromats`: a column to store the laundromats the user has.
+- `contracts`: a column to store how many contracts a user has.
 
-When you're ready to make this README your own, just edit this file and use the handy template below (or feel free to structure it however you want - this is just a starting point!). Thanks to [makeareadme.com](https://www.makeareadme.com/) for this template.
+### Washing Machine
 
-## Suggestions for a good README
+The `washingMachine` table stores a washingMachine entity. Each washingMachine has the following fields:
 
-Every project is different, so consider which of these sections apply to yours. The sections used in the template are suggestions for most open source projects. Also keep in mind that while a README can be too long and detailed, too long is better than too short. If you think your README is too long, consider utilizing another form of documentation rather than cutting out information.
+- `id`: a column to stores the id of a washingMachine.
+- `createdAt`: a column to stores when the washingMachine is created.
+- `updatedAt`: a column to stores when the washingMachine is updated.
+- `deletedAt`: a column to stores when the washingMachine is deleted.
+- `name`: a column to stores the name of the washingMachine.
+- `brand`: a column to stores the brand of the washingMachine.
+- `description`: a column to stores the description of a washingMachine.
+- `contracts`: a column to stores the contracts that belong to the washingMachine.
+- `laundromat`: a column to stores
 
-## Name
-Choose a self-explaining name for your project.
+### Base Entity
 
-## Description
-Let people know what your project can do specifically. Provide context and add a link to any reference visitors might be unfamiliar with. A list of Features or a Background subsection can also be added here. If there are alternatives to your project, this is a good place to list differentiating factors.
+The `baseEntity` table stores a base entity. Each baseEntity has the following fields:
 
-## Badges
-On some READMEs, you may see small images that convey metadata, such as whether or not all the tests are passing for the project. You can use Shields to add some to your README. Many services also have instructions for adding a badge.
+- `id`: a column to stores the id of the baseEntity.
+- `createdAt`: a column to stores when the baseEntity is created.
+- `updatedAt`: a column to stores when the baseEntity is updated.
+- `deletedAt`: a column to stores when the baseEntity is deleted.
+- `name`: a column to stores the name of the baseEntity.
 
-## Visuals
-Depending on what you are making, it can be a good idea to include screenshots or even a video (you'll frequently see GIFs rather than actual videos). Tools like ttygif can help, but check out Asciinema for a more sophisticated method.
+## Tech Stakes <a name="tech-stakes"></a>
 
-## Installation
-Within a particular ecosystem, there may be a common way of installing things, such as using Yarn, NuGet, or Homebrew. However, consider the possibility that whoever is reading your README is a novice and would like more guidance. Listing specific steps helps remove ambiguity and gets people to using your project as quickly as possible. If it only runs in a specific context like a particular programming language version or operating system or has dependencies that have to be installed manually, also add a Requirements subsection.
+### Frontend
 
-## Usage
-Use examples liberally, and show the expected output if you can. It's helpful to have inline the smallest example of usage that you can demonstrate, while providing links to more sophisticated examples if they are too long to reasonably include in the README.
+- [React](https://reactjs.org/) - JavaScript library for building user interfaces
+- [React Router](https://reactrouter.com/) - React routing library
+- [Vite](https://vitejs.dev/) - Build tool
+- [Mantine](https://mantine.dev/) - React CSS Framework
+- [Firebase](https://firebase.google.com/) - Google base login service
 
-## Support
-Tell people where they can go to for help. It can be any combination of an issue tracker, a chat room, an email address, etc.
+### Backend
 
-## Roadmap
-If you have ideas for releases in the future, it is a good idea to list them in the README.
+- [PostgreSQL](https://www.postgresql.org/) - Database
+- [TypeORM](https://typeorm.io/) - ODM
+- [Firebase](https://firebase.google.com/) - Authentification service
+- [Mocha](https://mochajs.org/) - Testing framework
+- [Chai](https://www.chaijs.com/) - Assertion library
+- [tsc-watch](https://www.npmjs.com/package/tsc-watch) -TypeScript compiler
+- [Axios](https://www.npmjs.com/package/axios) - JavaScript library
+- [Express](https://expressjs.com/) - Web framework
+- [Faker](https://www.npmjs.com/package/@faker-js/faker) - Dummy Data generator
 
-## Contributing
-State if you are open to contributions and what your requirements are for accepting them.
+### Other tools
 
-For people who want to make changes to your project, it's helpful to have some documentation on how to get started. Perhaps there is a script that they should run or some environment variables that they need to set. Make these steps explicit. These instructions could also be useful to your future self.
+- [Docker](https://www.docker.com/) - Containerization platform
+- [Docker Compose](https://docs.docker.com/compose/) - Tool for defining and running multi-container Docker applications
+- [ESLint](https://eslint.org/) - Linter
+- [Prettier](https://prettier.io/) - Code formatter
 
-You can also document commands to lint the code or run tests. These steps help to ensure high code quality and reduce the likelihood that the changes inadvertently break something. Having instructions for running tests is especially helpful if it requires external setup, such as starting a Selenium server for testing in a browser.
+## Authors <a name="authors"></a>
 
-## Authors and acknowledgment
-Show your appreciation to those who have contributed to the project.
-
-## License
-For open source projects, say how it is licensed.
-
-## Project status
-If you have run out of energy or time for your project, put a note at the top of the README saying that development has slowed down or stopped completely. Someone may choose to fork your project or volunteer to step in as a maintainer or owner, allowing your project to keep going. You can also make an explicit request for maintainers.
+- [Vinston Salim, 772744]
+- [Bernhard Ricardo Putranto, 772543]
+- [Agustinus Nicander Hery, 772535]
+- [Moses Antonio, 1112599]
+- [Vinsky Strauss TanHanSen, 772529]
