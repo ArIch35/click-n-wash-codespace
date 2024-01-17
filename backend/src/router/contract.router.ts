@@ -103,6 +103,7 @@ router.post('/', (async (req, res) => {
       name: title,
       content: message,
       to: washingMachine.laundromat.owner,
+      forVendor: true,
     });
     await getDb().messageRepository.save(newMessage);
     const contractWithReducedData = propertiesRemover<Contract>(contract, [
@@ -166,6 +167,7 @@ router.put('/:id', (async (req, res) => {
       name: title,
       content: message,
       to: isWmOwner ? contract.user : contract.washingMachine.laundromat.owner,
+      forVendor: !isWmOwner,
     });
     await getDb().messageRepository.save(newMessage);
     return res.status(STATUS_OK).json(contract);
