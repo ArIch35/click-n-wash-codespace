@@ -88,15 +88,23 @@ router.post('/', (async (req, res) => {
       washingMachine,
     });
     await finalizeContract(contract);
+    const title = 'Someone has booked your washing machine!';
+    const message = `Washing machine ${washingMachine.name} in laundromat ${
+      washingMachine.laundromat.name
+    } has been booked from ${contract.startDate.toLocaleString()} to ${contract.endDate.toLocaleString()}`;
     const notification: Notification = {
-      title: 'Someone has booked your washing machine!',
-      message: `Washing machine ${washingMachine.name} in laundromat ${
-        washingMachine.laundromat.name
-      } has been booked from ${contract.startDate.toLocaleString()} to ${contract.endDate.toLocaleString()}`,
+      title,
+      message,
       color: 'green',
       autoClose: false,
     };
     sendNotification(contract.washingMachine.laundromat.owner.id, notification);
+    const newMessage = getDb().messageRepository.create({
+      name: title,
+      content: message,
+      to: washingMachine.laundromat.owner,
+    });
+    await getDb().messageRepository.save(newMessage);
     const contractWithReducedData = propertiesRemover<Contract>(contract, [
       'washingMachine.laundromat.owner',
     ]);
@@ -125,26 +133,41 @@ router.put('/:id', (async (req, res) => {
       return res.status(STATUS_NOT_FOUND).json(MESSAGE_NOT_FOUND);
     }
 
+    const isWmOwner = contract.washingMachine.laundromat.owner.id === uid;
+
     // Check whether the user in contract is the same as the user
-    if (uid !== contract.user.id) {
+    if (uid !== contract.user.id && !isWmOwner) {
       return res.status(STATUS_FORBIDDEN).json(MESSAGE_FORBIDDEN_NOT_OWNER);
     }
 
     // Check whether the contract is ongoing
-    if (contract.status !== 'ongoing') {
+    if (contract.status !== 'ongoing' && !isWmOwner) {
       return res.status(STATUS_FORBIDDEN).json(customMessage(false, 'Contract is not ongoing'));
     }
 
     await finalizeContract(contract, true);
+    const title = isWmOwner
+      ? 'Your booking has been cancelled!'
+      : 'Someone has cancelled a booking for your washing machine!';
+    const message = `A booking for washing machine ${contract.washingMachine.name} in laundromat ${
+      contract.washingMachine.laundromat.name
+    } from ${contract.startDate.toLocaleString()} to ${contract.endDate.toLocaleString()} has been cancelled`;
     const notification: Notification = {
-      title: 'Someone has cancelled a booking for your washing machine!',
-      message: `A booking for washing machine ${contract.washingMachine.name} in laundromat ${
-        contract.washingMachine.laundromat.name
-      } from ${contract.startDate.toLocaleString()} to ${contract.endDate.toLocaleString()} has been cancelled`,
+      title,
+      message,
       color: 'blue',
       autoClose: false,
     };
-    sendNotification(contract.washingMachine.laundromat.owner.id, notification);
+    sendNotification(
+      isWmOwner ? contract.user.id : contract.washingMachine.laundromat.owner.id,
+      notification,
+    );
+    const newMessage = getDb().messageRepository.create({
+      name: title,
+      content: message,
+      to: isWmOwner ? contract.user : contract.washingMachine.laundromat.owner,
+    });
+    await getDb().messageRepository.save(newMessage);
     return res.status(STATUS_OK).json(contract);
   } catch (error: unknown) {
     if (error instanceof ValidationError) {

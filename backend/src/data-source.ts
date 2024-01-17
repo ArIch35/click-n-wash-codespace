@@ -2,6 +2,7 @@ import { DataSource } from 'typeorm';
 import BalanceTransaction from './entities/balance-transaction';
 import Contract from './entities/contract';
 import Laundromat from './entities/laundromat';
+import Message from './entities/message';
 import User from './entities/user';
 import WashingMachine from './entities/washing-machine';
 import loadEnv from './utils/load-env';
@@ -22,7 +23,7 @@ const createDataSource = (schema?: string) => {
     schema: schema || 'cnw-schema',
     synchronize: true,
     logging: false,
-    entities: [User, Laundromat, WashingMachine, Contract, BalanceTransaction],
+    entities: [User, Laundromat, WashingMachine, Contract, BalanceTransaction, Message],
     subscribers: [],
     migrations: [],
   }).initialize();

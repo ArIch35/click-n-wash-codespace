@@ -3,14 +3,17 @@ import {
   IconBuildingStore,
   IconFileUnknown,
   IconHome,
+  IconInbox,
   IconSettings,
   IconTransactionEuro,
   TablerIconsProps,
 } from '@tabler/icons-react';
 import { RouteProps } from 'react-router-dom';
+import AddLaundromatPage from './pages/AddLaundromatPage';
 import BalancePage from './pages/BalancePage';
 import BookingsPage from './pages/BookingsPage';
 import HomePage from './pages/HomePage';
+import InboxPage from './pages/InboxPage';
 import ManageLaundromatsPage from './pages/ManageLaundromatsPage';
 import MissingPage from './pages/MissingPage';
 import SettingsPage from './pages/SettingsPage';
@@ -36,6 +39,14 @@ export const routes: Route[] = [
     index: true,
   },
   {
+    path: '/inbox',
+    element: <InboxPage />,
+    label: 'Inbox',
+    icon: IconInbox,
+    onNavbar: true,
+    requireAuth: true,
+  },
+  {
     path: '/bookings',
     element: <BookingsPage />,
     label: 'Manage bookings',
@@ -48,7 +59,6 @@ export const routes: Route[] = [
     element: <SimulationPage />,
     label: 'Simulate bookings',
     icon: IconBook2,
-    onNavbar: false,
     requireAuth: true,
   },
   {
@@ -64,7 +74,6 @@ export const routes: Route[] = [
     element: <SettingsPage />,
     label: 'Settings',
     icon: IconSettings,
-    onNavbar: true,
     requireAuth: true,
   },
   {

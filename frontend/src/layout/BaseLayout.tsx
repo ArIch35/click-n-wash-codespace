@@ -1,7 +1,8 @@
-import { AppShell, Overlay, Transition } from '@mantine/core';
+import { AppShell, Box, Overlay, Transition } from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
 import { ReactNode, useState } from 'react';
 import Navbar from '../components/navbar/Navbar';
+import { sizes } from '../utils/constants';
 import Header from './Header/Header';
 
 const BaseLayout = ({ children }: { children: ReactNode }) => {
@@ -17,7 +18,7 @@ const BaseLayout = ({ children }: { children: ReactNode }) => {
 
   return (
     <AppShell>
-      <AppShell.Header zIndex={0}>
+      <AppShell.Header zIndex={0} h={sizes.headerHeight}>
         <Header toggle={navbarHandlers.open} setVisible={setVisible} />
       </AppShell.Header>
 
@@ -38,7 +39,7 @@ const BaseLayout = ({ children }: { children: ReactNode }) => {
           </Transition>
         </div>
 
-        <div style={{ paddingTop: '45px', height: '100vh', zIndex: 0 }}>
+        <Box pt={sizes.headerHeight} style={{ height: '100vh', zIndex: 0 }}>
           {children}
           {visible && (
             <Overlay
@@ -52,7 +53,7 @@ const BaseLayout = ({ children }: { children: ReactNode }) => {
               }}
             />
           )}
-        </div>
+        </Box>
       </AppShell.Main>
     </AppShell>
   );

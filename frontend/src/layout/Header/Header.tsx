@@ -1,82 +1,46 @@
 import { Burger, Button, Group } from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
-import { signOut } from 'firebase/auth';
 import React from 'react';
 import { useSelector } from 'react-redux';
-import AuthAnchor from '../../components/auth/AuthAnchor';
+import { useNavigate } from 'react-router-dom';
+import DarkModeToggle from '../../components/DarkModeToggle';
+import UserMenu from '../../components/UserMenu';
 import { AuthenticationForm } from '../../components/auth/AuthentificationForm';
-import firebaseAuth from '../../firebase';
 import NavbarControllerProps from '../../interfaces/navbar-controller-props';
 import { RootState } from '../../reducers/root.reducer';
 import classes from './Header.module.css';
 
-const links = [{ link: '/about', label: 'Login / Register' }];
-
 const Header = ({ toggle, setVisible }: NavbarControllerProps) => {
   const user = useSelector((state: RootState) => state.authenticationState.user);
+  const navigate = useNavigate();
   const [modalOpened, modalHandlers] = useDisclosure(false);
 
   const loggedIn = React.useMemo(() => user, [user]);
 
-  const items = links.map((link) =>
-    !loggedIn ? (
-      <AuthAnchor
-        key={link.label}
-        link={link}
-        className={classes.link}
-        onClick={(event) => {
-          event.preventDefault();
-          modalHandlers.open();
-        }}
-      />
-    ) : (
-      <AuthAnchor
-        key={'Logout'}
-        link={{ label: 'Logout' }}
-        className={classes.link}
-        onClick={() => {
-          window.location.href = '/';
-          signOut(firebaseAuth).catch((error) => {
-            console.error(error);
-          });
-        }}
-      />
-    ),
-  );
-
   return (
     <header className={classes.header}>
-      <div className={classes.inner}>
-        {!loggedIn && <AuthenticationForm opened={modalOpened} onClose={modalHandlers.close} />}
-        <Group>
-          <Burger
-            onClick={() => {
-              if (!loggedIn) {
-                modalHandlers.open();
-                return;
-              }
-              toggle();
-              setVisible(true);
-            }}
-            size={'sm'}
-          />
-          <Button
-            size="md"
-            variant="transparent"
-            fw={700}
-            onClick={() => {
-              window.location.href = '/';
-            }}
-          >
-            Click n&apos; Wash
-          </Button>
+      {!loggedIn && <AuthenticationForm opened={modalOpened} onClose={modalHandlers.close} />}
+      <Group>
+        <Burger
+          onClick={() => {
+            if (!loggedIn) {
+              modalHandlers.open();
+              return;
+            }
+            toggle();
+            setVisible(true);
+          }}
+        />
+        <Button size="md" variant="transparent" fw={700} onClick={() => navigate('/')}>
+          Click n&apos; Wash
+        </Button>
+      </Group>
+      <Group>
+        <Group ml={50} gap={5} className={classes.links} visibleFrom="sm">
+          <UserMenu open={modalHandlers.open} />
+          <DarkModeToggle />
         </Group>
-        <Group>
-          <Group ml={50} gap={5} className={classes.links} visibleFrom="sm">
-            {items}
-          </Group>
-        </Group>
-      </div>
+      </Group>
     </header>
   );
 };

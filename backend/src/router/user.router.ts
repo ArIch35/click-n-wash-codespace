@@ -2,7 +2,7 @@ import { RequestHandler, Router } from 'express';
 import { ValidationError } from 'yup';
 import getDb from '../db';
 import { createTopupSchema, finalizeBalanceTransaction } from '../entities/balance-transaction';
-import { createUserSchema, updateUserSchema } from '../entities/user';
+import { createUserSchema, markAsReadSchema, updateUserSchema } from '../entities/user';
 import StatusError from '../utils/error-with-status';
 import {
   MESSAGE_CONFLICT_UNRESOLVED,
@@ -33,6 +33,9 @@ router.get('/:idOrEmail', (async (req, res) => {
   try {
     const user = await getDb().userRepository.findOne({
       where: [{ id: req.params.idOrEmail }, { email: req.params.idOrEmail }],
+      relations: {
+        inbox: true,
+      },
     });
     if (!user) {
       return res.status(STATUS_NOT_FOUND).json(MESSAGE_NOT_FOUND);
@@ -92,6 +95,7 @@ router.post('/restore', (async (_req, res) => {
     const uid = res.locals.uid as string;
     const userExists = await getDb().userRepository.findOne({
       where: { id: uid },
+      relations: { inbox: true },
       withDeleted: true,
     });
     if (!userExists) {
@@ -116,6 +120,7 @@ router.post('/topup', (async (req, res) => {
     const uid = res.locals.uid as string;
     const user = await getDb().userRepository.findOne({
       where: { id: uid },
+      relations: { inbox: true },
     });
     if (!user) {
       return res.status(STATUS_BAD_REQUEST).json(customMessage(false, 'User does not exist'));
@@ -148,6 +153,7 @@ router.put('/', (async (req, res) => {
 
     const userExists = await getDb().userRepository.findOne({
       where: { id: uid },
+      relations: { inbox: true },
     });
     if (!userExists) {
       return res.status(STATUS_NOT_FOUND).json(MESSAGE_NOT_FOUND);
@@ -179,6 +185,37 @@ router.put('/', (async (req, res) => {
       return res.status(STATUS_SERVER_ERROR).json(MESSAGE_SERVER_ERROR);
     }
   }
+}) as RequestHandler);
+
+router.put('/read', (async (req, res) => {
+  const uid = res.locals.uid as string;
+  const user = await getDb().userRepository.findOne({
+    where: { id: uid },
+    relations: { inbox: true },
+  });
+
+  if (!user) {
+    return res.status(STATUS_NOT_FOUND).json(MESSAGE_NOT_FOUND);
+  }
+
+  if (!user.inbox) {
+    return res.status(STATUS_OK).json(user);
+  }
+
+  const validated = await markAsReadSchema.validate(req.body, {
+    abortEarly: false,
+    strict: true,
+  });
+
+  user.inbox = user.inbox?.map((message) => {
+    if (validated.messageIds.includes(message.id)) {
+      message.read = true;
+    }
+    return message;
+  });
+
+  await getDb().messageRepository.save(user.inbox);
+  return res.status(STATUS_OK).json(user);
 }) as RequestHandler);
 
 router.delete('/', (async (_req, res) => {

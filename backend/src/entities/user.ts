@@ -1,8 +1,9 @@
 import { Column, Entity, OneToMany } from 'typeorm';
-import { boolean, object, string } from 'yup';
+import { array, boolean, object, string } from 'yup';
 import BaseEntity from './base-entity';
 import Contract from './contract';
 import Laundromat from './laundromat';
+import Message from './message';
 
 @Entity()
 class User extends BaseEntity {
@@ -20,6 +21,9 @@ class User extends BaseEntity {
 
   @OneToMany(() => Contract, (contract) => contract.user)
   contracts?: Contract[];
+
+  @OneToMany(() => Message, (message) => message.to)
+  inbox?: Message[];
 }
 
 export default User;
@@ -36,3 +40,7 @@ export const updateUserSchema = object({
   .test('at-least-one-field', 'You must provide at least one field', (value) =>
     Object.values(value).some((field) => field !== undefined && field !== null),
   );
+
+export const markAsReadSchema = object({
+  messageIds: array().of(string().required()).required(),
+}).noUnknown(true);

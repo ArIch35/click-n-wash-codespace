@@ -12,12 +12,16 @@ import { updateUser } from '../../utils/api-functions';
 import classes from './Navbar.module.css';
 
 const settings = routes.find((route) => route.label === 'Settings');
-const data = routes.filter(
-  (route) => route.label !== settings?.label && route.label !== 'Missing' && route.onNavbar,
-);
 
 const Navbar = ({ toggle, setVisible }: NavbarControllerProps) => {
   const user = useSelector((state: RootState) => state.authenticationState.user);
+  const data = routes.filter(
+    (route) =>
+      route.onNavbar &&
+      (route.requireVendor
+        ? route.requireVendor === user?.isAlsoVendor
+        : route.requireVendor === undefined),
+  );
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const [active, setActive] = useState(
