@@ -1,5 +1,5 @@
 import { headers, Message } from '.';
-import Contract from '../../interfaces/entities/contract';
+import Contract, { BulkCancelContracts } from '../../interfaces/entities/contract';
 import entityParser from '../entity-parser';
 import loadEnv from '../load-env';
 
@@ -56,6 +56,24 @@ export const bookWashingMachine = async (id: string, startDate: Date) => {
       endDate: new Date(startDate.getTime() + ONE_HOUR * 2),
       washingMachine: id,
     }),
+  });
+
+  const data = (await response.json()) as unknown;
+  if (!response.ok) {
+    throw new Error((data as Message).message);
+  }
+};
+
+/**
+ * Cancels multiple contracts in bulk.
+ *
+ * @param bulkCancelContracts Start and end date of the time period to cancel contracts in bulk and the laundromat ID.
+ */
+export const bulkCancelContracts = async (bulkCancelContracts: BulkCancelContracts) => {
+  const response = await fetch(`${route}/bulkcancel`, {
+    method: 'POST',
+    headers: { ...(await headers()) },
+    body: JSON.stringify(bulkCancelContracts),
   });
 
   const data = (await response.json()) as unknown;

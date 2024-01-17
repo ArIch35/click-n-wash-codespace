@@ -1,7 +1,9 @@
 import { RequestHandler, Router } from 'express';
+import { LessThanOrEqual, MoreThanOrEqual } from 'typeorm';
 import { ValidationError } from 'yup';
 import getDb from '../db';
 import Contract, {
+  bulkCancelContractSchema,
   createContractSchema,
   finalizeContract,
   updateContractSchema,
@@ -110,6 +112,65 @@ router.post('/', (async (req, res) => {
       'washingMachine.laundromat.owner',
     ]);
     return res.status(STATUS_OK).json(contractWithReducedData);
+  } catch (error: unknown) {
+    if (error instanceof ValidationError) {
+      return res.status(STATUS_BAD_REQUEST).json(customMessage(false, error.errors.join(', ')));
+    } else if (error instanceof StatusError) {
+      return res.status(error.status).json(customMessage(false, error.message));
+    }
+    return res.status(STATUS_SERVER_ERROR).json(MESSAGE_SERVER_ERROR);
+  }
+}) as RequestHandler);
+
+router.post('/bulkcancel', (async (req, res) => {
+  try {
+    const validated = await bulkCancelContractSchema.validate(req.body, { abortEarly: false });
+    const id = res.locals.uid as string;
+
+    const contracts = await getDb().contractRepository.find({
+      where: [
+        {
+          washingMachine: { laundromat: { id: validated.laundromat, owner: { id } } },
+          status: 'ongoing',
+          endDate: MoreThanOrEqual(validated.startDate),
+        },
+        {
+          washingMachine: { laundromat: { id: validated.laundromat, owner: { id } } },
+          status: 'ongoing',
+          startDate: LessThanOrEqual(validated.endDate),
+        },
+      ],
+      relations: { user: true, washingMachine: { laundromat: { owner: true } } },
+    });
+
+    const cancelContract = async (contract: Contract) => {
+      await finalizeContract(contract, true);
+      const title = 'Your booking has been cancelled!';
+      const message = `A booking for washing machine ${
+        contract.washingMachine.name
+      } in laundromat ${
+        contract.washingMachine.laundromat.name
+      } from ${contract.startDate.toLocaleString()} to ${contract.endDate.toLocaleString()} has been cancelled`;
+      const notification: Notification = {
+        title,
+        message,
+        color: 'blue',
+        autoClose: false,
+      };
+      sendNotification(contract.user.id, notification);
+      const newMessage = getDb().messageRepository.create({
+        name: title,
+        content: message,
+        to: contract.user,
+        forVendor: false,
+      });
+      await getDb().messageRepository.save(newMessage);
+    };
+
+    await Promise.all(contracts.map(cancelContract));
+    return res
+      .status(STATUS_OK)
+      .json(customMessage(true, `${contracts.length} contracts cancelled`));
   } catch (error: unknown) {
     if (error instanceof ValidationError) {
       return res.status(STATUS_BAD_REQUEST).json(customMessage(false, error.errors.join(', ')));
