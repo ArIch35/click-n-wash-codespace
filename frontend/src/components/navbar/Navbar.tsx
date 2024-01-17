@@ -8,7 +8,7 @@ import NavbarControllerProps from '../../interfaces/navbar-controller-props';
 import { setUser } from '../../reducers/authentication.reducer';
 import { RootState } from '../../reducers/root.reducer';
 import { routes } from '../../routeConstants';
-import { updateUser } from '../../utils/api-functions';
+import { updateUser } from '../../utils/api';
 import classes from './Navbar.module.css';
 
 const settings = routes.find((route) => route.label === 'Settings');

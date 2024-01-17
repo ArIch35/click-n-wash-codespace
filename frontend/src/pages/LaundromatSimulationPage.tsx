@@ -1,16 +1,15 @@
-import { useEffect } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
-import { getContractById } from '../utils/api-functions';
-import Notification from '../interfaces/notification';
-import React from 'react';
 import { Card, Text } from '@mantine/core';
+import React, { useEffect } from 'react';
+import { useNavigate, useParams } from 'react-router-dom';
 import Timer from '../components/simulation/Timer';
-import Contract from '../interfaces/entities/contract';
-import { showCustomNotification } from '../utils/mantine-notifications';
-import { Activities } from '../components/simulation/activities/SimulationActivity.interface';
-import InsertLaundry from '../components/simulation/activities/InsertLaundry';
 import ChooseProgram from '../components/simulation/activities/ChooseProgram';
+import InsertLaundry from '../components/simulation/activities/InsertLaundry';
+import { Activities } from '../components/simulation/activities/SimulationActivity.interface';
 import TakeOutLaundry from '../components/simulation/activities/TakeOutLaundry';
+import Contract from '../interfaces/entities/contract';
+import Notification from '../interfaces/notification';
+import { getContractById } from '../utils/api';
+import { showCustomNotification } from '../utils/mantine-notifications';
 
 const initialActivities: Activities = {
   insertLaundry: 'idle',
@@ -18,7 +17,7 @@ const initialActivities: Activities = {
   washingCompleted: 'idle',
 };
 
-const SimulationPage: React.FC = () => {
+const LaundromatSimulationPage: React.FC = () => {
   const navigate = useNavigate();
   const { contractId } = useParams<string>();
   const [contract, setContract] = React.useState<Contract | null>(null);
@@ -77,4 +76,4 @@ const SimulationPage: React.FC = () => {
   );
 };
 
-export default SimulationPage;
+export default LaundromatSimulationPage;

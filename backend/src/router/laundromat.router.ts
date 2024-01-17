@@ -2,6 +2,7 @@ import { RequestHandler, Router } from 'express';
 import { ValidationError } from 'yup';
 import getDb from '../db';
 import { createLaundromatSchema, updateLaundromatSchema } from '../entities/laundromat';
+import WashingMachine from '../entities/washing-machine';
 import StatusError from '../utils/error-with-status';
 import {
   MESSAGE_FORBIDDEN_NOT_OWNER,
@@ -18,6 +19,16 @@ import {
   STATUS_OK,
   STATUS_SERVER_ERROR,
 } from '../utils/http-status-codes';
+
+interface TimeSlot {
+  start: Date;
+  end: Date;
+}
+
+interface washingMachineTimeSlots {
+  washingMachine: WashingMachine;
+  timeSlots: TimeSlot[];
+}
 
 const router: Router = Router();
 
@@ -45,6 +56,38 @@ router.get('/:id', (async (req, res) => {
       return res.status(STATUS_NOT_FOUND).json(MESSAGE_NOT_FOUND);
     }
     return res.status(STATUS_OK).json(laundromat);
+  } catch (error) {
+    return res.status(STATUS_SERVER_ERROR).json(MESSAGE_SERVER_ERROR);
+  }
+}) as RequestHandler);
+
+router.get('/:id/occupied-slots', (async (req, res) => {
+  try {
+    const laundromat = await getDb().laundromatRepository.findOne({
+      where: { id: req.params.id },
+      relations: { washingMachines: { contracts: true } },
+    });
+    if (!laundromat) {
+      return res.status(STATUS_NOT_FOUND).json(MESSAGE_NOT_FOUND);
+    }
+
+    const laundromatTimeSlots: washingMachineTimeSlots[] = [];
+    laundromat.washingMachines?.forEach((washingMachine) => {
+      const timeSlots: TimeSlot[] = [];
+      washingMachine.contracts
+        ?.filter((contract) => contract.status === 'ongoing')
+        .forEach((contract) => {
+          timeSlots.push({
+            start: contract.startDate,
+            end: contract.endDate,
+          });
+        });
+      laundromatTimeSlots.push({
+        washingMachine,
+        timeSlots,
+      });
+    });
+    return res.status(STATUS_OK).json(Array.from(laundromatTimeSlots));
   } catch (error) {
     return res.status(STATUS_SERVER_ERROR).json(MESSAGE_SERVER_ERROR);
   }

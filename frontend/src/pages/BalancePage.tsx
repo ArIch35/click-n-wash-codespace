@@ -1,11 +1,11 @@
 import { Flex, Space, Table, Text } from '@mantine/core';
-import BalanceTransaction from '../interfaces/entities/balance-transaction';
 import React from 'react';
-import { getBalanceTransactions } from '../utils/api-functions';
-import formatDate from '../utils/format-date';
-import AddFundsModal from '../components/ui/AddFundsModal';
 import { useSelector } from 'react-redux';
+import AddFundsModal from '../components/ui/AddFundsModal';
+import BalanceTransaction from '../interfaces/entities/balance-transaction';
 import { RootState } from '../reducers/root.reducer';
+import { getBalanceTransactions } from '../utils/api';
+import formatDate from '../utils/format-date';
 
 const BalancePage = () => {
   // List of contracts

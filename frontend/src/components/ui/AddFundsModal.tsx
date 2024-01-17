@@ -1,7 +1,7 @@
+import { Button, Flex, Modal } from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
-import { Modal, Button, Flex } from '@mantine/core';
 import React from 'react';
-import { topupBalance } from '../../utils/api-functions';
+import { topupBalance } from '../../utils/api';
 
 function AddFundsModal() {
   const [opened, { open, close }] = useDisclosure(false);
