@@ -37,7 +37,10 @@ const BalancePage = () => {
           Current Balance: ${user?.balance}
         </Text>
       </Flex>
-      <Flex mt="lg" px="md">
+      <Flex mt="m" justify={'flex-end'} px="md">
+        <AddFundsModal />
+      </Flex>
+      <Flex mt="m" px="md">
         <Table fz="md" verticalSpacing="md" horizontalSpacing="md" withTableBorder highlightOnHover>
           <Table.Thead>{ths}</Table.Thead>
           <Table.Tbody>
@@ -54,9 +57,6 @@ const BalancePage = () => {
               ))}
           </Table.Tbody>
         </Table>
-      </Flex>
-      <Flex mt="lg" justify={'flex-end'} px="md">
-        <AddFundsModal />
       </Flex>
     </Flex>
   );
