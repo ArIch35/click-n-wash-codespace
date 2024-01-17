@@ -17,7 +17,7 @@ const initialActivities: Activities = {
   washingCompleted: 'idle',
 };
 
-const SimulationPage: React.FC = () => {
+const LaundromatSimulationPage: React.FC = () => {
   const navigate = useNavigate();
   const { contractId } = useParams<string>();
   const [contract, setContract] = React.useState<Contract | null>(null);
@@ -76,4 +76,4 @@ const SimulationPage: React.FC = () => {
   );
 };
 
-export default SimulationPage;
+export default LaundromatSimulationPage;

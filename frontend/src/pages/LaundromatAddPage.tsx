@@ -35,7 +35,7 @@ const initialWashingMachineValues: initWashingMachine = {
   description: '',
 };
 
-const AddLaundromatPage = () => {
+const LaundromatAddPage = () => {
   const [active, setActive] = useState(0);
   const navigate = useNavigate();
 
@@ -121,4 +121,4 @@ const AddLaundromatPage = () => {
   );
 };
 
-export default AddLaundromatPage;
+export default LaundromatAddPage;

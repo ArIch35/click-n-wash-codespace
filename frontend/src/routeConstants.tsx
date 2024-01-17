@@ -9,16 +9,16 @@ import {
   TablerIconsProps,
 } from '@tabler/icons-react';
 import { RouteProps } from 'react-router-dom';
-import AddLaundromatPage from './pages/AddLaundromatPage';
+import LaundromatAddPage from './pages/LaundromatAddPage.tsx';
 import BalancePage from './pages/BalancePage';
 import BookingsPage from './pages/BookingsPage';
 import HomePage from './pages/HomePage';
 import InboxPage from './pages/InboxPage';
 import LaundromatDetailsPage from './pages/LaundromatDetailsPage';
-import ManageLaundromatsPage from './pages/ManageLaundromatsPage';
+import LaundromatsManagePage from './pages/LaundromatsManagePage.tsx';
 import MissingPage from './pages/MissingPage';
 import SettingsPage from './pages/SettingsPage';
-import SimulationPage from './pages/SimulationPage';
+import LaundromatSimulationPage from './pages/LaundromatSimulationPage.tsx';
 
 type Route = RouteProps & {
   label: string;
@@ -55,7 +55,7 @@ export const routes: Route[] = [
   },
   {
     path: '/simulate/:contractId',
-    element: <SimulationPage />,
+    element: <LaundromatSimulationPage />,
     label: 'Simulate bookings',
     icon: IconBook2,
     requireAuth: true,
@@ -77,7 +77,7 @@ export const routes: Route[] = [
   },
   {
     path: '/manage-laundromats',
-    element: <ManageLaundromatsPage />,
+    element: <LaundromatsManagePage />,
     label: 'Manage laundromats',
     icon: IconBuildingStore,
     onNavbar: true,
@@ -86,7 +86,7 @@ export const routes: Route[] = [
   },
   {
     path: '/add-laundromat',
-    element: <AddLaundromatPage />,
+    element: <LaundromatAddPage />,
     label: 'Add laundromat',
     icon: IconBuildingStore,
     requireAuth: true,
