@@ -2,7 +2,7 @@ import { Badge, Box, Button, Card, Group, Stack, Text, Title } from '@mantine/co
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import Contract from '../interfaces/entities/contract';
-import { cancelContract, getContracts } from '../utils/api-functions';
+import { cancelContract, getContracts } from '../utils/api';
 import formatDate from '../utils/format-date';
 import { showCustomNotification } from '../utils/mantine-notifications';
 

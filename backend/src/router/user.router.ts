@@ -188,34 +188,43 @@ router.put('/', (async (req, res) => {
 }) as RequestHandler);
 
 router.put('/read', (async (req, res) => {
-  const uid = res.locals.uid as string;
-  const user = await getDb().userRepository.findOne({
-    where: { id: uid },
-    relations: { inbox: true },
-  });
+  try {
+    const validated = await markAsReadSchema.validate(req.body, {
+      abortEarly: false,
+      strict: true,
+    });
+    const uid = res.locals.uid as string;
 
-  if (!user) {
-    return res.status(STATUS_NOT_FOUND).json(MESSAGE_NOT_FOUND);
-  }
+    const user = await getDb().userRepository.findOne({
+      where: { id: uid },
+      relations: { inbox: true },
+    });
 
-  if (!user.inbox) {
-    return res.status(STATUS_OK).json(user);
-  }
-
-  const validated = await markAsReadSchema.validate(req.body, {
-    abortEarly: false,
-    strict: true,
-  });
-
-  user.inbox = user.inbox?.map((message) => {
-    if (validated.messageIds.includes(message.id)) {
-      message.read = true;
+    if (!user) {
+      return res.status(STATUS_NOT_FOUND).json(MESSAGE_NOT_FOUND);
     }
-    return message;
-  });
 
-  await getDb().messageRepository.save(user.inbox);
-  return res.status(STATUS_OK).json(user);
+    if (!user.inbox) {
+      return res.status(STATUS_OK).json(user);
+    }
+
+    user.inbox = user.inbox?.map((message) => {
+      if (validated.messageIds.includes(message.id)) {
+        message.read = true;
+      }
+      return message;
+    });
+
+    await getDb().messageRepository.save(user.inbox);
+    return res.status(STATUS_OK).json(user);
+  } catch (error: unknown) {
+    if (error instanceof ValidationError) {
+      return res.status(STATUS_BAD_REQUEST).json(customMessage(false, error.errors.join(', ')));
+    } else if (error instanceof StatusError) {
+      return res.status(error.status).json(customMessage(false, error.message));
+    }
+    return res.status(STATUS_SERVER_ERROR).json(MESSAGE_SERVER_ERROR);
+  }
 }) as RequestHandler);
 
 router.delete('/', (async (_req, res) => {

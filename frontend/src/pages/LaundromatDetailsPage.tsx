@@ -10,18 +10,18 @@ import {
   Text,
   TextInput,
 } from '@mantine/core';
-import { useEffect, useState } from 'react';
-import Laundromat from '../interfaces/entities/laundromat';
-import {
-  deleteLaundromat,
-  getLaundromatById,
-  updateLaundromat,
-  deleteWashingMachine,
-  createWashingMachine,
-} from '../utils/api-functions';
-import { useNavigate, useParams } from 'react-router-dom';
 import { hasLength, isInRange, useForm } from '@mantine/form';
 import { useDisclosure } from '@mantine/hooks';
+import { useEffect, useState } from 'react';
+import { useNavigate, useParams } from 'react-router-dom';
+import Laundromat from '../interfaces/entities/laundromat';
+import {
+  createWashingMachine,
+  deleteLaundromat,
+  deleteWashingMachine,
+  getLaundromatById,
+  updateLaundromat,
+} from '../utils/api';
 import { showErrorNotification, showSuccessNotification } from '../utils/mantine-notifications';
 
 const ManageLaundromatsPage = () => {

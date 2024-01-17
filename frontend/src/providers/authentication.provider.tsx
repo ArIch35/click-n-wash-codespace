@@ -4,7 +4,7 @@ import firebaseAuth from '../firebase';
 import User, { CreateUser } from '../interfaces/entities/user';
 import { setAuth, setRegisteredName, setUser } from '../reducers/authentication.reducer';
 import { RootState } from '../reducers/root.reducer';
-import { createUser, getUser } from '../utils/api-functions';
+import { createUser, getUser } from '../utils/api';
 
 const AuthenticationContext = React.createContext<null>(null);
 

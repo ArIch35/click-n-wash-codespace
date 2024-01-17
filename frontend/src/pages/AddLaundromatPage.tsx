@@ -1,9 +1,9 @@
-import { Container, TextInput, rem, Stepper, Button, Group, NumberInput } from '@mantine/core';
+import { Button, Container, Group, NumberInput, Stepper, TextInput, rem } from '@mantine/core';
 import { useForm } from '@mantine/form';
 import { IconCircleCheck } from '@tabler/icons-react';
 import { useState } from 'react';
-import { createLaundromat, createWashingMachine } from '../utils/api-functions';
 import { useNavigate } from 'react-router-dom';
+import { createLaundromat, createWashingMachine } from '../utils/api';
 
 interface initLaundromat {
   name: string;

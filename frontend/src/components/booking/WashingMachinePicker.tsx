@@ -2,7 +2,7 @@ import { Modal } from '@mantine/core';
 import { notifications } from '@mantine/notifications';
 import React, { useState } from 'react';
 import WashingMachine from '../../interfaces/entities/washing-machine';
-import { bookWashingMachine, getAllWashingMachinesContractsById } from '../../utils/api-functions';
+import { bookWashingMachine, getWashingMachineTimeSlots } from '../../utils/api';
 import BaseList from '../ui/BaseList.component';
 import IndividualWashingMachine from '../ui/IndividualWashingMachineComponent';
 import TimePicker from './TimePicker';
@@ -35,10 +35,10 @@ const WashingMachinePicker: React.FC<WashingMachinePickerProps> = ({
   const onWashingMachineClick = (washingMachine: WashingMachine) => {
     setTimePickerOpen(true);
     setSelectedWashingMachine(washingMachine);
-    getAllWashingMachinesContractsById(washingMachine.id)
-      .then((contracts) => {
+    getWashingMachineTimeSlots(washingMachine.id)
+      .then((timeSlots) => {
         const bookedDatesMap = new Map<string, Date[]>();
-        contracts.forEach((contract) => {
+        timeSlots.forEach((contract) => {
           const date = contract.start;
           const dateString = getDateStringRepresentation(date);
           if (bookedDatesMap.has(dateString)) {

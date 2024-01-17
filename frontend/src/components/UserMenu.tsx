@@ -1,5 +1,5 @@
-import { ActionIcon, Indicator, Menu } from '@mantine/core';
-import { IconCash, IconInbox, IconUser, IconUserOff } from '@tabler/icons-react';
+import { ActionIcon, Button, Indicator, Menu } from '@mantine/core';
+import { IconCash, IconInbox, IconUser } from '@tabler/icons-react';
 import { signOut } from 'firebase/auth';
 import { useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
@@ -24,18 +24,20 @@ const UserMenu = ({ open }: UserMenuProps) => {
     });
   };
 
-  const Icon = (
-    <ActionIcon
-      variant="outline"
-      onClick={() => {
-        if (!user) {
-          open();
-        }
-      }}
-      size={sizes.iconSizeLarge}
-    >
-      {user ? <IconUser size={sizes.iconSizeLarge} /> : <IconUserOff size={sizes.iconSizeLarge} />}
+  const onIconClick = () => {
+    if (!user) {
+      open();
+    }
+  };
+
+  const Icon = user ? (
+    <ActionIcon variant="outline" onClick={onIconClick} size={sizes.iconSizeLarge}>
+      <IconUser size={sizes.iconSizeLarge} />
     </ActionIcon>
+  ) : (
+    <Button onClick={open} variant="outline" h={sizes.iconSizeLarge}>
+      Login
+    </Button>
   );
 
   return user ? (

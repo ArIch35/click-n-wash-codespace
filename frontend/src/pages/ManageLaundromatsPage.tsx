@@ -1,8 +1,8 @@
 import { Button, Container, Flex, LoadingOverlay, Table, Text } from '@mantine/core';
 import { useEffect, useState } from 'react';
-import Laundromat from '../interfaces/entities/laundromat';
-import { getLaundromats } from '../utils/api-functions';
 import { useNavigate } from 'react-router-dom';
+import Laundromat from '../interfaces/entities/laundromat';
+import { getLaundromats } from '../utils/api';
 
 const ManageLaundromatsPage = () => {
   const [laundromats, setLaundromats] = useState<Laundromat[]>([]);

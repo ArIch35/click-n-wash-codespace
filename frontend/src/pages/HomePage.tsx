@@ -7,7 +7,7 @@ import BaseList from '../components/ui/BaseList.component';
 import IndividualLaundromat from '../components/ui/IndividualLaundromat.component';
 import Laundromat from '../interfaces/entities/laundromat';
 import WashingMachine from '../interfaces/entities/washing-machine';
-import { getLaundromats, getWashingMachinesByLaundromatId } from '../utils/api-functions';
+import { getLaundromats } from '../utils/api';
 
 const HomePage = () => {
   const [allLaundromats, setAllLaundromats] = useState<Laundromat[]>([]);
@@ -18,18 +18,6 @@ const HomePage = () => {
       location: '',
     },
   });
-
-  const getWaschingMachinesFromLaundromat = (id: string) => {
-    getWashingMachinesByLaundromatId(id)
-      .then((laundromat: Laundromat) => {
-        const washingMachines: WashingMachine[] | undefined = laundromat.washingMachines;
-        setChosenWashingMachines(washingMachines!);
-        setIsOpen(true);
-      })
-      .catch((error) => {
-        console.error(error);
-      });
-  };
 
   useEffect(() => {
     getLaundromats()
@@ -74,7 +62,8 @@ const HomePage = () => {
           items={allLaundromats}
           IndividualComponent={IndividualLaundromat}
           onItemClick={(item: Laundromat) => {
-            getWaschingMachinesFromLaundromat(item.id);
+            setChosenWashingMachines(item.washingMachines || []);
+            setIsOpen(true);
           }}
         />
       )}

@@ -2,7 +2,7 @@ import { Stack, Table } from '@mantine/core';
 import React from 'react';
 import { useSelector } from 'react-redux';
 import { RootState } from '../reducers/root.reducer';
-import { markAsRead } from '../utils/api-functions';
+import { markAsRead } from '../utils/api';
 
 const InboxPage = () => {
   const user = useSelector((state: RootState) => state.authenticationState.user);
