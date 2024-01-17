@@ -14,11 +14,10 @@ import BalancePage from './pages/BalancePage';
 import BookingsPage from './pages/BookingsPage';
 import HomePage from './pages/HomePage';
 import InboxPage from './pages/InboxPage';
+import LaundromatDetailsPage from './pages/LaundromatDetailsPage';
 import ManageLaundromatsPage from './pages/ManageLaundromatsPage';
 import MissingPage from './pages/MissingPage';
 import SettingsPage from './pages/SettingsPage';
-import AddLaundromatPage from './pages/AddLaundromatPage';
-import LaundromatDetailsPage from './pages/LaundromatDetailsPage';
 import SimulationPage from './pages/SimulationPage';
 
 type Route = RouteProps & {
