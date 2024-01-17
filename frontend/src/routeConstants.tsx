@@ -15,6 +15,8 @@ import ManageLaundromatsPage from './pages/ManageLaundromatsPage';
 import MissingPage from './pages/MissingPage';
 import SettingsPage from './pages/SettingsPage';
 import AddLaundromatPage from './pages/AddLaundromatPage';
+import LaundromatDetailsPage from './pages/LaundromatDetailsPage';
+import SimulationPage from './pages/SimulationPage';
 
 type Route = RouteProps & {
   label: string;
@@ -39,6 +41,14 @@ export const routes: Route[] = [
     label: 'Manage bookings',
     icon: IconBook2,
     onNavbar: true,
+    requireAuth: true,
+  },
+  {
+    path: '/simulate/:contractId',
+    element: <SimulationPage />,
+    label: 'Simulate bookings',
+    icon: IconBook2,
+    onNavbar: false,
     requireAuth: true,
   },
   {
@@ -79,5 +89,13 @@ export const routes: Route[] = [
     element: <MissingPage />,
     label: 'Missing',
     icon: IconFileUnknown,
+  },
+  {
+    path: '/edit-laundromat/:id',
+    element: <LaundromatDetailsPage />,
+    label: 'Laundromat Details',
+    icon: IconBuildingStore,
+    requireAuth: true,
+    requireVendor: true,
   },
 ];
