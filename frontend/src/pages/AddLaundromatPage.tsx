@@ -3,6 +3,7 @@ import { useForm } from '@mantine/form';
 import { IconCircleCheck } from '@tabler/icons-react';
 import { useState } from 'react';
 import { createLaundromat, createWashingMachine } from '../utils/api-functions';
+import { useNavigate } from 'react-router-dom';
 
 interface initLaundromat {
   name: string;
@@ -36,6 +37,7 @@ const initialWashingMachineValues: initWashingMachine = {
 
 const AddLaundromatPage = () => {
   const [active, setActive] = useState(0);
+  const navigate = useNavigate();
 
   const LaundromatForm = useForm({
     initialValues: initialLaundromatValues,
@@ -55,7 +57,10 @@ const AddLaundromatPage = () => {
       if (LaundromatForm.validate().hasErrors) {
         return current;
       }
-      current === 2 && onSubmit().catch((err) => console.log(err));
+      current === 2 &&
+        onSubmit()
+          .then(() => navigate('/manage-laundromats'))
+          .catch((err) => console.log(err));
       return current < 3 ? current + 1 : current;
     });
 
@@ -109,7 +114,8 @@ const AddLaundromatPage = () => {
             Back
           </Button>
         )}
-        {active !== 3 && <Button onClick={nextStep}>Next step</Button>}
+        {active < 2 && <Button onClick={nextStep}>Next step</Button>}
+        {active === 2 && <Button onClick={nextStep}>Submit</Button>}
       </Group>
     </Container>
   );
