@@ -50,7 +50,7 @@ function AddFundsModal() {
         </Flex>
       </Modal>
 
-      <Button onClick={open} radius={100}>
+      <Button onClick={open} radius={100} size="lg">
         Add Funds
       </Button>
     </>
