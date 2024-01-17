@@ -16,8 +16,6 @@ const BalancePage = () => {
     getBalanceTransactions()
       .then((transactions) => setTransactions(transactions))
       .catch((error) => console.log(error));
-
-    console.log(transactions);
   }, []);
 
   const ths = (
