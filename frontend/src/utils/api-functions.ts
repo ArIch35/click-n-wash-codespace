@@ -89,6 +89,7 @@ export const updateUser = async (body: UpdateUser): Promise<User> => {
 };
 
 /**
+<<<<<<< frontend/src/utils/api-functions.ts
  * Marks the specified messages as read.
  * @param messageIds - An array of message IDs to mark as read.
  * @throws {Error} If the server response is not successful.
@@ -102,6 +103,22 @@ export const markAsRead = async (messageIds: string[]) => {
     },
     body: JSON.stringify({ messageIds }),
   });
+  const data = (await response.json()) as unknown;
+  if (!response.ok) {
+    throw new Error((data as Message).message);
+  }
+};
+
+/*
+ * Sends a request to top up the user's balance with the specified amount.
+ * @param amount - The amount to top up the balance with.
+ * @throws {Error} If the request fails, an error with the error message is thrown.
+ */
+export const topupBalance = async (amount: number) => {
+  const response = await fetch(`${loadEnv().VITE_SERVER_ADDRESS}/users/topup`, {
+    method: 'POST',
+    body: JSON.stringify({ amount }),
+    });
   const data = (await response.json()) as unknown;
   if (!response.ok) {
     throw new Error((data as Message).message);
@@ -307,6 +324,24 @@ export const getContracts = async () => {
 };
 
 /**
+ * Retrieves a contract by its ID from the server.
+ * @param id - The ID of the contract to retrieve.
+ * @returns A Promise that resolves to the retrieved Contract object.
+ * @throws An error if the server response is not successful or if there is an error parsing the response data.
+ */
+export const getContractById = async (id: string) => {
+  const response = await fetch(`${loadEnv().VITE_SERVER_ADDRESS}/contracts/${id}`, {
+    headers: { ...(await headers()) },
+  });
+
+  const data = (await response.json()) as unknown;
+  if (!response.ok) {
+    throw new Error((data as Message).message);
+  }
+  return entityParser<Contract>(data as Contract);
+};
+
+/**
  * Creates a contract on the server.
  * @param id The id of the washing machine.
  * @param startDate The start date of the contract.
@@ -354,19 +389,6 @@ export const cancelContract = async (id: string) => {
   if (!response.ok) {
     throw new Error((data as Message).message);
   }
-};
-
-export const getContactById = async (id: string) => {
-  const response = await fetch(`${loadEnv().VITE_SERVER_ADDRESS}/contracts/${id}`, {
-    headers: { ...(await headers()) },
-  });
-
-  const data = (await response.json()) as unknown;
-  if (!response.ok) {
-    throw new Error((data as Message).message);
-  }
-
-  return entityParser<Contract>(data as Contract);
 };
 
 /**
