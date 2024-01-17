@@ -57,9 +57,10 @@ const AddLaundromatPage = () => {
       if (LaundromatForm.validate().hasErrors) {
         return current;
       }
-      current === 2 && onSubmit()
-        .then(() => navigate('/manage-laundromats'))
-        .catch((err) => console.log(err));
+      current === 2 &&
+        onSubmit()
+          .then(() => navigate('/manage-laundromats'))
+          .catch((err) => console.log(err));
       return current < 3 ? current + 1 : current;
     });
 
