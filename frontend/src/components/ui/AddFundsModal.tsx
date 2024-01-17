@@ -1,8 +1,23 @@
 import { useDisclosure } from '@mantine/hooks';
 import { Modal, Button, Flex } from '@mantine/core';
+import React from 'react';
+import { topupBalance } from '../../utils/api-functions';
 
 function AddFundsModal() {
   const [opened, { open, close }] = useDisclosure(false);
+  // Topup functions
+  const [amount, setAmount] = React.useState(0);
+
+  function onSubmit() {
+    // Use topup function here
+    topupBalance(amount)
+      .then(() => {
+        close();
+      })
+      .catch((error) => {
+        console.log(error);
+      });
+  }
 
   return (
     <>
@@ -19,12 +34,18 @@ function AddFundsModal() {
       >
         <Flex direction="column" gap="xl">
           <Flex justify="center" direction="row" gap="xl">
-            <Button radius={100}>$10</Button>
-            <Button radius={100}>$20</Button>
-            <Button radius={100}>$50</Button>
+            <Button radius={100} onClick={() => setAmount(10)}>
+              $10
+            </Button>
+            <Button radius={100} onClick={() => setAmount(20)}>
+              $20
+            </Button>
+            <Button radius={100} onClick={() => setAmount(50)}>
+              $50
+            </Button>
           </Flex>
-          <Button radius={100} color="red" onClick={close}>
-            Cancel
+          <Button radius={100} color="green" onClick={() => onSubmit()}>
+            Okay
           </Button>
         </Flex>
       </Modal>
