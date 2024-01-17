@@ -1,24 +1,30 @@
 import { Flex, Space, Table, Text } from '@mantine/core';
-import Contract from '../interfaces/entities/contract';
+import BalanceTransaction from '../interfaces/entities/balance-transaction';
 import React from 'react';
-import { getContracts } from '../utils/api-functions';
+import { getBalanceTransactions } from '../utils/api-functions';
 import formatDate from '../utils/format-date';
 import AddFundsModal from '../components/ui/AddFundsModal';
+import { useSelector } from 'react-redux';
+import { RootState } from '../reducers/root.reducer';
 
 const BalancePage = () => {
   // List of contracts
-  const [contracts, setContracts] = React.useState<Contract[]>([]);
+  const [transactions, setTransactions] = React.useState<BalanceTransaction[]>([]);
+  const user = useSelector((state: RootState) => state.authenticationState.user);
+
   React.useEffect(() => {
-    getContracts()
-      .then((contracts) => setContracts(contracts))
+    getBalanceTransactions()
+      .then((transactions) => setTransactions(transactions))
       .catch((error) => console.log(error));
+
+    console.log(transactions);
   }, []);
 
   const ths = (
     <Table.Tr>
       <Table.Th fz="lg">Transaction Date</Table.Th>
       <Table.Th fz="lg">Transaction Status</Table.Th>
-      <Table.Th fz="lg">Transcation Amount</Table.Th>
+      <Table.Th fz="lg">Transaction Amount</Table.Th>
     </Table.Tr>
   );
 
@@ -30,27 +36,24 @@ const BalancePage = () => {
         </Text>
         <Space />
         <Text fz={35} fw={700}>
-          Current Balance: ${}
+          Current Balance: ${user?.balance}
         </Text>
       </Flex>
       <Flex mt="lg" px="md">
         <Table fz="md" verticalSpacing="md" horizontalSpacing="md" withTableBorder highlightOnHover>
           <Table.Thead>{ths}</Table.Thead>
           <Table.Tbody>
-            {contracts
+            {transactions
               .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
-              .map(
-                (contract) => (
-                  console.log(contract),
-                  (
-                    <Table.Tr key={contract.id}>
-                      <Table.Td>{formatDate(contract.createdAt)}</Table.Td>
-                      <Table.Td>{contract.status}</Table.Td>
-                      <Table.Td>{contract.price}</Table.Td>
-                    </Table.Tr>
-                  )
-                ),
-              )}
+              .map((transaction) => (
+                <Table.Tr key={transaction.id}>
+                  <Table.Td>{formatDate(transaction.createdAt)}</Table.Td>
+                  <Table.Td>
+                    {transaction.type.charAt(0).toUpperCase() + transaction.type.slice(1)}
+                  </Table.Td>
+                  <Table.Td>${transaction.amount}</Table.Td>
+                </Table.Tr>
+              ))}
           </Table.Tbody>
         </Table>
       </Flex>
