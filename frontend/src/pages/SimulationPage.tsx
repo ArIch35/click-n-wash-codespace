@@ -1,6 +1,6 @@
 import { useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { getContactById } from '../utils/api-functions';
+import { getContractById } from '../utils/api-functions';
 import Notification from '../interfaces/notification';
 import React from 'react';
 import { Card, Text } from '@mantine/core';
@@ -30,7 +30,7 @@ const SimulationPage: React.FC = () => {
   };
 
   useEffect(() => {
-    getContactById(contractId!)
+    getContractById(contractId!)
       .then((contract) => {
         setContract(contract);
       })

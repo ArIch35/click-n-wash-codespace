@@ -1,7 +1,11 @@
 import { RequestHandler, Router } from 'express';
 import { ValidationError } from 'yup';
 import getDb from '../db';
-import { createContractSchema, finalizeContract, updateContractSchema } from '../entities/contract';
+import Contract, {
+  createContractSchema,
+  finalizeContract,
+  updateContractSchema,
+} from '../entities/contract';
 import Notification from '../interfaces/notification';
 import StatusError from '../utils/error-with-status';
 import {
@@ -17,6 +21,7 @@ import {
   STATUS_OK,
   STATUS_SERVER_ERROR,
 } from '../utils/http-status-codes';
+import propertiesRemover from '../utils/properties-remover';
 import sendNotification from '../utils/send-notification';
 
 const router: Router = Router();
@@ -25,7 +30,7 @@ router.get('/', (async (_, res) => {
   const id = res.locals.uid as string;
   try {
     const contracts = await getDb().contractRepository.find({
-      where: [{ user: { id } }, { washingMachine: { laundromat: { owner: { id } } } }],
+      where: { user: { id } },
       relations: { washingMachine: { laundromat: true } },
       withDeleted: true,
     });
@@ -39,10 +44,7 @@ router.get('/:id', (async (req, res) => {
   const id = res.locals.uid as string;
   try {
     const contract = await getDb().contractRepository.findOne({
-      where: [
-        { id: req.params.id, user: { id } },
-        { id: req.params.id, washingMachine: { laundromat: { owner: { id } } } },
-      ],
+      where: { id: req.params.id, user: { id } },
       relations: { washingMachine: true },
       withDeleted: true,
     });
@@ -95,7 +97,10 @@ router.post('/', (async (req, res) => {
       autoClose: false,
     };
     sendNotification(contract.washingMachine.laundromat.owner.id, notification);
-    return res.status(STATUS_OK).json(contract);
+    const contractWithReducedData = propertiesRemover<Contract>(contract, [
+      'washingMachine.laundromat.owner',
+    ]);
+    return res.status(STATUS_OK).json(contractWithReducedData);
   } catch (error: unknown) {
     if (error instanceof ValidationError) {
       return res.status(STATUS_BAD_REQUEST).json(customMessage(false, error.errors.join(', ')));

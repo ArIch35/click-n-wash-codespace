@@ -1,4 +1,5 @@
 import firebaseAuth from '../firebase';
+import BalanceTransaction from '../interfaces/entities/balance-transaction';
 import Contract from '../interfaces/entities/contract';
 import Laundromat, { CreateLaundromat } from '../interfaces/entities/laundromat';
 import User, { CreateUser, UpdateUser } from '../interfaces/entities/user';
@@ -85,6 +86,26 @@ export const updateUser = async (body: UpdateUser): Promise<User> => {
     throw new Error((data as Message).message);
   }
   return data as User;
+};
+
+/**
+ * Sends a request to top up the user's balance with the specified amount.
+ * @param amount - The amount to top up the balance with.
+ * @throws {Error} If the request fails, an error with the error message is thrown.
+ */
+export const topupBalance = async (amount: number) => {
+  const response = await fetch(`${loadEnv().VITE_SERVER_ADDRESS}/users/topup`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      ...(await headers()),
+    },
+    body: JSON.stringify({ amount }),
+  });
+  const data = (await response.json()) as unknown;
+  if (!response.ok) {
+    throw new Error((data as Message).message);
+  }
 };
 
 /**
@@ -286,6 +307,24 @@ export const getContracts = async () => {
 };
 
 /**
+ * Retrieves a contract by its ID from the server.
+ * @param id - The ID of the contract to retrieve.
+ * @returns A Promise that resolves to the retrieved Contract object.
+ * @throws An error if the server response is not successful or if there is an error parsing the response data.
+ */
+export const getContractById = async (id: string) => {
+  const response = await fetch(`${loadEnv().VITE_SERVER_ADDRESS}/contracts/${id}`, {
+    headers: { ...(await headers()) },
+  });
+
+  const data = (await response.json()) as unknown;
+  if (!response.ok) {
+    throw new Error((data as Message).message);
+  }
+  return entityParser<Contract>(data as Contract);
+};
+
+/**
  * Creates a contract on the server.
  * @param id The id of the washing machine.
  * @param startDate The start date of the contract.
@@ -335,8 +374,13 @@ export const cancelContract = async (id: string) => {
   }
 };
 
-export const getContactById = async (id: string) => {
-  const response = await fetch(`${loadEnv().VITE_SERVER_ADDRESS}/contracts/${id}`, {
+/**
+ * Retrieves the balance transactions from the server.
+ * @returns A promise that resolves to an array of BalanceTransaction objects.
+ * @throws An error if the server response is not successful.
+ */
+export const getBalanceTransactions = async () => {
+  const response = await fetch(`${loadEnv().VITE_SERVER_ADDRESS}/balancetransactions`, {
     headers: { ...(await headers()) },
   });
 
@@ -344,6 +388,5 @@ export const getContactById = async (id: string) => {
   if (!response.ok) {
     throw new Error((data as Message).message);
   }
-
-  return entityParser<Contract>(data as Contract);
+  return entityParser<BalanceTransaction[]>(data as BalanceTransaction[]);
 };

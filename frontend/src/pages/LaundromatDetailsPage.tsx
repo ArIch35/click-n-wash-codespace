@@ -95,7 +95,8 @@ const ManageLaundromatsPage = () => {
         setLoading(false);
         setLaundromat(undefined);
       });
-  }, []);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [id]);
 
   const rows = laundromat?.washingMachines?.map((element) => (
     <Table.Tr key={element.name}>
