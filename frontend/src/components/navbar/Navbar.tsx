@@ -8,6 +8,8 @@ import { useAuth } from '../../providers/authentication/Authentication.Context';
 import { routes } from '../../routeConstants';
 import { updateUser } from '../../utils/api';
 import classes from './Navbar.module.css';
+import Notification from '../../interfaces/notification';
+import { showCustomNotification } from '../../utils/mantine-notifications';
 
 const settings = routes.find((route) => route.label === 'Settings');
 
@@ -25,17 +27,26 @@ const Navbar = ({ toggle, setVisible }: NavbarControllerProps) => {
     data.find((item) => item.path === window.location.pathname)?.label || '',
   );
 
+  const customNotification: Notification = {
+    title: 'Error',
+    message: 'You still have laundromats, you cannot change to non vendor',
+    color: 'red',
+    autoClose: false,
+  };
   const toggleVendorMode = () => {
     if (!user) {
       throw new Error('User is not logged in');
     }
+    console.log(user);
 
     const body: UpdateUser = {
       isAlsoVendor: !user.isAlsoVendor,
     };
     updateUser(body)
       .then(() => refreshUser())
-      .catch((error) => console.error(error));
+      .catch((error) => {
+        console.error(error), showCustomNotification(customNotification);
+      });
   };
 
   const navOnClick = (label: string, link: string) => {
@@ -92,7 +103,7 @@ const Navbar = ({ toggle, setVisible }: NavbarControllerProps) => {
       ) : (
         <IconUser className={classes.linkIcon} stroke={1.5} />
       )}
-      <span>Is a vendor? {user?.isAlsoVendor ? 'Yes' : 'No'}</span>
+      <span>{user?.isAlsoVendor ? 'Deactivate' : 'Activate'} Vendor Mode</span>
     </a>
   );
 
