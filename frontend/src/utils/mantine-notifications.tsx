@@ -1,16 +1,32 @@
 import { notifications } from '@mantine/notifications';
 import Notification from '../interfaces/notification';
 import { autoCloseDuration } from './constants';
+import { IconBuildingStore } from '@tabler/icons-react';
+import { ThemeIcon } from '@mantine/core';
 
+const iconForServerNotification = (
+  <ThemeIcon variant="light" color="blue">
+    <IconBuildingStore />
+  </ThemeIcon>
+);
 /**
  * Show custom notification with autoClose
  * @param notification Notification to show
  */
 export const showCustomNotification = (notification: Notification) => {
-  notifications.show({
-    ...notification,
-    autoClose: notification.autoClose ? autoCloseDuration : false,
-  });
+  if (notification.vendor) {
+    delete notification.vendor;
+    notifications.show({
+      ...notification,
+      autoClose: notification.autoClose ? autoCloseDuration : false,
+      icon: iconForServerNotification,
+    });
+  } else {
+    notifications.show({
+      ...notification,
+      autoClose: notification.autoClose ? autoCloseDuration : false,
+    });
+  }
 };
 
 /**
@@ -46,12 +62,17 @@ export const showVendorRequiredOnce = () => {
  * @param entityName Name of the entity
  * @param action Action performed on the entity
  */
-export const showSuccessNotification = (entityName: string, action: string) => {
+export const showSuccessNotification = (
+  entityName: string,
+  action: string,
+  vendor: boolean = false,
+) => {
   showCustomNotification({
     title: 'Success',
     message: `${entityName} successfully ${action}d`,
-    color: 'green',
+    color: vendor ? '' : 'green',
     autoClose: true,
+    vendor,
   });
 };
 
@@ -60,11 +81,17 @@ export const showSuccessNotification = (entityName: string, action: string) => {
  * @param entityName Name of the entity
  * @param action Action performed on the entity
  */
-export const showErrorNotification = (entityName: string, action: string, message: string) => {
+export const showErrorNotification = (
+  entityName: string,
+  action: string,
+  message: string,
+  vendor: boolean = false,
+) => {
   showCustomNotification({
     title: `Failed to ${action} ${entityName}`,
     message: message,
     color: 'red',
     autoClose: true,
+    vendor,
   });
 };
