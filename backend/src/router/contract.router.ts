@@ -28,14 +28,42 @@ import sendNotification from '../utils/send-notification';
 
 const router: Router = Router();
 
+let currentTime = new Date().getTime();
+
+/**
+ * Sorts contracts based on their status and start date.
+ * Ongoing contracts are sorted based on the time difference between their start date and the current time.
+ * Non-ongoing contracts are sorted based on their status.
+ * @param a - The first contract to compare.
+ * @param b - The second contract to compare.
+ * @returns A negative value if `a` should be sorted before `b`, a positive value if `a` should be sorted after `b`,
+ *          or 0 if `a` and `b` have the same sorting order.
+ */
+const sortBasedOnStatus = (a: Contract, b: Contract) => {
+  if (a.status === 'ongoing' && b.status === 'ongoing') {
+    const aTimeDifference = Math.abs(a.startDate.getTime() - currentTime);
+    const bTimeDifference = Math.abs(b.startDate.getTime() - currentTime);
+    return aTimeDifference - bTimeDifference;
+  } else if (a.status === 'ongoing') {
+    return -1;
+  } else if (b.status === 'ongoing') {
+    return 1;
+  }
+
+  return 0;
+};
+
 router.get('/', (async (_, res) => {
   const id = res.locals.uid as string;
   try {
     const contracts = await getDb().contractRepository.find({
       where: { user: { id } },
       relations: { washingMachine: { laundromat: true } },
+      order: { startDate: 'DESC' },
       withDeleted: true,
     });
+    currentTime = new Date().getTime();
+    contracts.sort(sortBasedOnStatus);
     return res.status(STATUS_OK).json(contracts);
   } catch (error) {
     return res.status(STATUS_SERVER_ERROR).json(MESSAGE_SERVER_ERROR);
