@@ -1,4 +1,4 @@
-import { Button, Indicator, Select } from '@mantine/core';
+import { Button, Flex, Indicator, Select } from '@mantine/core';
 import { DatesProvider, DatePicker } from '@mantine/dates';
 import '@mantine/dates/styles.css';
 import { useState } from 'react';
@@ -161,6 +161,14 @@ const TimePicker = ({
       return !bookedDates.get(dateString)!.get(timeString)!.includes(washingMachine.id);
     });
   };
+
+  if (washingMachines.length === 0) {
+    return (
+      <Flex mt="md" justify="center">
+        No washing machines available
+      </Flex>
+    );
+  }
 
   return (
     <DatesProvider
