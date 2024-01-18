@@ -4,6 +4,7 @@ interface Notification {
   message: string;
   color: string;
   autoClose: boolean;
+  vendor?: boolean;
 }
 
 export default Notification;
