@@ -1,5 +1,6 @@
 import { headers, Message } from '.';
 import User, { CreateUser, UpdateUser } from '../../interfaces/entities/user';
+import entityParser from '../entity-parser';
 import loadEnv from '../load-env';
 
 const route = `${loadEnv().VITE_SERVER_ADDRESS}/users`;
@@ -18,7 +19,7 @@ export const getUser = async (id: string): Promise<User> => {
   if (!response.ok) {
     throw new Error((data as Message).message);
   }
-  return data as User;
+  return entityParser<User>(data as User);
 };
 
 /**
@@ -37,7 +38,7 @@ export const createUser = async (body: CreateUser): Promise<User> => {
   if (!response.ok) {
     throw new Error((data as Message).message);
   }
-  return data as User;
+  return entityParser<User>(data as User);
 };
 
 /**
@@ -56,7 +57,7 @@ export const updateUser = async (body: UpdateUser): Promise<User> => {
   if (!response.ok) {
     throw new Error((data as Message).message);
   }
-  return data as User;
+  return entityParser<User>(data as User);
 };
 
 /**
