@@ -36,6 +36,11 @@ router.get('/:idOrEmail', (async (req, res) => {
       relations: {
         inbox: true,
       },
+      order: {
+        inbox: {
+          createdAt: 'DESC',
+        },
+      },
     });
     if (!user) {
       return res.status(STATUS_NOT_FOUND).json(MESSAGE_NOT_FOUND);
