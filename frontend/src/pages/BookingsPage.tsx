@@ -1,4 +1,4 @@
-import { Badge, Box, Button, Card, Group, Stack, Text, Title } from '@mantine/core';
+import { Badge, Box, Button, Card, Center, Group, Stack, Text, Title } from '@mantine/core';
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import Contract from '../interfaces/entities/contract';
@@ -6,12 +6,17 @@ import { cancelContract, getContracts } from '../utils/api';
 import formatDate from '../utils/format-date';
 import { showCustomNotification } from '../utils/mantine-notifications';
 
+/**
+ * Returns the color associated with the given status.
+ * @param status - The status of the booking.
+ * @returns The color string.
+ */
 const getColor = (status: string) => {
   switch (status) {
     case 'ongoing':
-      return 'orange';
-    case 'finished':
       return 'green';
+    case 'finished':
+      return 'blue';
     case 'cancelled':
       return 'red';
     default:
@@ -107,12 +112,16 @@ const BookingsPage = () => {
   }, []);
 
   return (
-    <Stack justify="center" align="center" p={'2rem'}>
-      <Title order={3}>Your Bookings</Title>
-      {contracts.map((contract) => (
-        <ContractCard key={contract.id} {...contract} />
-      ))}
-    </Stack>
+    <Center p="2rem">
+      <Stack>
+        <Center>
+          <Title order={3}>Your Bookings</Title>
+        </Center>
+        {contracts.map((contract) => (
+          <ContractCard key={contract.id} {...contract} />
+        ))}
+      </Stack>
+    </Center>
   );
 };
 
