@@ -1,4 +1,4 @@
-import { AppShell, Box, Overlay, Transition } from '@mantine/core';
+import { AppShell, Overlay, Transition, rem } from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
 import { ReactNode, useState } from 'react';
 import Navbar from '../components/navbar/Navbar';
@@ -18,12 +18,32 @@ const BaseLayout = ({ children }: { children: ReactNode }) => {
 
   return (
     <AppShell>
-      <AppShell.Header zIndex={0} h={sizes.headerHeight}>
+      <AppShell.Header h={sizes.headerHeight}>
         <Header toggle={navbarHandlers.open} setVisible={setVisible} />
       </AppShell.Header>
 
-      <AppShell.Main>
-        <div style={{ position: 'absolute', zIndex: 10 }}>
+      <AppShell.Main
+        pt={sizes.headerHeight}
+        h={`calc(100vh - ${rem(sizes.headerHeight)})`}
+        style={{ overflowY: 'scroll' }}
+      >
+        {children}
+        {visible && (
+          <Overlay
+            zIndex={101}
+            opacity={0.4}
+            blur={1}
+            onClick={(event) => {
+              event.preventDefault();
+              navbarHandlers.close();
+              setVisible(false);
+            }}
+          />
+        )}
+      </AppShell.Main>
+
+      <AppShell.Navbar>
+        <div style={{ position: 'absolute', zIndex: 1000 }}>
           <Transition
             mounted={navbarOpened}
             transition={scaleX}
@@ -38,23 +58,7 @@ const BaseLayout = ({ children }: { children: ReactNode }) => {
             )}
           </Transition>
         </div>
-
-        <Box pt={sizes.headerHeight} style={{ height: '100vh', zIndex: 0 }}>
-          {children}
-          {visible && (
-            <Overlay
-              zIndex={1}
-              opacity={0.4}
-              blur={1}
-              onClick={(event) => {
-                event.preventDefault();
-                navbarHandlers.close();
-                setVisible(false);
-              }}
-            />
-          )}
-        </Box>
-      </AppShell.Main>
+      </AppShell.Navbar>
     </AppShell>
   );
 };
