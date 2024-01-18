@@ -5,16 +5,16 @@ import { sizes } from '../utils/constants';
 interface Item {
   label: string;
   value: MantineColorScheme;
-  icon: React.ReactNode;
+  Icon: React.ReactNode;
 }
 
 const items: Item[] = [
-  { label: 'Light mode', value: 'light', icon: <IconSun size={sizes.iconSizeSmall} /> },
-  { label: 'Dark mode', value: 'dark', icon: <IconMoon size={sizes.iconSizeSmall} /> },
+  { label: 'Light mode', value: 'light', Icon: <IconSun size={sizes.iconSizeSmall} /> },
+  { label: 'Dark mode', value: 'dark', Icon: <IconMoon size={sizes.iconSizeSmall} /> },
   {
     label: 'System preferences',
     value: 'auto',
-    icon: <IconDeviceLaptop size={sizes.iconSizeSmall} />,
+    Icon: <IconDeviceLaptop size={sizes.iconSizeSmall} />,
   },
 ];
 
@@ -25,7 +25,7 @@ const DarkModeToggle = () => {
     <Menu trigger="hover" shadow="md" width={200}>
       <Menu.Target>
         <ActionIcon size={sizes.iconSizeLarge} variant="outline">
-          {items.find((item) => item.value === colorScheme)?.icon}
+          {items.find((item) => item.value === colorScheme)?.Icon}
         </ActionIcon>
       </Menu.Target>
 
@@ -33,7 +33,7 @@ const DarkModeToggle = () => {
         {items.map((item) => (
           <Menu.Item
             key={item.label}
-            leftSection={<ActionIcon variant="outline">{item.icon}</ActionIcon>}
+            leftSection={item.Icon}
             onClick={() => setColorScheme(item.value)}
           >
             {item.label}
