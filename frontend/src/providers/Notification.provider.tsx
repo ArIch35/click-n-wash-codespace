@@ -13,7 +13,7 @@ interface NotificationProviderProps {
 }
 
 const NotificationProvider = ({ children }: NotificationProviderProps) => {
-  const { user } = useAuth();
+  const { user, refreshUser } = useAuth();
   const socket: Socket = io(loadEnv().VITE_SERVER_ADDRESS.replace('/api', ''), {
     autoConnect: false,
   });
@@ -21,6 +21,7 @@ const NotificationProvider = ({ children }: NotificationProviderProps) => {
   // Handle socket connection here
   socket.on('notification', (data: Notification) => {
     showCustomNotification(data);
+    refreshUser();
   });
 
   socket.on('connect', () => {
