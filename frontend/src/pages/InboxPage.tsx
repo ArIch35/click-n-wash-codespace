@@ -1,4 +1,4 @@
-import { Group, SegmentedControl, Stack, Table, Title } from '@mantine/core';
+import { Center, Group, SegmentedControl, Stack, Table, Title } from '@mantine/core';
 import { useLocalStorage } from '@mantine/hooks';
 import React from 'react';
 import { useAuth } from '../providers/authentication/Authentication.Context';
@@ -82,13 +82,17 @@ const InboxPage = () => {
           />
         )}
       </Group>
-      <Stack align="center" px="10%">
-        <Title order={1}>Inbox</Title>
-        <Table>
-          <Table.Thead>{ths}</Table.Thead>
-          <Table.Tbody>{inboxMode === 'user' ? userRows : vendorRows}</Table.Tbody>
-        </Table>
-      </Stack>
+      <Center>
+        <Stack>
+          <Center>
+            <Title order={1}>Inbox</Title>
+          </Center>
+          <Table>
+            <Table.Thead>{ths}</Table.Thead>
+            <Table.Tbody>{inboxMode === 'user' ? userRows : vendorRows}</Table.Tbody>
+          </Table>
+        </Stack>
+      </Center>
     </Stack>
   );
 };
