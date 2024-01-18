@@ -10,6 +10,9 @@ class Message extends BaseEntity {
   @Column()
   read: boolean = false;
 
+  @Column({ nullable: true })
+  forVendor?: boolean;
+
   @ManyToOne(() => User, (user) => user.inbox)
   to!: User;
 }

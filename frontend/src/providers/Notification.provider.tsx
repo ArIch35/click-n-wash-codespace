@@ -1,11 +1,10 @@
 import { Notifications } from '@mantine/notifications';
 import React, { createContext, useEffect } from 'react';
-import { useSelector } from 'react-redux';
 import { Socket, io } from 'socket.io-client';
 import Notification from '../interfaces/notification';
-import { RootState } from '../reducers/root.reducer';
 import loadEnv from '../utils/load-env';
 import { showCustomNotification } from '../utils/mantine-notifications';
+import { useAuth } from './authentication/Authentication.Context';
 
 const NotificationContext = createContext<null>(null);
 
@@ -14,7 +13,7 @@ interface NotificationProviderProps {
 }
 
 const NotificationProvider = ({ children }: NotificationProviderProps) => {
-  const user = useSelector((state: RootState) => state.authenticationState.user);
+  const { user, refreshUser } = useAuth();
   const socket: Socket = io(loadEnv().VITE_SERVER_ADDRESS.replace('/api', ''), {
     autoConnect: false,
   });
@@ -22,6 +21,7 @@ const NotificationProvider = ({ children }: NotificationProviderProps) => {
   // Handle socket connection here
   socket.on('notification', (data: Notification) => {
     showCustomNotification(data);
+    refreshUser();
   });
 
   socket.on('connect', () => {

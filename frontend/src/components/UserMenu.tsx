@@ -1,10 +1,9 @@
 import { ActionIcon, Button, Indicator, Menu } from '@mantine/core';
 import { IconCash, IconInbox, IconUser } from '@tabler/icons-react';
 import { signOut } from 'firebase/auth';
-import { useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import firebaseAuth from '../firebase';
-import { RootState } from '../reducers/root.reducer';
+import { useAuth } from '../providers/authentication/Authentication.Context';
 import { sizes } from '../utils/constants';
 
 interface UserMenuProps {
@@ -12,7 +11,7 @@ interface UserMenuProps {
 }
 
 const UserMenu = ({ open }: UserMenuProps) => {
-  const user = useSelector((state: RootState) => state.authenticationState.user);
+  const { user } = useAuth();
   const navigate = useNavigate();
 
   const unreadMessages = user?.inbox?.filter((message) => !message.read).length;

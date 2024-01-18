@@ -1,12 +1,10 @@
 import { Group, Text } from '@mantine/core';
 import { IconUser, IconUserCheck } from '@tabler/icons-react';
 import { useState } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import { UpdateUser } from '../../interfaces/entities/user';
 import NavbarControllerProps from '../../interfaces/navbar-controller-props';
-import { setUser } from '../../reducers/authentication.reducer';
-import { RootState } from '../../reducers/root.reducer';
+import { useAuth } from '../../providers/authentication/Authentication.Context';
 import { routes } from '../../routeConstants';
 import { updateUser } from '../../utils/api';
 import classes from './Navbar.module.css';
@@ -14,7 +12,7 @@ import classes from './Navbar.module.css';
 const settings = routes.find((route) => route.label === 'Settings');
 
 const Navbar = ({ toggle, setVisible }: NavbarControllerProps) => {
-  const user = useSelector((state: RootState) => state.authenticationState.user);
+  const { user, refreshUser } = useAuth();
   const data = routes.filter(
     (route) =>
       route.onNavbar &&
@@ -22,7 +20,6 @@ const Navbar = ({ toggle, setVisible }: NavbarControllerProps) => {
         ? route.requireVendor === user?.isAlsoVendor
         : route.requireVendor === undefined),
   );
-  const dispatch = useDispatch();
   const navigate = useNavigate();
   const [active, setActive] = useState(
     data.find((item) => item.path === window.location.pathname)?.label || '',
@@ -37,12 +34,8 @@ const Navbar = ({ toggle, setVisible }: NavbarControllerProps) => {
       isAlsoVendor: !user.isAlsoVendor,
     };
     updateUser(body)
-      .then((user) => {
-        dispatch(setUser(user));
-      })
-      .catch((error) => {
-        console.error(error);
-      });
+      .then(() => refreshUser())
+      .catch((error) => console.error(error));
   };
 
   const navOnClick = (label: string, link: string) => {

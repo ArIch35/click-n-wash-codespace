@@ -8,7 +8,7 @@ export interface Message {
 export const headers = async () => {
   const token = await firebaseAuth.currentUser?.getIdToken();
   if (!token) {
-    throw new Error('No token found');
+    console.warn('No token found');
   }
   return {
     'Content-Type': 'application/json',

@@ -1,16 +1,15 @@
 import { Flex, Space, Table, Text } from '@mantine/core';
 import React from 'react';
-import { useSelector } from 'react-redux';
 import AddFundsModal from '../components/ui/AddFundsModal';
 import BalanceTransaction from '../interfaces/entities/balance-transaction';
-import { RootState } from '../reducers/root.reducer';
+import { useAuth } from '../providers/authentication/Authentication.Context';
 import { getBalanceTransactions } from '../utils/api';
 import formatDate from '../utils/format-date';
 
 const BalancePage = () => {
   // List of contracts
   const [transactions, setTransactions] = React.useState<BalanceTransaction[]>([]);
-  const user = useSelector((state: RootState) => state.authenticationState.user);
+  const { user } = useAuth();
 
   React.useEffect(() => {
     getBalanceTransactions()

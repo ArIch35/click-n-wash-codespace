@@ -15,9 +15,8 @@ import { useForm } from '@mantine/form';
 import { upperFirst, useMediaQuery, useToggle } from '@mantine/hooks';
 import { createUserWithEmailAndPassword, signInWithEmailAndPassword } from 'firebase/auth';
 import React from 'react';
-import { useDispatch } from 'react-redux';
 import firebaseAuth from '../../firebase';
-import { setRegisteredName } from '../../reducers/authentication.reducer';
+import { useAuth } from '../../providers/authentication/Authentication.Context';
 import { GoogleButton } from './GoogleButton';
 
 interface FormValues {
@@ -35,7 +34,7 @@ const initialValues: FormValues = {
 };
 
 export function AuthenticationForm({ ...props }: ModalProps) {
-  const dispatch = useDispatch();
+  const { setRegisteredName } = useAuth();
   const [type, toggle] = useToggle(['login', 'register']);
   const isMobile = useMediaQuery('(max-width: 50em)');
   const form = useForm({
@@ -57,7 +56,7 @@ export function AuthenticationForm({ ...props }: ModalProps) {
       );
       return;
     }
-    dispatch(setRegisteredName(values.name));
+    setRegisteredName(values.name);
     createUserWithEmailAndPassword(firebaseAuth, values.email, values.password).catch((error) =>
       console.error(error),
     );

@@ -147,3 +147,15 @@ export const createContractSchema = object({
 export const updateContractSchema = object({
   status: string().required(),
 }).test('is-cancelled', 'Contract can only be cancelled', (value) => value.status === 'cancelled');
+
+export const bulkCancelContractSchema = object({
+  startDate: date().required(),
+  endDate: date().required(),
+  laundromat: string().required(),
+})
+  .test('is-valid-date', 'Start date must be before end date', (value) => {
+    return value.startDate < value.endDate;
+  })
+  .test('is-in-future', 'Start date must be in the future', (value) => {
+    return value.startDate > new Date();
+  });

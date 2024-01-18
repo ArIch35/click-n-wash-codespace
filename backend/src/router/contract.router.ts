@@ -1,7 +1,9 @@
 import { RequestHandler, Router } from 'express';
+import { LessThanOrEqual, MoreThanOrEqual } from 'typeorm';
 import { ValidationError } from 'yup';
 import getDb from '../db';
 import Contract, {
+  bulkCancelContractSchema,
   createContractSchema,
   finalizeContract,
   updateContractSchema,
@@ -26,14 +28,42 @@ import sendNotification from '../utils/send-notification';
 
 const router: Router = Router();
 
+let currentTime = new Date().getTime();
+
+/**
+ * Sorts contracts based on their status and start date.
+ * Ongoing contracts are sorted based on the time difference between their start date and the current time.
+ * Non-ongoing contracts are sorted based on their status.
+ * @param a - The first contract to compare.
+ * @param b - The second contract to compare.
+ * @returns A negative value if `a` should be sorted before `b`, a positive value if `a` should be sorted after `b`,
+ *          or 0 if `a` and `b` have the same sorting order.
+ */
+const sortBasedOnStatus = (a: Contract, b: Contract) => {
+  if (a.status === 'ongoing' && b.status === 'ongoing') {
+    const aTimeDifference = Math.abs(a.startDate.getTime() - currentTime);
+    const bTimeDifference = Math.abs(b.startDate.getTime() - currentTime);
+    return aTimeDifference - bTimeDifference;
+  } else if (a.status === 'ongoing') {
+    return -1;
+  } else if (b.status === 'ongoing') {
+    return 1;
+  }
+
+  return 0;
+};
+
 router.get('/', (async (_, res) => {
   const id = res.locals.uid as string;
   try {
     const contracts = await getDb().contractRepository.find({
       where: { user: { id } },
       relations: { washingMachine: { laundromat: true } },
+      order: { startDate: 'DESC' },
       withDeleted: true,
     });
+    currentTime = new Date().getTime();
+    contracts.sort(sortBasedOnStatus);
     return res.status(STATUS_OK).json(contracts);
   } catch (error) {
     return res.status(STATUS_SERVER_ERROR).json(MESSAGE_SERVER_ERROR);
@@ -103,12 +133,72 @@ router.post('/', (async (req, res) => {
       name: title,
       content: message,
       to: washingMachine.laundromat.owner,
+      forVendor: true,
     });
     await getDb().messageRepository.save(newMessage);
     const contractWithReducedData = propertiesRemover<Contract>(contract, [
       'washingMachine.laundromat.owner',
     ]);
     return res.status(STATUS_OK).json(contractWithReducedData);
+  } catch (error: unknown) {
+    if (error instanceof ValidationError) {
+      return res.status(STATUS_BAD_REQUEST).json(customMessage(false, error.errors.join(', ')));
+    } else if (error instanceof StatusError) {
+      return res.status(error.status).json(customMessage(false, error.message));
+    }
+    return res.status(STATUS_SERVER_ERROR).json(MESSAGE_SERVER_ERROR);
+  }
+}) as RequestHandler);
+
+router.post('/bulkcancel', (async (req, res) => {
+  try {
+    const validated = await bulkCancelContractSchema.validate(req.body, { abortEarly: false });
+    const id = res.locals.uid as string;
+
+    const contracts = await getDb().contractRepository.find({
+      where: [
+        {
+          washingMachine: { laundromat: { id: validated.laundromat, owner: { id } } },
+          status: 'ongoing',
+          endDate: MoreThanOrEqual(validated.startDate),
+        },
+        {
+          washingMachine: { laundromat: { id: validated.laundromat, owner: { id } } },
+          status: 'ongoing',
+          startDate: LessThanOrEqual(validated.endDate),
+        },
+      ],
+      relations: { user: true, washingMachine: { laundromat: { owner: true } } },
+    });
+
+    const cancelContract = async (contract: Contract) => {
+      await finalizeContract(contract, true);
+      const title = 'Your booking has been cancelled!';
+      const message = `A booking for washing machine ${
+        contract.washingMachine.name
+      } in laundromat ${
+        contract.washingMachine.laundromat.name
+      } from ${contract.startDate.toLocaleString()} to ${contract.endDate.toLocaleString()} has been cancelled`;
+      const notification: Notification = {
+        title,
+        message,
+        color: 'blue',
+        autoClose: false,
+      };
+      sendNotification(contract.user.id, notification);
+      const newMessage = getDb().messageRepository.create({
+        name: title,
+        content: message,
+        to: contract.user,
+        forVendor: false,
+      });
+      await getDb().messageRepository.save(newMessage);
+    };
+
+    await Promise.all(contracts.map(cancelContract));
+    return res
+      .status(STATUS_OK)
+      .json(customMessage(true, `${contracts.length} contracts cancelled`));
   } catch (error: unknown) {
     if (error instanceof ValidationError) {
       return res.status(STATUS_BAD_REQUEST).json(customMessage(false, error.errors.join(', ')));
@@ -166,6 +256,7 @@ router.put('/:id', (async (req, res) => {
       name: title,
       content: message,
       to: isWmOwner ? contract.user : contract.washingMachine.laundromat.owner,
+      forVendor: !isWmOwner,
     });
     await getDb().messageRepository.save(newMessage);
     return res.status(STATUS_OK).json(contract);

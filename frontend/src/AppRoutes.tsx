@@ -1,7 +1,6 @@
 import React from 'react';
-import { useSelector } from 'react-redux';
 import { Navigate, Route, Routes } from 'react-router-dom';
-import { RootState } from './reducers/root.reducer';
+import { useAuth } from './providers/authentication/Authentication.Context';
 import { routes } from './routeConstants';
 import { showAuthRequiredOnce, showVendorRequiredOnce } from './utils/mantine-notifications';
 
@@ -12,8 +11,7 @@ interface CheckRoute {
 }
 
 const CheckRoute = ({ children, requireAuth, requireVendor }: CheckRoute) => {
-  const auth = useSelector((state: RootState) => state.authenticationState.firebaseData);
-  const user = useSelector((state: RootState) => state.authenticationState.user);
+  const { auth, user } = useAuth();
 
   React.useEffect(() => {
     if (requireAuth && !auth) {
