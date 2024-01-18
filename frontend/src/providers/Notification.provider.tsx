@@ -20,6 +20,7 @@ const NotificationProvider = ({ children }: NotificationProviderProps) => {
 
   // Handle socket connection here
   socket.on('notification', (data: Notification) => {
+    data.vendor = true;
     showCustomNotification(data);
     refreshUser();
   });
