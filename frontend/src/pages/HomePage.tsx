@@ -71,6 +71,7 @@ const HomePage = () => {
           isOpen={isOpen}
           onClose={() => {
             setIsOpen(false);
+            setChosenLaundromat(null);
           }}
           laundromat={chosenLaundromat}
         />
