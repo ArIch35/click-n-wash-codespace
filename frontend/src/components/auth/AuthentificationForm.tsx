@@ -23,6 +23,7 @@ interface FormValues {
   email: string;
   name: string;
   password: string;
+  confirm: string;
   terms: boolean;
 }
 
@@ -30,6 +31,7 @@ const initialValues: FormValues = {
   email: '',
   name: '',
   password: '',
+  confirm: '',
   terms: false,
 };
 
@@ -38,6 +40,7 @@ export function AuthenticationForm({ ...props }: ModalProps) {
   const [type, toggle] = useToggle(['login', 'register']);
   const isMobile = useMediaQuery('(max-width: 50em)');
   const form = useForm({
+    validateInputOnBlur: true,
     initialValues,
     validate: {
       email: (val) => (/^\S+@\S+$/.test(val) ? null : 'Invalid email'),
@@ -45,6 +48,8 @@ export function AuthenticationForm({ ...props }: ModalProps) {
         val.length <= 6 && type === 'register'
           ? 'Password should include at least 6 characters'
           : null,
+      confirm: (value, values) =>
+        value !== values.password && type === 'register' ? 'Passwords do not match' : null,
       terms: (val) => (type === 'register' && !val ? 'You must accept terms and conditions' : null),
     },
   });
@@ -96,31 +101,36 @@ export function AuthenticationForm({ ...props }: ModalProps) {
             <TextInput
               label="Name"
               placeholder="Your name"
-              value={form.values.name}
-              onChange={(event) => form.setFieldValue('name', event.currentTarget.value)}
               radius="md"
+              {...form.getInputProps('name')}
             />
           )}
 
           <TextInput
             required
             label="Email"
-            placeholder="hello@mantine.dev"
-            value={form.values.email}
-            onChange={(event) => form.setFieldValue('email', event.currentTarget.value)}
-            error={form.errors.email}
+            placeholder="Email address"
             radius="md"
+            {...form.getInputProps('email')}
           />
 
           <PasswordInput
             required
             label="Password"
             placeholder="Your password"
-            value={form.values.password}
-            onChange={(event) => form.setFieldValue('password', event.currentTarget.value)}
-            error={form.errors.password}
             radius="md"
+            {...form.getInputProps('password')}
           />
+
+          {type === 'register' && (
+            <PasswordInput
+              required
+              label="Confirm password"
+              placeholder="Confirm password"
+              radius="md"
+              {...form.getInputProps('confirm')}
+            />
+          )}
 
           {type === 'register' && (
             <Checkbox
