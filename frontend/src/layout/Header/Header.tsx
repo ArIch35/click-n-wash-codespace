@@ -1,17 +1,16 @@
 import { Burger, Button, Group } from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
 import React from 'react';
-import { useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import DarkModeToggle from '../../components/DarkModeToggle';
 import UserMenu from '../../components/UserMenu';
 import { AuthenticationForm } from '../../components/auth/AuthentificationForm';
 import NavbarControllerProps from '../../interfaces/navbar-controller-props';
-import { RootState } from '../../reducers/root.reducer';
+import { useAuth } from '../../providers/authentication/Authentication.Context';
 import classes from './Header.module.css';
 
 const Header = ({ toggle, setVisible }: NavbarControllerProps) => {
-  const user = useSelector((state: RootState) => state.authenticationState.user);
+  const { user } = useAuth();
   const navigate = useNavigate();
   const [modalOpened, modalHandlers] = useDisclosure(false);
 

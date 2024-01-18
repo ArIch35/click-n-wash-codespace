@@ -1,12 +1,8 @@
 import React from 'react';
-import { useDispatch, useSelector } from 'react-redux';
-import firebaseAuth from '../firebase';
-import User, { CreateUser } from '../interfaces/entities/user';
-import { setAuth, setRegisteredName, setUser } from '../reducers/authentication.reducer';
-import { RootState } from '../reducers/root.reducer';
-import { createUser, getUser } from '../utils/api';
-
-const AuthenticationContext = React.createContext<null>(null);
+import firebaseAuth from '../../firebase';
+import User, { CreateUser } from '../../interfaces/entities/user';
+import { createUser, getUser } from '../../utils/api';
+import AuthenticationContext, { Auth } from './Authentication.Context';
 
 interface AuthenticationProviderProps {
   children: React.ReactNode;
@@ -39,18 +35,23 @@ const signInToBackend = async (name: string) => {
 };
 
 const AuthenticationProvider = ({ children }: AuthenticationProviderProps) => {
-  const dispatch = useDispatch();
-  const registeredName = useSelector(
-    (state: RootState) => state.authenticationState.registeredName,
-  );
+  const [firebaseData, setFirebaseData] = React.useState<Auth | null>(null);
+  const [user, setUser] = React.useState<User | null>(null);
+  const [registeredName, setRegisteredName] = React.useState<string>('');
+  const [refresh, setRefresh] = React.useState<boolean>(false);
+
+  const refreshUser = () => {
+    setRefresh(!refresh);
+  };
+
   const [fetched, setFetched] = React.useState(false);
 
   React.useEffect(() => {
     const unsubscribe = firebaseAuth.onAuthStateChanged((user) => {
       const firebaseUser = user;
       if (!firebaseUser) {
-        dispatch(setAuth(null));
-        dispatch(setUser(null));
+        setFirebaseData(null);
+        setUser(null);
         setFetched(true);
         return;
       }
@@ -60,22 +61,24 @@ const AuthenticationProvider = ({ children }: AuthenticationProviderProps) => {
           const { providerId, email, displayName } = firebaseUser;
           const name = registeredName || displayName || email || 'No name';
           const user = await signInToBackend(name);
-          dispatch(setUser(user));
-          dispatch(setAuth({ token, providerId }));
+          setUser(user);
+          setFirebaseData({ token, providerId });
         })
         .catch((error) => {
           console.error(error);
         })
         .finally(() => {
           setFetched(true);
-          dispatch(setRegisteredName(''));
+          setRegisteredName('');
         });
     });
     return () => unsubscribe();
-  }, [dispatch, registeredName]);
+  }, [registeredName, refresh]);
 
   return (
-    <AuthenticationContext.Provider value={null}>
+    <AuthenticationContext.Provider
+      value={{ auth: firebaseData, user, registeredName, setRegisteredName, refreshUser }}
+    >
       {fetched && children}
     </AuthenticationContext.Provider>
   );
