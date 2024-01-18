@@ -5,7 +5,7 @@ import { IconBuildingStore } from '@tabler/icons-react';
 import { ThemeIcon } from '@mantine/core';
 
 const iconForServerNotification = (
-  <ThemeIcon variant="light" color="blue">
+  <ThemeIcon variant="white" color="blue">
     <IconBuildingStore />
   </ThemeIcon>
 );
