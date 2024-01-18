@@ -117,9 +117,32 @@ const BookingsPage = () => {
         <Center>
           <Title order={3}>Your Bookings</Title>
         </Center>
-        {contracts.map((contract) => (
-          <ContractCard key={contract.id} {...contract} />
-        ))}
+        {contracts
+          // Sort the status ongoing first, then finished, then cancelled
+          .sort((a, b) => {
+            if (a.status === 'ongoing' && b.status !== 'ongoing') {
+              return -1;
+            } else if (a.status !== 'ongoing' && b.status === 'ongoing') {
+              return 1;
+            } else if (
+              a.status === 'finished' &&
+              b.status !== 'finished' &&
+              b.status !== 'ongoing'
+            ) {
+              return -1;
+            } else if (a.status !== 'finished' && b.status === 'finished') {
+              return 1;
+            } else if (a.status === 'cancelled' && b.status !== 'cancelled') {
+              return 1;
+            } else if (a.status !== 'cancelled' && b.status === 'cancelled') {
+              return -1;
+            } else {
+              return 0;
+            }
+          })
+          .map((contract) => (
+            <ContractCard key={contract.id} {...contract} />
+          ))}
       </Stack>
     </Center>
   );
