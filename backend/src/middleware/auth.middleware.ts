@@ -15,9 +15,6 @@ const checkToken: RequestHandler = (async (req, res, next) => {
       (path1 === req.path.toLocaleLowerCase() || path2 === req.path.toLocaleLowerCase())
     );
   });
-  if (skipAuth) {
-    return next();
-  }
 
   try {
     if (!req.headers.authorization) {
@@ -35,6 +32,9 @@ const checkToken: RequestHandler = (async (req, res, next) => {
     res.locals = { uid, email };
     next();
   } catch (error) {
+    if (skipAuth) {
+      return next();
+    }
     res.status(STATUS_UNAUTHORIZED).send(customMessage(false, (error as Error).message));
   }
 }) as RequestHandler;
