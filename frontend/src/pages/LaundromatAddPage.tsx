@@ -46,7 +46,10 @@ const LaundromatAddPage = () => {
         city: (value) => active === 0 && value.trim().length < 3 && 'City is too short',
         country: (value) => active === 0 && value.trim().length < 3 && 'Country is too short',
         postalCode: (value) =>
-          active === 0 && value.trim().length !== 5 && 'Postal code must be 5 characters long',
+          active === 0 &&
+          (value.length !== 5 || !value.split('').every((char) => !isNaN(Number(char))))
+            ? 'Postal code must be 5 digits long'
+            : null,
         price: (value) => active === 0 && value < 0 && 'Price must be positive number',
       },
       washingMachines: {
