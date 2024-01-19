@@ -1,32 +1,48 @@
 import { notifications } from '@mantine/notifications';
 import Notification from '../interfaces/notification';
 import { autoCloseDuration } from './constants';
-import { IconBuildingStore } from '@tabler/icons-react';
-import { ThemeIcon } from '@mantine/core';
+import { Badge, ThemeIcon } from '@mantine/core';
+import { IconBuildingStore, IconCheck, IconX } from '@tabler/icons-react';
 
-const iconForServerNotification = (
-  <ThemeIcon variant="white" color="blue">
-    <IconBuildingStore />
+/**
+ * Show notification
+ * @param color Color of the notification
+ */
+const iconForServerNotification = (color: string) => (
+  <ThemeIcon color={color} variant="light">
+    <IconBuildingStore size={24} />
   </ThemeIcon>
 );
 /**
  * Show custom notification with autoClose
  * @param notification Notification to show
  */
-export const showCustomNotification = (notification: Notification) => {
-  if (notification.vendor) {
-    delete notification.vendor;
-    notifications.show({
-      ...notification,
-      autoClose: notification.autoClose ? autoCloseDuration : false,
-      icon: iconForServerNotification,
-    });
-  } else {
+export const showCustomNotification = (
+  notification: Notification,
+  isFromServer: boolean = false,
+) => {
+  if (!isFromServer) {
     notifications.show({
       ...notification,
       autoClose: notification.autoClose ? autoCloseDuration : false,
     });
+    return;
   }
+
+  const color = notification.color;
+  notification.color = 'white';
+
+  notifications.show({
+    ...notification,
+    autoClose: notification.autoClose ? autoCloseDuration : false,
+    icon: iconForServerNotification(color),
+    title: (
+      <Badge color={color} variant="light">
+        Vendor Notification - {notification.title}
+      </Badge>
+    ),
+    message: notification.message,
+  });
 };
 
 /**
@@ -62,17 +78,13 @@ export const showVendorRequiredOnce = () => {
  * @param entityName Name of the entity
  * @param action Action performed on the entity
  */
-export const showSuccessNotification = (
-  entityName: string,
-  action: string,
-  vendor: boolean = false,
-) => {
+export const showSuccessNotification = (entityName: string, action: string) => {
   showCustomNotification({
     title: 'Success',
     message: `${entityName} successfully ${action}d`,
-    color: vendor ? '' : 'green',
+    color: 'green',
     autoClose: true,
-    vendor,
+    icon: <IconCheck />,
   });
 };
 
@@ -81,17 +93,12 @@ export const showSuccessNotification = (
  * @param entityName Name of the entity
  * @param action Action performed on the entity
  */
-export const showErrorNotification = (
-  entityName: string,
-  action: string,
-  message: string,
-  vendor: boolean = false,
-) => {
+export const showErrorNotification = (entityName: string, action: string, message: string) => {
   showCustomNotification({
     title: `Failed to ${action} ${entityName}`,
     message: message,
     color: 'red',
     autoClose: true,
-    vendor,
+    icon: <IconX />,
   });
 };
