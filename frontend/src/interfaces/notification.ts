@@ -4,6 +4,7 @@ interface Notification {
   message: string;
   color: string;
   autoClose: boolean;
+  icon?: React.ReactNode;
 }
 
 export default Notification;
