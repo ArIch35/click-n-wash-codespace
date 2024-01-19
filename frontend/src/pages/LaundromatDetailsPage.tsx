@@ -38,8 +38,8 @@ const ManageLaundromatsPage = () => {
     street: string;
     postalCode: string;
     city: string;
-    price: number;
     country: string;
+    price: number;
   }
 
   const initialLaundromatValues: LaundromatForm = {
@@ -57,7 +57,10 @@ const ManageLaundromatsPage = () => {
     validate: {
       name: hasLength({ min: 3 }, 'Name must be at least 3 characters long'),
       street: hasLength({ min: 3 }, 'Street name must be at least 3 characters long'),
-      postalCode: hasLength({ min: 5, max: 5 }, 'Postal code must be 5 characters long'),
+      postalCode: (value) =>
+        /^(?!01000|99999)(0[1-9]\d{3}|[1-9]\d{4})$/.test(value)
+          ? null
+          : 'Postal Code must be a valid German postal code',
       city: hasLength({ min: 3 }, 'City Name must be at least 3 characters long'),
       price: isInRange({ min: 1 }, 'Price per Machine must be 1 € or more'),
       country: hasLength({ min: 3 }, 'Country name must be at least 3 characters long'),
@@ -295,15 +298,13 @@ const ManageLaundromatsPage = () => {
               loaderProps={{ color: 'blue', type: 'dots', size: 'xl' }}
             />
             <form onSubmit={handleUpdateLaundromat}>
-              {Object.keys(laundromatForm.values).map((key, index) =>
-                index ===
-                Object.keys(laundromatForm.values).length - 1 ? null : typeof laundromatForm.values[
-                    key as keyof LaundromatForm
-                  ] === 'number' ? (
+              {Object.keys(laundromatForm.values).map((key) =>
+                typeof laundromatForm.values[key as keyof LaundromatForm] === 'number' ? (
                   <NumberInput
                     key={key}
                     name={key}
                     label={key}
+                    mih={1}
                     {...laundromatForm.getInputProps(key)}
                   />
                 ) : (
