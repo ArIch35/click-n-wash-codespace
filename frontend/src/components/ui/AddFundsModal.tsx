@@ -13,6 +13,8 @@ function AddFundsModal() {
     topupBalance(amount)
       .then(() => {
         close();
+        // Window reload to update balance
+        window.location.reload();
       })
       .catch((error) => {
         console.log(error);
