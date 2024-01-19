@@ -34,13 +34,46 @@ function AddFundsModal() {
       >
         <Flex direction="column" gap="xl">
           <Flex justify="center" direction="row" gap="xl">
-            <Button radius={100} onClick={() => setAmount(10)} size="md">
+            <Button
+              radius={100}
+              onClick={() => setAmount(10)}
+              size="md"
+              style={() => {
+                if (amount != 10) {
+                  return {
+                    backgroundColor: 'transparent',
+                  };
+                }
+              }}
+            >
               $10
             </Button>
-            <Button radius={100} onClick={() => setAmount(20)} size="md">
+            <Button
+              radius={100}
+              onClick={() => setAmount(20)}
+              size="md"
+              style={() => {
+                if (amount != 20) {
+                  return {
+                    backgroundColor: 'transparent',
+                  };
+                }
+              }}
+            >
               $20
             </Button>
-            <Button radius={100} onClick={() => setAmount(50)} size="md">
+            <Button
+              radius={100}
+              onClick={() => setAmount(50)}
+              size="md"
+              style={() => {
+                if (amount != 50) {
+                  return {
+                    backgroundColor: 'transparent',
+                  };
+                }
+              }}
+            >
               $50
             </Button>
           </Flex>
