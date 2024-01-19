@@ -118,7 +118,7 @@ router.post('/', (async (req, res) => {
       washingMachine,
     });
     await finalizeContract(contract);
-    const title = 'Someone has booked your washing machine!';
+    const title = 'Incoming Booking!';
     const message = `Washing machine ${washingMachine.name} in laundromat ${
       washingMachine.laundromat.name
     } has been booked from ${contract.startDate.toLocaleString()} to ${contract.endDate.toLocaleString()}`;
@@ -237,7 +237,7 @@ router.put('/:id', (async (req, res) => {
 
     await finalizeContract(contract, true);
     const title = isWmOwner
-      ? 'Your booking has been cancelled!'
+      ? 'Booking Canccellation!'
       : 'Someone has cancelled a booking for your washing machine!';
     const message = `A booking for washing machine ${contract.washingMachine.name} in laundromat ${
       contract.washingMachine.laundromat.name
@@ -245,7 +245,7 @@ router.put('/:id', (async (req, res) => {
     const notification: Notification = {
       title,
       message,
-      color: 'blue',
+      color: 'red',
       autoClose: false,
     };
     sendNotification(

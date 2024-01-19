@@ -1,15 +1,47 @@
 import { notifications } from '@mantine/notifications';
 import Notification from '../interfaces/notification';
 import { autoCloseDuration } from './constants';
+import { Badge, ThemeIcon } from '@mantine/core';
+import { IconBuildingStore, IconCheck, IconX } from '@tabler/icons-react';
 
+/**
+ * Show notification
+ * @param color Color of the notification
+ */
+const iconForServerNotification = (color: string) => (
+  <ThemeIcon color={color} variant="light">
+    <IconBuildingStore size={24} />
+  </ThemeIcon>
+);
 /**
  * Show custom notification with autoClose
  * @param notification Notification to show
  */
-export const showCustomNotification = (notification: Notification) => {
+export const showCustomNotification = (
+  notification: Notification,
+  isFromServer: boolean = false,
+) => {
+  if (!isFromServer) {
+    notifications.show({
+      ...notification,
+      autoClose: notification.autoClose ? autoCloseDuration : false,
+    });
+    return;
+  }
+
+  const color = notification.color;
+  notification.color = 'white';
+
   notifications.show({
     ...notification,
     autoClose: notification.autoClose ? autoCloseDuration : false,
+    icon: iconForServerNotification(color),
+    title: (
+      <Badge color={color} variant="light">
+        Vendor Notification - {notification.title}
+      </Badge>
+    ),
+    message: notification.message,
   });
 };
 
@@ -52,6 +84,7 @@ export const showSuccessNotification = (entityName: string, action: string) => {
     message: `${entityName} successfully ${action}d`,
     color: 'green',
     autoClose: true,
+    icon: <IconCheck />,
   });
 };
 
@@ -66,5 +99,6 @@ export const showErrorNotification = (entityName: string, action: string, messag
     message: message,
     color: 'red',
     autoClose: true,
+    icon: <IconX />,
   });
 };
