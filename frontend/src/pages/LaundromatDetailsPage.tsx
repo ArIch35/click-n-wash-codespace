@@ -23,15 +23,47 @@ import {
   updateLaundromat,
 } from '../utils/api';
 import { showErrorNotification, showSuccessNotification } from '../utils/mantine-notifications';
+import WashingMachine from '../interfaces/entities/washing-machine';
 
 const ManageLaundromatsPage = () => {
   const { id } = useParams();
   const navigate = useNavigate();
   const [laundromat, setLaundromat] = useState<Laundromat>();
+  const [washingMachines, setWashingMachines] = useState<WashingMachine[]>();
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
   const [visible, { toggle }] = useDisclosure(false);
   const [opened, { open, close }] = useDisclosure(false);
+
+  useEffect(() => {
+    if (!id) {
+      return;
+    }
+
+    getLaundromatById(id)
+      .then((response) => {
+        setLaundromat(response);
+        setWashingMachines(response.washingMachines);
+
+        // Set form default values
+        laundromatForm.setInitialValues({
+          name: response.name,
+          street: response.street,
+          city: response.city,
+          postalCode: response.postalCode,
+          country: response.country,
+          price: response.price,
+        });
+
+        laundromatForm.reset();
+        setLoading(false);
+      })
+      .catch((error) => {
+        console.error(error);
+        showErrorNotification('Laundromat', 'get', String(error));
+      });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [id]);
 
   interface LaundromatForm {
     name: string;
@@ -67,40 +99,16 @@ const ManageLaundromatsPage = () => {
     },
   });
 
-  useEffect(() => {
-    if (!id) {
-      return;
-    }
+  const ths = (
+    <Table.Tr>
+      <Table.Th>Name</Table.Th>
+      <Table.Th>Description</Table.Th>
+      <Table.Th>Number of Contracts</Table.Th>
+      <Table.Th>Actions</Table.Th>
+    </Table.Tr>
+  );
 
-    getLaundromatById(id)
-      .then((response) => {
-        setLaundromat(response);
-
-        // Set form default values
-        laundromatForm.setInitialValues({
-          name: response.name,
-          street: response.street,
-          city: response.city,
-          postalCode: response.postalCode,
-          country: response.country,
-          price: response.price,
-        });
-
-        laundromatForm.reset();
-
-        setLoading(false);
-        setError(false);
-      })
-      .catch((error) => {
-        console.error(error);
-        setError(true);
-        setLoading(false);
-        setLaundromat(undefined);
-      });
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [id]);
-
-  const rows = laundromat?.washingMachines?.map((element) => (
+  const rows = washingMachines?.map((element) => (
     <Table.Tr key={element.name}>
       <Table.Td>{element.name}</Table.Td>
       <Table.Td>{element.description}</Table.Td>
@@ -111,26 +119,20 @@ const ManageLaundromatsPage = () => {
             variant="filled"
             color="red"
             type="submit"
-            onClick={() => handleDeleteWashingMachine(element.id)}
+            onClick={(event) => {
+              event.preventDefault();
+              handleDeleteWashingMachine(element.id);
+            }}
           >
             Delete
           </Button>
-          <Button variant="filled" color="yellow" type="submit">
+          <Button variant="filled" color="yellow">
             Edit
           </Button>
         </form>
       </Table.Td>
     </Table.Tr>
   ));
-
-  const ths = (
-    <Table.Tr>
-      <Table.Th>Name</Table.Th>
-      <Table.Th>Description</Table.Th>
-      <Table.Th>Number of Contracts</Table.Th>
-      <Table.Th>Actions</Table.Th>
-    </Table.Tr>
-  );
 
   const handleDeleteLaundromat = () => {
     if (laundromat?.washingMachines?.length !== 0) {
@@ -146,26 +148,34 @@ const ManageLaundromatsPage = () => {
     open();
   };
 
-  const handleUpdateLaundromat = () => {
+  const handleUpdateLaundromat = (event: React.FormEvent<HTMLFormElement>) => {
+    event?.preventDefault();
+
     if (!id) {
       showErrorNotification('Laundromat', 'delete', 'Laundromat not found');
       return;
     }
 
+    setLoading(true);
     updateLaundromat(id, laundromatForm.values)
       .then((response) => {
         console.log(response);
-        setTimeout(() => {
-          toggle();
-        }, 1000);
-
+        laundromatForm.setInitialValues({
+          name: response.name,
+          street: response.street,
+          city: response.city,
+          postalCode: response.postalCode,
+          country: response.country,
+          price: response.price,
+        });
         showSuccessNotification('Laudromat', 'update');
+        setLoading(false);
+        setError(false);
       })
       .catch((error) => {
         showErrorNotification('Laudromat', 'update', String(error));
-        setTimeout(() => {
-          toggle();
-        }, 1000);
+        setLoading(false);
+        setError(true);
       });
   };
 
@@ -175,18 +185,19 @@ const ManageLaundromatsPage = () => {
       return;
     }
 
+    // Check if washing machine has contracts
+    if (washingMachines?.find((element) => element.id === id)?.contracts?.length !== 0) {
+      showErrorNotification('Washing Machine', 'delete', 'Washing Machine has contracts');
+      return;
+    }
+
     deleteWashingMachine(id)
       .then((response) => {
         console.log(response);
-        setTimeout(() => {
-          toggle();
-        }, 1000);
 
-        if (!laundromat) {
-          return;
-        }
-
-        laundromat.washingMachines?.filter((element) => element.id !== id);
+        // Update washing machines state
+        const newWashingMachines = washingMachines?.filter((element) => element.id !== id);
+        setWashingMachines(newWashingMachines);
         showSuccessNotification('Washing Machine', 'delete');
       })
       .catch((error) => {
@@ -212,11 +223,9 @@ const ManageLaundromatsPage = () => {
       .then((response) => {
         console.log(response);
 
-        // Append to the laundromat state
-        const newLaundromat = { ...laundromat };
-        newLaundromat.washingMachines?.push(response);
-        setLaundromat(newLaundromat);
-        showSuccessNotification('Washing Machine', 'create');
+        // Append to the washing machines state
+        washingMachines?.push(response);
+        showSuccessNotification('Random Washing Machine', 'create');
       })
       .catch((error) => {
         console.error(error);
@@ -241,9 +250,6 @@ const ManageLaundromatsPage = () => {
             deleteLaundromat(id)
               .then((response) => {
                 console.log(response);
-                setTimeout(() => {
-                  toggle();
-                }, 1000);
                 showSuccessNotification('Laudromat', 'delete');
                 navigate('/manage-laundromats');
               })
@@ -347,7 +353,7 @@ const ManageLaundromatsPage = () => {
             <Flex justify={'space-between'} py={30}>
               <Text size="xl">My Washing Machines</Text>
               <form onSubmit={handleCreateRandomWashingMachine}>
-                <Button radius={'100'} onClick={toggle} type="submit">
+                <Button radius={'100'} type="submit">
                   + Add Random Washing Machine
                 </Button>
               </form>
