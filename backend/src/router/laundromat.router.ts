@@ -50,7 +50,7 @@ router.get('/:id', (async (req, res) => {
   try {
     const laundromat = await getDb().laundromatRepository.findOne({
       where: { id: req.params.id },
-      relations: { washingMachines: true },
+      relations: { washingMachines: { contracts: true } },
     });
     if (!laundromat) {
       return res.status(STATUS_NOT_FOUND).json(MESSAGE_NOT_FOUND);
