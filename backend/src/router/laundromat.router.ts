@@ -48,14 +48,16 @@ router.get('/', (async (req, res) => {
 
 router.get('/filter-params', (async (_, res) => {
   try {
-    const cities = await getDb()
-      .laundromatRepository.createQueryBuilder('laundromat')
-      .select('laundromat.city')
-      .distinct(true)
-      .getRawMany();
+    const cities = (
+      await getDb()
+        .laundromatRepository.createQueryBuilder('laundromat')
+        .select('laundromat.city')
+        .distinct(true)
+        .getRawMany()
+    ).map((city: { laundromat_city: string }) => city.laundromat_city);
     const maxPrice = await getDb().laundromatRepository.maximum('price');
-    console.log(cities, maxPrice);
-    return res.status(STATUS_OK).json({ cities, maxPrice });
+    const minPrice = await getDb().laundromatRepository.minimum('price');
+    return res.status(STATUS_OK).json({ cities, maxPrice, minPrice });
   } catch (error) {
     return res.status(STATUS_SERVER_ERROR).json(MESSAGE_SERVER_ERROR);
   }

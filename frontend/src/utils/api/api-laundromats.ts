@@ -137,5 +137,6 @@ export const getLaundromatFilters = async () => {
   if (!response.ok) {
     throw new Error((data as Message).message);
   }
-  return entityParser<RequestFilter>(data as RequestFilter);
+
+  return data as RequestFilter;
 };
