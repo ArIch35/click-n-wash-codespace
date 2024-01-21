@@ -46,6 +46,21 @@ router.get('/', (async (req, res) => {
   }
 }) as RequestHandler);
 
+router.get('/filter-params', (async (_, res) => {
+  try {
+    const cities = await getDb()
+      .laundromatRepository.createQueryBuilder('laundromat')
+      .select('laundromat.city')
+      .distinct(true)
+      .getRawMany();
+    const maxPrice = await getDb().laundromatRepository.maximum('price');
+    console.log(cities, maxPrice);
+    return res.status(STATUS_OK).json({ cities, maxPrice });
+  } catch (error) {
+    return res.status(STATUS_SERVER_ERROR).json(MESSAGE_SERVER_ERROR);
+  }
+}) as RequestHandler);
+
 router.get('/:id', (async (req, res) => {
   try {
     const laundromat = await getDb().laundromatRepository.findOne({
