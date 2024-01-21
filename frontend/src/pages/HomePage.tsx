@@ -31,18 +31,13 @@ const HomePage = () => {
 
   const onFilterSelected = (filter: SearchFilter) => {
     if (
-      filter === searchFilter ||
-      Object.values(filter).every((value) => value === '' || value === -1 || value === null)
+      JSON.stringify(filter) === JSON.stringify(searchFilter) ||
+      Object.values(filter).every((value) => value === undefined || value === -1)
     ) {
       return;
     }
-    const validFilter = {
-      name: !filter.name || filter.name === '' ? undefined : filter.name,
-      city: !filter.city || filter.city === '' ? undefined : filter.city,
-      priceFrom: filter.priceFrom === -1 ? undefined : filter.priceFrom,
-      priceTo: filter.priceTo === -1 ? undefined : filter.priceTo,
-    };
-    getFilteredLaundromats(validFilter)
+
+    getFilteredLaundromats(filter)
       .then((laundromats) => {
         if (laundromats.length === 0) {
           showCustomNotification({

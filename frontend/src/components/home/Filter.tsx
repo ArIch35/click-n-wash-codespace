@@ -39,6 +39,17 @@ const Filter: React.FC<FilterProps> = ({ onFilterSelected, onFilterReset }) => {
       });
   }, []);
 
+  const returnValidFilter = (filter: SearchFilter) => {
+    const oneOfThePriceChanged =
+      filter.priceFrom !== requestFilter!.minPrice || filter.priceTo !== requestFilter!.maxPrice;
+    onFilterSelected({
+      name: !filter.name || filter.name === '' ? undefined : filter.name,
+      city: !filter.city || filter.city === '' ? undefined : filter.city,
+      priceFrom: !oneOfThePriceChanged || filter.priceFrom === -1 ? undefined : filter.priceFrom,
+      priceTo: !oneOfThePriceChanged || filter.priceTo === -1 ? undefined : filter.priceTo,
+    });
+  };
+
   return (
     <Stack>
       <TextInput
@@ -49,6 +60,7 @@ const Filter: React.FC<FilterProps> = ({ onFilterSelected, onFilterReset }) => {
       />
       {requestFilter && (
         <Select
+          key={searchFilter.city}
           label="Laundromat City"
           placeholder="Pick City"
           data={requestFilter.cities}
@@ -66,6 +78,7 @@ const Filter: React.FC<FilterProps> = ({ onFilterSelected, onFilterReset }) => {
           step={1}
           minRange={5}
           defaultValue={[requestFilter.minPrice, requestFilter.maxPrice]}
+          value={[searchFilter.priceFrom!, searchFilter.priceTo!]}
           onChange={(value) => {
             setSearchFilter({ ...searchFilter, priceFrom: value[0], priceTo: value[1] });
           }}
@@ -73,7 +86,7 @@ const Filter: React.FC<FilterProps> = ({ onFilterSelected, onFilterReset }) => {
       )}
       <Button
         onClick={() => {
-          onFilterSelected(searchFilter);
+          returnValidFilter(searchFilter);
         }}
       >
         Filter
@@ -83,8 +96,8 @@ const Filter: React.FC<FilterProps> = ({ onFilterSelected, onFilterReset }) => {
           setSearchFilter({
             name: '',
             city: '',
-            priceFrom: -1,
-            priceTo: -1,
+            priceFrom: requestFilter!.minPrice,
+            priceTo: requestFilter!.maxPrice,
           });
           onFilterReset();
         }}
