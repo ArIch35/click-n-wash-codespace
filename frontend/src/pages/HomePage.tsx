@@ -7,6 +7,7 @@ import BaseList from '../components/ui/BaseList.component';
 import IndividualLaundromat from '../components/ui/IndividualLaundromat.component';
 import Laundromat from '../interfaces/entities/laundromat';
 import { getLaundromats } from '../utils/api';
+import Filter, { SearchFilter } from '../components/home/Filter';
 
 const HomePage = () => {
   const [allLaundromats, setAllLaundromats] = useState<Laundromat[]>([]);
@@ -17,6 +18,10 @@ const HomePage = () => {
       location: '',
     },
   });
+
+  const onFilterSelected = (filter: SearchFilter) => {
+    console.log(filter);
+  };
 
   useEffect(() => {
     getLaundromats()
@@ -48,14 +53,7 @@ const HomePage = () => {
 
   return (
     <Stack>
-      <InputSelect
-        name="test"
-        options={[
-          { value: 'test', label: 'test' },
-          { value: 'test2', label: 'test2' },
-        ]}
-        {...form.getInputProps('location')}
-      />
+      <Filter onFilterSelected={onFilterSelected} />
       {allLaundromats && (
         <BaseList
           items={allLaundromats}

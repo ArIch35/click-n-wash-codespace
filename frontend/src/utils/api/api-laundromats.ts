@@ -1,4 +1,5 @@
 import { headers, Message } from '.';
+import { RequestFilter } from '../../components/home/Filter';
 import Laundromat, { CreateLaundromat } from '../../interfaces/entities/laundromat';
 import LaundromatTimeSlots from '../../interfaces/laundromat-time-slots';
 import entityParser from '../entity-parser';
@@ -120,4 +121,21 @@ export const deleteLaundromat = async (id: string) => {
   if (!response.ok) {
     throw new Error((data as Message).message);
   }
+};
+
+/**
+ * Retrieves the filter parameters for the laundromats.
+ * @returns A promise that resolves to the filter parameters.
+ * @throws An error if the API request fails or returns an error message.
+ */
+export const getLaundromatFilters = async () => {
+  const response = await fetch(`${route}/filter-params`, {
+    headers: { ...(await headers()) },
+  });
+
+  const data = (await response.json()) as unknown;
+  if (!response.ok) {
+    throw new Error((data as Message).message);
+  }
+  return entityParser<RequestFilter>(data as RequestFilter);
 };
