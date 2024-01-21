@@ -19,6 +19,7 @@ import {
   STATUS_OK,
   STATUS_SERVER_ERROR,
 } from '../utils/http-status-codes';
+import { Between, FindOperator, ILike } from 'typeorm';
 
 interface TimeSlot {
   start: Date;
@@ -36,15 +37,43 @@ router.get('/', (async (req, res) => {
   try {
     const uid = res.locals.uid as string;
     const onlyOwned = req.query.onlyOwned === 'true';
+    const name = req.query.name as string;
+    const city = req.query.city as string;
+    const priceFrom = req.query.priceFrom as string;
+    const priceTo = req.query.priceTo as string;
+
     const laundromats = await getDb().laundromatRepository.find({
-      where: onlyOwned ? { owner: { id: uid } } : {},
+      where: {
+        ...(onlyOwned ? { owner: { id: uid } } : {}),
+        ...filterConditionBuilder(name, city, priceFrom, priceTo),
+      },
       relations: { washingMachines: true },
     });
     return res.status(STATUS_OK).json(laundromats);
   } catch (error) {
+    console.log(error);
     return res.status(STATUS_SERVER_ERROR).json(MESSAGE_SERVER_ERROR);
   }
 }) as RequestHandler);
+
+const filterConditionBuilder = (
+  name?: string,
+  city?: string,
+  priceFrom?: string,
+  priceTo?: string,
+) => {
+  const filterCondition: { [key: string]: FindOperator<string> | string } = {};
+  if (name) {
+    filterCondition.name = ILike(`%${name}%`);
+  }
+  if (city) {
+    filterCondition.city = city;
+  }
+  if (priceFrom && priceTo) {
+    filterCondition.price = Between(priceFrom, priceTo);
+  }
+  return filterCondition;
+};
 
 router.get('/filter-params', (async (_, res) => {
   try {

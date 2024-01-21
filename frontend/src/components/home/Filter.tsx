@@ -3,10 +3,10 @@ import { getLaundromatFilters } from '../../utils/api';
 import { Stack, Select, TextInput, Button, RangeSlider } from '@mantine/core';
 
 export interface SearchFilter {
-  name: string;
-  city: string;
-  priceFrom: number;
-  priceTo: number;
+  name?: string;
+  city?: string;
+  priceFrom?: number;
+  priceTo?: number;
 }
 
 export interface RequestFilter {
@@ -16,10 +16,11 @@ export interface RequestFilter {
 }
 
 type FilterProps = {
-  onFilterSelected: (filter: SearchFilter | undefined) => void;
+  onFilterSelected: (filter: SearchFilter) => void;
+  onFilterReset: () => void;
 };
 
-const Filter: React.FC<FilterProps> = ({ onFilterSelected }) => {
+const Filter: React.FC<FilterProps> = ({ onFilterSelected, onFilterReset }) => {
   const [requestFilter, setRequestFilter] = React.useState<RequestFilter | null>();
   const [searchFilter, setSearchFilter] = React.useState<SearchFilter>({
     name: '',
@@ -76,6 +77,19 @@ const Filter: React.FC<FilterProps> = ({ onFilterSelected }) => {
         }}
       >
         Filter
+      </Button>
+      <Button
+        onClick={() => {
+          setSearchFilter({
+            name: '',
+            city: '',
+            priceFrom: -1,
+            priceTo: -1,
+          });
+          onFilterReset();
+        }}
+      >
+        Reset
       </Button>
     </Stack>
   );

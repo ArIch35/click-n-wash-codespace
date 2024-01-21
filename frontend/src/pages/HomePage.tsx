@@ -5,12 +5,23 @@ import WashingMachinePicker from '../components/home/WashingMachinePicker';
 import BaseList from '../components/ui/BaseList.component';
 import IndividualLaundromat from '../components/ui/IndividualLaundromat.component';
 import Laundromat from '../interfaces/entities/laundromat';
-import { getLaundromats } from '../utils/api';
+import { getFilteredLaundromats, getLaundromats } from '../utils/api';
 import Filter, { SearchFilter } from '../components/home/Filter';
+import {
+  showCustomNotification,
+  showErrorNotification,
+  showSuccessNotification,
+} from '../utils/mantine-notifications';
 
 const HomePage = () => {
   const [allLaundromats, setAllLaundromats] = useState<Laundromat[]>([]);
   const [chosenLaundromat, setChosenLaundromat] = useState<Laundromat | null>(null);
+  const [searchFilter, setSearchFilter] = useState<SearchFilter>({
+    name: '',
+    city: '',
+    priceFrom: -1,
+    priceTo: -1,
+  });
   const [isOpen, setIsOpen] = useState<boolean>(false);
   const form = useForm({
     initialValues: {
@@ -19,10 +30,40 @@ const HomePage = () => {
   });
 
   const onFilterSelected = (filter: SearchFilter) => {
-    console.log(filter);
+    if (
+      filter === searchFilter ||
+      Object.values(filter).every((value) => value === '' || value === -1 || value === null)
+    ) {
+      return;
+    }
+    const validFilter = {
+      name: !filter.name || filter.name === '' ? undefined : filter.name,
+      city: !filter.city || filter.city === '' ? undefined : filter.city,
+      priceFrom: filter.priceFrom === -1 ? undefined : filter.priceFrom,
+      priceTo: filter.priceTo === -1 ? undefined : filter.priceTo,
+    };
+    getFilteredLaundromats(validFilter)
+      .then((laundromats) => {
+        if (laundromats.length === 0) {
+          showCustomNotification({
+            title: 'No Result',
+            message: 'There is no laundromat that matches your search criteria',
+            color: 'yellow',
+            autoClose: true,
+          });
+          return;
+        }
+        showSuccessNotification('Laundromat', `searced with ${laundromats.length} results`);
+        setAllLaundromats(laundromats);
+      })
+      .catch((error) => {
+        console.error(error);
+        showErrorNotification('Laundromat', 'Search', 'search failed');
+      });
+    setSearchFilter(filter);
   };
 
-  useEffect(() => {
+  const getAllLaundromats = () => {
     getLaundromats()
       .then((laundromats) => {
         setAllLaundromats(laundromats);
@@ -30,6 +71,10 @@ const HomePage = () => {
       .catch((error) => {
         console.error(error);
       });
+  };
+
+  useEffect(() => {
+    getAllLaundromats();
   }, []);
 
   useEffect(() => {
@@ -52,7 +97,7 @@ const HomePage = () => {
 
   return (
     <Stack>
-      <Filter onFilterSelected={onFilterSelected} />
+      <Filter onFilterSelected={onFilterSelected} onFilterReset={getAllLaundromats} />
       {allLaundromats && (
         <BaseList
           items={allLaundromats}
