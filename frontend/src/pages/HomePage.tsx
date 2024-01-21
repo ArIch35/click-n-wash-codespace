@@ -1,7 +1,7 @@
 import { Stack } from '@mantine/core';
 import { useForm } from '@mantine/form';
 import { useEffect, useState } from 'react';
-import WashingMachinePicker from '../components/booking/WashingMachinePicker';
+import WashingMachinePicker from '../components/home/WashingMachinePicker';
 import InputSelect from '../components/inputs/InputSelect';
 import BaseList from '../components/ui/BaseList.component';
 import IndividualLaundromat from '../components/ui/IndividualLaundromat.component';
