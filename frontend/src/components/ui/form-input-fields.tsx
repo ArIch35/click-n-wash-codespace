@@ -12,6 +12,26 @@ interface FormInputFieldsProps<T> {
 }
 
 /**
+ * Formats the given name by splitting it on periods, adding spaces before capital letters,
+ * removing trailing 's', and incrementing the last digit if it exists.
+ * @param name - The name to be formatted.
+ * @returns The formatted name.
+ */
+const formatName = (name: string) => {
+  return name
+    .split('.')
+    .map((item) =>
+      item
+        .replace(/([A-Z])/g, ' $1')
+        .replace(/s$/, '')
+        .match(/\d$/)
+        ? item.slice(0, item.length - 1) + (parseInt(item[item.length - 1], 10) + 1)
+        : item.replace(/([A-Z])/g, ' $1').replace(/s$/, ''),
+    )
+    .join(' ');
+};
+
+/**
  * Renders the inputs for a form based on the provided props.
  *
  * @template T - The type of the form object.
@@ -46,9 +66,10 @@ const renderInputs = <T extends object>(props: FormInputFieldsProps<T>) => {
       if (supportArrays && Array.isArray(value)) {
         return value.flatMap((item, index) => {
           const childrenKey = `${parentKey}.${index}`;
-          const name = (
+          const name = formatName(childrenKey);
+          const nameElement = (
             <Title order={5} key={childrenKey}>
-              {upperFirst(childrenKey.replaceAll('.', ' '))}
+              {upperFirst(name)}
             </Title>
           );
           const params: FormInputFieldsProps<T> = {
@@ -60,14 +81,15 @@ const renderInputs = <T extends object>(props: FormInputFieldsProps<T>) => {
             preview,
           };
           const data = renderInputs(params);
-          return [name, ...data];
+          return [nameElement, ...data];
         });
       }
 
       if (supportObjects && typeof value === 'object' && !Array.isArray(value)) {
-        const name = (
+        const name = formatName(parentKey);
+        const nameElement = (
           <Title order={5} key={parentKey}>
-            {upperFirst(parentKey.replaceAll('.', ' '))}
+            {upperFirst(name)}
           </Title>
         );
         const params: FormInputFieldsProps<T> = {
@@ -79,7 +101,7 @@ const renderInputs = <T extends object>(props: FormInputFieldsProps<T>) => {
           preview,
         };
         const data = renderInputs(params);
-        return [name, ...data];
+        return [nameElement, ...data];
       }
 
       if (typeof value === 'number') {
