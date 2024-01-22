@@ -1,4 +1,4 @@
-import { BeforeInsert, BeforeUpdate, Column, Entity, ManyToOne, OneToMany } from 'typeorm';
+import { BeforeInsert, BeforeUpdate, Column, Entity, ManyToOne, Not, OneToMany } from 'typeorm';
 import { object, string } from 'yup';
 import getDb from '../db';
 import StatusError from '../utils/error-with-status';
@@ -41,6 +41,7 @@ const checkDuplicateNameWithinLaundromat = async (
 ): Promise<void> => {
   const existingWashingMachine = await getDb().washingMachineRepository.findOne({
     where: {
+      id: Not(washingMachine.id),
       name: washingMachine.name,
       laundromat: {
         id: washingMachine.laundromat.id,

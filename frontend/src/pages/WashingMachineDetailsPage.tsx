@@ -10,15 +10,15 @@ import {
   Text,
   TextInput,
 } from '@mantine/core';
+import { hasLength, useForm } from '@mantine/form';
+import { useDisclosure } from '@mantine/hooks';
 import React, { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { deleteWashingMachine, getWashingMachineById, updateWashingMachine } from '../utils/api';
-import WashingMachine from '../interfaces/entities/washing-machine';
 import Contract from '../interfaces/entities/contract';
+import WashingMachine from '../interfaces/entities/washing-machine';
 import { WashingMachineForm } from '../interfaces/forms/WashingMachineFrom';
-import { hasLength, useForm } from '@mantine/form';
+import { deleteWashingMachine, getWashingMachineById, updateWashingMachine } from '../utils/api';
 import { showErrorNotification, showSuccessNotification } from '../utils/mantine-notifications';
-import { useDisclosure } from '@mantine/hooks';
 
 const WashingMachineDetailsPage = () => {
   const { id } = useParams();
@@ -33,8 +33,6 @@ const WashingMachineDetailsPage = () => {
   useEffect(() => {
     if (!id) {
       return;
-      setError(true);
-      setLoading(false);
     }
 
     getWashingMachineById(id)
@@ -68,6 +66,7 @@ const WashingMachineDetailsPage = () => {
         setError(true);
         setLoading(false);
       });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [id]);
 
   const initialWashingMachineValues: WashingMachineForm = {
@@ -80,9 +79,8 @@ const WashingMachineDetailsPage = () => {
     validateInputOnChange: true,
     initialValues: initialWashingMachineValues,
     validate: {
-      name: hasLength({ min: 1 }, 'Name must be at least 1 characters long'),
-      description: hasLength({ min: 1 }, 'Name must be at least 1 characters long'),
-      brand: hasLength({ min: 1 }, 'Name must be at least 1 characters long'),
+      name: hasLength({ min: 1 }, 'Name must be at least 1 character long'),
+      brand: hasLength({ min: 1 }, 'Brand must be at least 1 character long'),
     },
   });
 

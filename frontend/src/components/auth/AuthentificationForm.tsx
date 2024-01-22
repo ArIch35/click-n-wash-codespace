@@ -46,7 +46,7 @@ export function AuthenticationForm({ ...props }: ModalProps) {
       email: (val) => (/^\S+@\S+$/.test(val) ? null : 'Invalid email'),
       password: (val) =>
         val.length <= 6 && type === 'register'
-          ? 'Password should include at least 6 characters'
+          ? 'Password should have at least 6 characters'
           : null,
       confirm: (value, values) =>
         value !== values.password && type === 'register' ? 'Passwords do not match' : null,
