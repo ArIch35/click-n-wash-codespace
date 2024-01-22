@@ -1,5 +1,5 @@
 import { Box, Button, Container, Flex, Group, Stepper, rem } from '@mantine/core';
-import { useForm } from '@mantine/form';
+import { hasLength, isInRange, useForm } from '@mantine/form';
 import { IconCircleCheck } from '@tabler/icons-react';
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
@@ -42,20 +42,19 @@ const LaundromatAddPage = () => {
 
     validate: {
       laundromat: {
-        name: (value) => active === 0 && value.trim().length < 3 && 'Name is too short',
-        street: (value) => active === 0 && value.trim().length < 3 && 'Street is too short',
-        city: (value) => active === 0 && value.trim().length < 3 && 'City is too short',
-        country: (value) => active === 0 && value.trim().length < 3 && 'Country is too short',
+        name: hasLength({ min: 3 }, 'Name must be at least 3 characters long'),
+        street: hasLength({ min: 3 }, 'Street name must be at least 3 characters long'),
+        city: hasLength({ min: 3 }, 'City Name must be at least 3 characters long'),
+        country: hasLength({ min: 3 }, 'Country name must be at least 3 characters long'),
         postalCode: (value) =>
-          active === 0 &&
-          (value.length !== 5 || !value.split('').every((char) => !isNaN(Number(char))))
-            ? 'Postal code must be 5 digits long'
-            : null,
-        price: (value) => active === 0 && value < 0 && 'Price must be positive number',
+          /^(?!01000|99999)(0[1-9]\d{3}|[1-9]\d{4})$/.test(value)
+            ? null
+            : 'Postal Code must be a valid German postal code',
+        price: isInRange({ min: 1 }, 'Price per Machine must be 1 € or more'),
       },
       washingMachines: {
-        name: (value) => active === 1 && value.trim().length < 3 && 'Name is too short',
-        brand: (value) => active === 1 && value.trim().length < 3 && 'Brand is too short',
+        name: hasLength({ min: 1 }, 'Name must be at least 1 character long'),
+        brand: hasLength({ min: 1 }, 'Brand must be at least 1 character long'),
       },
     },
   });

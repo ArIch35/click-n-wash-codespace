@@ -15,6 +15,8 @@ import { useDisclosure } from '@mantine/hooks';
 import React, { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import Laundromat from '../interfaces/entities/laundromat';
+import WashingMachine from '../interfaces/entities/washing-machine';
+import { LaundromatForm } from '../interfaces/forms/LaundromatForm';
 import {
   createWashingMachine,
   deleteLaundromat,
@@ -23,8 +25,6 @@ import {
   updateLaundromat,
 } from '../utils/api';
 import { showErrorNotification, showSuccessNotification } from '../utils/mantine-notifications';
-import WashingMachine from '../interfaces/entities/washing-machine';
-import { LaundromatForm } from '../interfaces/forms/LaundromatForm';
 
 const ManageLaundromatsPage = () => {
   const { id } = useParams();
@@ -82,13 +82,13 @@ const ManageLaundromatsPage = () => {
     validate: {
       name: hasLength({ min: 3 }, 'Name must be at least 3 characters long'),
       street: hasLength({ min: 3 }, 'Street name must be at least 3 characters long'),
+      city: hasLength({ min: 3 }, 'City Name must be at least 3 characters long'),
+      country: hasLength({ min: 3 }, 'Country name must be at least 3 characters long'),
       postalCode: (value) =>
         /^(?!01000|99999)(0[1-9]\d{3}|[1-9]\d{4})$/.test(value)
           ? null
           : 'Postal Code must be a valid German postal code',
-      city: hasLength({ min: 3 }, 'City Name must be at least 3 characters long'),
       price: isInRange({ min: 1 }, 'Price per Machine must be 1 € or more'),
-      country: hasLength({ min: 3 }, 'Country name must be at least 3 characters long'),
     },
   });
 
