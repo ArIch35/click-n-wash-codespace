@@ -17,6 +17,7 @@ import CustomMap from '../components/home/Map';
 const HomePage = () => {
   const [allLaundromats, setAllLaundromats] = useState<Laundromat[]>([]);
   const [chosenLaundromat, setChosenLaundromat] = useState<Laundromat | null>(null);
+  const [focusedLaundromat, setFocusedLaundromat] = useState<Laundromat | null>(null);
   const [searchFilter, setSearchFilter] = useState<SearchFilter>({
     name: '',
     city: '',
@@ -47,6 +48,7 @@ const HomePage = () => {
             color: 'yellow',
             autoClose: true,
           });
+          setAllLaundromats([]);
           return;
         }
         showSuccessNotification('Laundromat', `searced with ${laundromats.length} results`);
@@ -67,6 +69,15 @@ const HomePage = () => {
       .catch((error) => {
         console.error(error);
       });
+  };
+
+  const onLaundromatChosen = (laundromat: Laundromat) => {
+    setChosenLaundromat(laundromat);
+    setIsOpen(true);
+  };
+
+  const onLocationClick = (laundromat: Laundromat) => {
+    setFocusedLaundromat(laundromat);
   };
 
   useEffect(() => {
@@ -94,7 +105,13 @@ const HomePage = () => {
   return (
     <Grid gutter="md">
       <Grid.Col span={9}>
-        <CustomMap />
+        {allLaundromats && (
+          <CustomMap
+            laundromats={allLaundromats}
+            onMarkerClick={onLaundromatChosen}
+            focusedLaundromat={focusedLaundromat}
+          />
+        )}
       </Grid.Col>
       <Grid.Col span={3}>
         <Stack>
@@ -103,10 +120,8 @@ const HomePage = () => {
             <BaseList
               items={allLaundromats}
               IndividualComponent={IndividualLaundromat}
-              onItemClick={(item: Laundromat) => {
-                setChosenLaundromat(item);
-                setIsOpen(true);
-              }}
+              onItemClick={onLaundromatChosen}
+              onLocationClick={onLocationClick}
             />
           )}
           {chosenLaundromat && (
