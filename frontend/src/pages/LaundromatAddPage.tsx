@@ -7,6 +7,7 @@ import FormInputFields from '../components/ui/form-input-fields';
 import { CreateLaundromat } from '../interfaces/entities/laundromat';
 import { CreateWashingMachine } from '../interfaces/entities/washing-machine';
 import { createLaundromat, createWashingMachine } from '../utils/api';
+import { showErrorNotification, showSuccessNotification } from '../utils/mantine-notifications';
 
 type FormValues = {
   laundromat: CreateLaundromat;
@@ -69,9 +70,11 @@ const LaundromatAddPage = () => {
         await Promise.all(
           washingMachines.map((washingMachine) => createWashingMachine(washingMachine)),
         );
+        showSuccessNotification('Laundromat', 'create');
         navigate('/manage-laundromats');
       })
       .catch((error) => {
+        showErrorNotification('Laundromat', 'create', JSON.stringify(error));
         console.log(error);
       });
   };
