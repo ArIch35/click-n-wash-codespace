@@ -13,4 +13,6 @@ export type CreateWashingMachine = Pick<WashingMachine, 'name' | 'brand' | 'desc
   laundromat: string;
 };
 
+export type UpdateWashingMachine = Pick<WashingMachine, 'name' | 'brand' | 'description'>;
+
 export default WashingMachine;
