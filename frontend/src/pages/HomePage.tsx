@@ -1,4 +1,4 @@
-import { Stack } from '@mantine/core';
+import { Grid, Stack } from '@mantine/core';
 import { useForm } from '@mantine/form';
 import { useEffect, useState } from 'react';
 import WashingMachinePicker from '../components/home/WashingMachinePicker';
@@ -12,6 +12,7 @@ import {
   showErrorNotification,
   showSuccessNotification,
 } from '../utils/mantine-notifications';
+import CustomMap from '../components/home/Map';
 
 const HomePage = () => {
   const [allLaundromats, setAllLaundromats] = useState<Laundromat[]>([]);
@@ -91,29 +92,36 @@ const HomePage = () => {
   }, [form.values]);
 
   return (
-    <Stack>
-      <Filter onFilterSelected={onFilterSelected} onFilterReset={getAllLaundromats} />
-      {allLaundromats && (
-        <BaseList
-          items={allLaundromats}
-          IndividualComponent={IndividualLaundromat}
-          onItemClick={(item: Laundromat) => {
-            setChosenLaundromat(item);
-            setIsOpen(true);
-          }}
-        />
-      )}
-      {chosenLaundromat && (
-        <WashingMachinePicker
-          isOpen={isOpen}
-          onClose={() => {
-            setIsOpen(false);
-            setChosenLaundromat(null);
-          }}
-          laundromat={chosenLaundromat}
-        />
-      )}
-    </Stack>
+    <Grid gutter="md">
+      <Grid.Col span={9}>
+        <CustomMap />
+      </Grid.Col>
+      <Grid.Col span={3}>
+        <Stack>
+          <Filter onFilterSelected={onFilterSelected} onFilterReset={getAllLaundromats} />
+          {allLaundromats && (
+            <BaseList
+              items={allLaundromats}
+              IndividualComponent={IndividualLaundromat}
+              onItemClick={(item: Laundromat) => {
+                setChosenLaundromat(item);
+                setIsOpen(true);
+              }}
+            />
+          )}
+          {chosenLaundromat && (
+            <WashingMachinePicker
+              isOpen={isOpen}
+              onClose={() => {
+                setIsOpen(false);
+                setChosenLaundromat(null);
+              }}
+              laundromat={chosenLaundromat}
+            />
+          )}
+        </Stack>
+      </Grid.Col>
+    </Grid>
   );
 };
 
