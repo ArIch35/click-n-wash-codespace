@@ -24,6 +24,7 @@ import {
 } from '../utils/api';
 import { showErrorNotification, showSuccessNotification } from '../utils/mantine-notifications';
 import WashingMachine from '../interfaces/entities/washing-machine';
+import { LaundromatForm } from '../interfaces/forms/LaundromatForm';
 
 const ManageLaundromatsPage = () => {
   const { id } = useParams();
@@ -32,11 +33,12 @@ const ManageLaundromatsPage = () => {
   const [washingMachines, setWashingMachines] = useState<WashingMachine[]>();
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
-  const [visible, { toggle }] = useDisclosure(false);
   const [opened, { open, close }] = useDisclosure(false);
 
   useEffect(() => {
     if (!id) {
+      setError(true);
+      setLoading(false);
       return;
     }
 
@@ -64,15 +66,6 @@ const ManageLaundromatsPage = () => {
       });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [id]);
-
-  interface LaundromatForm {
-    name: string;
-    street: string;
-    postalCode: string;
-    city: string;
-    country: string;
-    price: number;
-  }
 
   const initialLaundromatValues: LaundromatForm = {
     name: '',
@@ -125,7 +118,13 @@ const ManageLaundromatsPage = () => {
           >
             Delete
           </Button>
-          <Button variant="filled" color="yellow">
+          <Button
+            variant="filled"
+            color="yellow"
+            onClick={() => {
+              navigate(`/edit-washingmachine/${element.id}`);
+            }}
+          >
             Edit
           </Button>
         </form>
@@ -141,11 +140,6 @@ const ManageLaundromatsPage = () => {
       return;
     }
 
-    if (!id) {
-      showErrorNotification('Laundromat', 'delete', 'Laundromat not found');
-      return;
-    }
-
     open(); // Open modal
   };
 
@@ -155,7 +149,7 @@ const ManageLaundromatsPage = () => {
     close();
 
     if (!id) {
-      showErrorNotification('Laudromat', 'delete', 'Laundromat not found');
+      showErrorNotification('Laudromat', 'delete', 'Laundromat Id not found');
       return;
     }
 
@@ -177,7 +171,7 @@ const ManageLaundromatsPage = () => {
     event?.preventDefault();
 
     if (!id) {
-      showErrorNotification('Laundromat', 'delete', 'Laundromat not found');
+      showErrorNotification('Laundromat', 'delete', 'Laundromat Id not found');
       return;
     }
 
@@ -192,6 +186,8 @@ const ManageLaundromatsPage = () => {
           country: response.country,
           price: response.price,
         });
+
+        setLaundromat(response);
         showSuccessNotification('Laudromat', 'update');
         setLoading(false);
         setError(false);
@@ -207,7 +203,7 @@ const ManageLaundromatsPage = () => {
     event?.preventDefault();
 
     if (!id || !laundromat) {
-      showErrorNotification('Laundromat', 'delete', 'Laundromat not found');
+      showErrorNotification('Laundromat', 'delete', 'Laundromat Id not found');
       return;
     }
 
@@ -241,7 +237,7 @@ const ManageLaundromatsPage = () => {
     event?.preventDefault();
 
     if (!id) {
-      showErrorNotification('Laundromat', 'delete', 'Laundromat not found');
+      showErrorNotification('Laundromat', 'delete', 'Laundromat Id not found');
       return;
     }
 
@@ -266,11 +262,11 @@ const ManageLaundromatsPage = () => {
   };
 
   const onDeleteModal = (
-    <Modal opened={opened} onClose={close} title="Delete Laundromat">
-      <Text>Are you sure you want to delete this laundromat?</Text>
+    <Modal opened={opened} onClose={close} title={`Delete Laundromat ${laundromat?.name}`}>
+      <Text>Are you sure you want to delete Laundromat {laundromat?.name}?</Text>
       <Flex justify="flex-end" mt="md">
         <form onSubmit={handleDeleteLaundromatModal}>
-          <Button variant="filled" color="red" onClick={toggle} type="submit">
+          <Button variant="filled" color="red" type="submit">
             Delete
           </Button>
           <Button variant="filled" color="yellow" ml="sm" onClick={close}>
@@ -307,12 +303,6 @@ const ManageLaundromatsPage = () => {
             Laundromat {laundromat.name} Details Page
           </Text>
           <Box maw={340} mx="auto">
-            <LoadingOverlay
-              visible={visible}
-              zIndex={1000}
-              overlayProps={{ radius: 'sm', blur: 2 }}
-              loaderProps={{ color: 'blue', type: 'dots', size: 'xl' }}
-            />
             <form onSubmit={handleUpdateLaundromat}>
               {Object.keys(laundromatForm.values).map((key) =>
                 typeof laundromatForm.values[key as keyof LaundromatForm] === 'number' ? (
@@ -376,7 +366,7 @@ const ManageLaundromatsPage = () => {
             <Table>
               <Table.Thead>{ths}</Table.Thead>
               <Table.Tbody>{rows}</Table.Tbody>
-            </Table>{' '}
+            </Table>
           </>
         </>
       )}
