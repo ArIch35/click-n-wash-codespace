@@ -7,6 +7,7 @@ export const users: Record<string, string> = {};
 
 export const routesWithoutAuth: RoutePair[] = [
   { path: '/api/laundromats', method: 'GET' },
+  { path: '/api/laundromats/filter-params', method: 'GET' },
   { path: '/api/generateToken', method: 'GET' },
   // Add more routes that should be accessible without auth here
 ];

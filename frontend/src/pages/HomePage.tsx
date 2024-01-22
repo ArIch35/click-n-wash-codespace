@@ -1,16 +1,27 @@
 import { Stack } from '@mantine/core';
 import { useForm } from '@mantine/form';
 import { useEffect, useState } from 'react';
-import WashingMachinePicker from '../components/booking/WashingMachinePicker';
-import InputSelect from '../components/inputs/InputSelect';
+import WashingMachinePicker from '../components/home/WashingMachinePicker';
 import BaseList from '../components/ui/BaseList.component';
 import IndividualLaundromat from '../components/ui/IndividualLaundromat.component';
 import Laundromat from '../interfaces/entities/laundromat';
-import { getLaundromats } from '../utils/api';
+import { getFilteredLaundromats, getLaundromats } from '../utils/api';
+import Filter, { SearchFilter } from '../components/home/Filter';
+import {
+  showCustomNotification,
+  showErrorNotification,
+  showSuccessNotification,
+} from '../utils/mantine-notifications';
 
 const HomePage = () => {
   const [allLaundromats, setAllLaundromats] = useState<Laundromat[]>([]);
   const [chosenLaundromat, setChosenLaundromat] = useState<Laundromat | null>(null);
+  const [searchFilter, setSearchFilter] = useState<SearchFilter>({
+    name: '',
+    city: '',
+    priceFrom: -1,
+    priceTo: -1,
+  });
   const [isOpen, setIsOpen] = useState<boolean>(false);
   const form = useForm({
     initialValues: {
@@ -18,7 +29,36 @@ const HomePage = () => {
     },
   });
 
-  useEffect(() => {
+  const onFilterSelected = (filter: SearchFilter) => {
+    if (
+      JSON.stringify(filter) === JSON.stringify(searchFilter) ||
+      Object.values(filter).every((value) => value === undefined || value === -1)
+    ) {
+      return;
+    }
+
+    getFilteredLaundromats(filter)
+      .then((laundromats) => {
+        if (laundromats.length === 0) {
+          showCustomNotification({
+            title: 'No Result',
+            message: 'There is no laundromat that matches your search criteria',
+            color: 'yellow',
+            autoClose: true,
+          });
+          return;
+        }
+        showSuccessNotification('Laundromat', `searced with ${laundromats.length} results`);
+        setAllLaundromats(laundromats);
+      })
+      .catch((error) => {
+        console.error(error);
+        showErrorNotification('Laundromat', 'Search', 'search failed');
+      });
+    setSearchFilter(filter);
+  };
+
+  const getAllLaundromats = () => {
     getLaundromats()
       .then((laundromats) => {
         setAllLaundromats(laundromats);
@@ -26,6 +66,10 @@ const HomePage = () => {
       .catch((error) => {
         console.error(error);
       });
+  };
+
+  useEffect(() => {
+    getAllLaundromats();
   }, []);
 
   useEffect(() => {
@@ -48,14 +92,7 @@ const HomePage = () => {
 
   return (
     <Stack>
-      <InputSelect
-        name="test"
-        options={[
-          { value: 'test', label: 'test' },
-          { value: 'test2', label: 'test2' },
-        ]}
-        {...form.getInputProps('location')}
-      />
+      <Filter onFilterSelected={onFilterSelected} onFilterReset={getAllLaundromats} />
       {allLaundromats && (
         <BaseList
           items={allLaundromats}
