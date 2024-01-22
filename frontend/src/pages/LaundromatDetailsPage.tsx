@@ -12,7 +12,7 @@ import {
 } from '@mantine/core';
 import { hasLength, isInRange, useForm } from '@mantine/form';
 import { useDisclosure } from '@mantine/hooks';
-import { useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import Laundromat from '../interfaces/entities/laundromat';
 import {
@@ -23,24 +23,49 @@ import {
   updateLaundromat,
 } from '../utils/api';
 import { showErrorNotification, showSuccessNotification } from '../utils/mantine-notifications';
+import WashingMachine from '../interfaces/entities/washing-machine';
+import { LaundromatForm } from '../interfaces/forms/LaundromatForm';
 
 const ManageLaundromatsPage = () => {
   const { id } = useParams();
   const navigate = useNavigate();
   const [laundromat, setLaundromat] = useState<Laundromat>();
+  const [washingMachines, setWashingMachines] = useState<WashingMachine[]>();
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
-  const [visible, { toggle }] = useDisclosure(false);
   const [opened, { open, close }] = useDisclosure(false);
 
-  interface LaundromatForm {
-    name: string;
-    street: string;
-    postalCode: string;
-    city: string;
-    price: number;
-    country: string;
-  }
+  useEffect(() => {
+    if (!id) {
+      setError(true);
+      setLoading(false);
+      return;
+    }
+
+    getLaundromatById(id)
+      .then((response) => {
+        setLaundromat(response);
+        setWashingMachines(response.washingMachines);
+
+        // Set form default values
+        laundromatForm.setInitialValues({
+          name: response.name,
+          street: response.street,
+          city: response.city,
+          postalCode: response.postalCode,
+          country: response.country,
+          price: response.price,
+        });
+
+        laundromatForm.reset();
+        setLoading(false);
+      })
+      .catch((error) => {
+        console.error(error);
+        showErrorNotification('Laundromat', 'get', String(error));
+      });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [id]);
 
   const initialLaundromatValues: LaundromatForm = {
     name: '',
@@ -57,47 +82,26 @@ const ManageLaundromatsPage = () => {
     validate: {
       name: hasLength({ min: 3 }, 'Name must be at least 3 characters long'),
       street: hasLength({ min: 3 }, 'Street name must be at least 3 characters long'),
-      postalCode: hasLength({ min: 5, max: 5 }, 'Postal code must be 5 characters long'),
+      postalCode: (value) =>
+        /^(?!01000|99999)(0[1-9]\d{3}|[1-9]\d{4})$/.test(value)
+          ? null
+          : 'Postal Code must be a valid German postal code',
       city: hasLength({ min: 3 }, 'City Name must be at least 3 characters long'),
       price: isInRange({ min: 1 }, 'Price per Machine must be 1 € or more'),
       country: hasLength({ min: 3 }, 'Country name must be at least 3 characters long'),
     },
   });
 
-  useEffect(() => {
-    if (!id) {
-      return;
-    }
+  const ths = (
+    <Table.Tr>
+      <Table.Th>Name</Table.Th>
+      <Table.Th>Description</Table.Th>
+      <Table.Th>Number of Active Contracts</Table.Th>
+      <Table.Th>Actions</Table.Th>
+    </Table.Tr>
+  );
 
-    getLaundromatById(id)
-      .then((response) => {
-        setLaundromat(response);
-
-        // Set form default values
-        laundromatForm.setInitialValues({
-          name: response.name,
-          street: response.street,
-          city: response.city,
-          postalCode: response.postalCode,
-          country: response.country,
-          price: response.price,
-        });
-
-        laundromatForm.reset();
-
-        setLoading(false);
-        setError(false);
-      })
-      .catch((error) => {
-        console.error(error);
-        setError(true);
-        setLoading(false);
-        setLaundromat(undefined);
-      });
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [id]);
-
-  const rows = laundromat?.washingMachines?.map((element) => (
+  const rows = washingMachines?.map((element) => (
     <Table.Tr key={element.name}>
       <Table.Td>{element.name}</Table.Td>
       <Table.Td>{element.description}</Table.Td>
@@ -108,11 +112,19 @@ const ManageLaundromatsPage = () => {
             variant="filled"
             color="red"
             type="submit"
-            onClick={() => handleDeleteWashingMachine(element.id)}
+            onClick={(event) => {
+              handleDeleteWashingMachine(event, element.id);
+            }}
           >
             Delete
           </Button>
-          <Button variant="filled" color="yellow" type="submit">
+          <Button
+            variant="filled"
+            color="yellow"
+            onClick={() => {
+              navigate(`/edit-washingmachine/${element.id}`);
+            }}
+          >
             Edit
           </Button>
         </form>
@@ -120,81 +132,78 @@ const ManageLaundromatsPage = () => {
     </Table.Tr>
   ));
 
-  const ths = (
-    <Table.Tr>
-      <Table.Th>Name</Table.Th>
-      <Table.Th>Description</Table.Th>
-      <Table.Th>Number of Contracts</Table.Th>
-      <Table.Th>Actions</Table.Th>
-    </Table.Tr>
-  );
+  const handleDeleteLaundromat = (event: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
+    event?.preventDefault();
 
-  const handleDeleteLaundromat = () => {
-    if (laundromat?.washingMachines?.length !== 0) {
+    if (washingMachines?.length !== 0) {
       showErrorNotification('Laundromat', 'delete', 'Laundromat has washing machines');
       return;
     }
 
-    if (!id) {
-      showErrorNotification('Laundromat', 'delete', 'Laundromat not found');
-      return;
-    }
-
-    open();
+    open(); // Open modal
   };
 
-  const handleUpdateLaundromat = () => {
+  const handleDeleteLaundromatModal = (event: React.FormEvent<HTMLFormElement>) => {
+    event?.preventDefault();
+
+    close();
+
     if (!id) {
-      showErrorNotification('Laundromat', 'delete', 'Laundromat not found');
+      showErrorNotification('Laudromat', 'delete', 'Laundromat Id not found');
       return;
     }
 
-    updateLaundromat(id, laundromatForm.values)
-      .then((response) => {
-        console.log(response);
-        setTimeout(() => {
-          toggle();
-        }, 1000);
-
-        showSuccessNotification('Laudromat', 'update');
-      })
-      .catch((error) => {
-        showErrorNotification('Laudromat', 'update', String(error));
-        setTimeout(() => {
-          toggle();
-        }, 1000);
-      });
-  };
-
-  const handleDeleteWashingMachine = (id: string) => {
-    if (!id) {
-      showErrorNotification('Laundromat', 'delete', 'Laundromat not found');
-      return;
-    }
-
-    deleteWashingMachine(id)
-      .then((response) => {
-        console.log(response);
-        setTimeout(() => {
-          toggle();
-        }, 1000);
-
-        if (!laundromat) {
-          return;
-        }
-
-        laundromat.washingMachines?.filter((element) => element.id !== id);
-        showSuccessNotification('Washing Machine', 'delete');
+    deleteLaundromat(id)
+      .then(() => {
+        showSuccessNotification('Laudromat', 'delete');
+        setError(false);
+        setLoading(false);
+        navigate('/manage-laundromats');
       })
       .catch((error) => {
         console.error(error);
-        showErrorNotification('Washing Machine', 'delete', String(error));
+        showErrorNotification('Laudromat', 'delete', String(error));
+        setError(true);
       });
   };
 
-  const handleCreateRandomWashingMachine = () => {
+  const handleUpdateLaundromat = (event: React.FormEvent<HTMLFormElement>) => {
+    event?.preventDefault();
+
+    if (!id) {
+      showErrorNotification('Laundromat', 'delete', 'Laundromat Id not found');
+      return;
+    }
+
+    setLoading(true);
+    updateLaundromat(id, laundromatForm.values)
+      .then((response) => {
+        laundromatForm.setInitialValues({
+          name: response.name,
+          street: response.street,
+          city: response.city,
+          postalCode: response.postalCode,
+          country: response.country,
+          price: response.price,
+        });
+
+        setLaundromat(response);
+        showSuccessNotification('Laudromat', 'update');
+        setLoading(false);
+        setError(false);
+      })
+      .catch((error) => {
+        showErrorNotification('Laudromat', 'update', String(error));
+        setLoading(false);
+        setError(true);
+      });
+  };
+
+  const handleCreateRandomWashingMachine = (event: React.FormEvent<HTMLFormElement>) => {
+    event?.preventDefault();
+
     if (!id || !laundromat) {
-      showErrorNotification('Laundromat', 'delete', 'Laundromat not found');
+      showErrorNotification('Laundromat', 'delete', 'Laundromat Id not found');
       return;
     }
 
@@ -209,11 +218,10 @@ const ManageLaundromatsPage = () => {
       .then((response) => {
         console.log(response);
 
-        // Append to the laundromat state
-        const newLaundromat = { ...laundromat };
-        newLaundromat.washingMachines?.push(response);
-        setLaundromat(newLaundromat);
-        showSuccessNotification('Washing Machine', 'create');
+        // Append to the washing machines state
+        const newWashingMachines = [...(washingMachines ?? []), response];
+        setWashingMachines(newWashingMachines);
+        showSuccessNotification('Random Washing Machine', 'create');
       })
       .catch((error) => {
         console.error(error);
@@ -222,36 +230,43 @@ const ManageLaundromatsPage = () => {
       });
   };
 
+  const handleDeleteWashingMachine = (
+    event: React.MouseEvent<HTMLButtonElement, MouseEvent>,
+    id: string,
+  ) => {
+    event?.preventDefault();
+
+    if (!id) {
+      showErrorNotification('Laundromat', 'delete', 'Laundromat Id not found');
+      return;
+    }
+
+    // Check if washing machine has contracts
+    const toBeDeletedWashingMachine = washingMachines?.find((element) => element.id === id);
+    if (toBeDeletedWashingMachine?.contracts && toBeDeletedWashingMachine.contracts.length > 0) {
+      showErrorNotification('Washing Machine', 'delete', 'Washing Machine has contracts');
+      return;
+    }
+
+    deleteWashingMachine(id)
+      .then(() => {
+        // Update washing machines state
+        const newWashingMachines = washingMachines?.filter((element) => element.id !== id);
+        setWashingMachines(newWashingMachines);
+        showSuccessNotification('Washing Machine', 'delete');
+      })
+      .catch((error) => {
+        console.error(error);
+        showErrorNotification('Washing Machine', 'delete', String(error));
+      });
+  };
+
   const onDeleteModal = (
-    <Modal opened={opened} onClose={close} title="On Delete">
-      <Text>Are you sure you want to delete this laundromat?</Text>
+    <Modal opened={opened} onClose={close} title={`Delete Laundromat ${laundromat?.name}`}>
+      <Text>Are you sure you want to delete Laundromat {laundromat?.name}?</Text>
       <Flex justify="flex-end" mt="md">
-        <form
-          onSubmit={laundromatForm.onSubmit((values) => {
-            close();
-
-            if (!id) {
-              return;
-            }
-            console.log(values);
-
-            deleteLaundromat(id)
-              .then((response) => {
-                console.log(response);
-                setTimeout(() => {
-                  toggle();
-                }, 1000);
-                showSuccessNotification('Laudromat', 'delete');
-                navigate('/manage-laundromats');
-              })
-              .catch((error) => {
-                console.error(error);
-                showErrorNotification('Laudromat', 'delete', String(error));
-                setError(true);
-              });
-          })}
-        >
-          <Button variant="filled" color="red" onClick={toggle} type="submit">
+        <form onSubmit={handleDeleteLaundromatModal}>
+          <Button variant="filled" color="red" type="submit">
             Delete
           </Button>
           <Button variant="filled" color="yellow" ml="sm" onClick={close}>
@@ -288,22 +303,14 @@ const ManageLaundromatsPage = () => {
             Laundromat {laundromat.name} Details Page
           </Text>
           <Box maw={340} mx="auto">
-            <LoadingOverlay
-              visible={visible}
-              zIndex={1000}
-              overlayProps={{ radius: 'sm', blur: 2 }}
-              loaderProps={{ color: 'blue', type: 'dots', size: 'xl' }}
-            />
             <form onSubmit={handleUpdateLaundromat}>
-              {Object.keys(laundromatForm.values).map((key, index) =>
-                index ===
-                Object.keys(laundromatForm.values).length - 1 ? null : typeof laundromatForm.values[
-                    key as keyof LaundromatForm
-                  ] === 'number' ? (
+              {Object.keys(laundromatForm.values).map((key) =>
+                typeof laundromatForm.values[key as keyof LaundromatForm] === 'number' ? (
                   <NumberInput
                     key={key}
                     name={key}
                     label={key}
+                    mih={1}
                     {...laundromatForm.getInputProps(key)}
                   />
                 ) : (
@@ -316,7 +323,12 @@ const ManageLaundromatsPage = () => {
                 ),
               )}
               <Flex justify="flex-end" mt="md">
-                <Button variant="filled" color="red" onClick={handleDeleteLaundromat}>
+                <Button
+                  variant="filled"
+                  color="red"
+                  onClick={handleDeleteLaundromat}
+                  disabled={laundromatForm.isDirty()}
+                >
                   Delete
                 </Button>
                 <Button
@@ -346,7 +358,7 @@ const ManageLaundromatsPage = () => {
             <Flex justify={'space-between'} py={30}>
               <Text size="xl">My Washing Machines</Text>
               <form onSubmit={handleCreateRandomWashingMachine}>
-                <Button radius={'100'} onClick={toggle} type="submit">
+                <Button radius={'100'} type="submit">
                   + Add Random Washing Machine
                 </Button>
               </form>
@@ -354,7 +366,7 @@ const ManageLaundromatsPage = () => {
             <Table>
               <Table.Thead>{ths}</Table.Thead>
               <Table.Tbody>{rows}</Table.Tbody>
-            </Table>{' '}
+            </Table>
           </>
         </>
       )}

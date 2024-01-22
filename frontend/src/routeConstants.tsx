@@ -19,6 +19,7 @@ import LaundromatsManagePage from './pages/LaundromatsManagePage.tsx';
 import MissingPage from './pages/MissingPage';
 import SettingsPage from './pages/SettingsPage';
 import LaundromatSimulationPage from './pages/LaundromatSimulationPage.tsx';
+import WashingMachineDetailsPage from './pages/WashingMachineDetailsPage.tsx';
 
 type Route = RouteProps & {
   label: string;
@@ -102,6 +103,14 @@ export const routes: Route[] = [
     path: '/edit-laundromat/:id',
     element: <LaundromatDetailsPage />,
     label: 'Laundromat Details',
+    icon: IconBuildingStore,
+    requireAuth: true,
+    requireVendor: true,
+  },
+  {
+    path: '/edit-washingmachine/:id',
+    element: <WashingMachineDetailsPage />,
+    label: 'Washing Machine Details',
     icon: IconBuildingStore,
     requireAuth: true,
     requireVendor: true,

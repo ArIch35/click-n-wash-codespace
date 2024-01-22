@@ -1,5 +1,8 @@
 import { headers, Message } from '.';
-import WashingMachine, { CreateWashingMachine } from '../../interfaces/entities/washing-machine';
+import WashingMachine, {
+  CreateWashingMachine,
+  UpdateWashingMachine,
+} from '../../interfaces/entities/washing-machine';
 import entityParser from '../entity-parser';
 import loadEnv from '../load-env';
 
@@ -14,6 +17,41 @@ const route = `${loadEnv().VITE_SERVER_ADDRESS}/washingmachines`;
 export const createWashingMachine = async (body: CreateWashingMachine) => {
   const response = await fetch(`${route}`, {
     method: 'POST',
+    headers: { ...(await headers()) },
+    body: JSON.stringify(body),
+  });
+
+  const data = (await response.json()) as unknown;
+  if (!response.ok) {
+    throw new Error((data as Message).message);
+  }
+
+  return entityParser<WashingMachine>(data as WashingMachine);
+};
+
+/**
+ * Retrieves a washing machine by its ID.
+ * @param id - The ID of the washing machine.
+ * @returns A promise that resolves to the retrieved washing machine.
+ * @throws An error if the request fails or the response is not successful.
+ */
+export const getWashingMachineById = async (id: string) => {
+  const response = await fetch(`${route}/${id}`, {
+    method: 'GET',
+    headers: { ...(await headers()) },
+  });
+
+  const data = (await response.json()) as unknown;
+  if (!response.ok) {
+    throw new Error((data as Message).message);
+  }
+
+  return entityParser<WashingMachine>(data as WashingMachine);
+};
+
+export const updateWashingMachine = async (id: string, body: UpdateWashingMachine) => {
+  const response = await fetch(`${route}/${id}`, {
+    method: 'PUT',
     headers: { ...(await headers()) },
     body: JSON.stringify(body),
   });
