@@ -37,6 +37,7 @@ router.get('/:id', (async (req, res) => {
   try {
     const washingMachine = await getDb().washingMachineRepository.findOne({
       where: { id: req.params.id },
+      relations: { contracts: true },
     });
     if (!washingMachine) {
       return res.status(STATUS_NOT_FOUND).json(MESSAGE_NOT_FOUND);
