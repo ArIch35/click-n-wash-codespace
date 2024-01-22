@@ -1,3 +1,4 @@
+import { LatLngExpression } from 'leaflet';
 import BaseEntity from './base-entity';
 import User from './user';
 import WashingMachine from './washing-machine';
@@ -10,6 +11,7 @@ interface Laundromat extends BaseEntity {
   price: number;
   owner: User;
   washingMachines?: WashingMachine[];
+  position?: LatLngExpression;
 }
 
 export type CreateLaundromat = Pick<
