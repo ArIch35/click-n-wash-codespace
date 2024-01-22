@@ -6,6 +6,7 @@
 - [Features](#features)
 - [Tech Stakes](tech-stakes)
 - [Database Structures](database-structure)
+- [API Functions](api-functions)
 - [Authors](#authors)
 
 ## About Click n' Wash <a name="about"></a>
@@ -21,9 +22,9 @@ Click n' Wash is a student-led initiative aimed at simplifying the laundry exper
 - **Manage a Laundromat**: a vendor can manage their own laundromat.
 - **Manage a Booking**: a user can manage or cancel their own booking.
 - **Top up balance**: a user can top up their own balance for the payment method for the washing machine.
-- **Balance History**: user can see their own balance history.
+- **Transaction History**: user can see their own transaction history.
 - **Become a Vendor**: user can become a vendor to open their own laundromat.
--
+- **Refund System** : a vendor can refunds the transaction to the user, when there is an error with the machine.
 
 ## Database Structures <a name="database-structures"></a>
 
@@ -97,6 +98,8 @@ The `baseEntity` table stores a base entity. Each baseEntity has the following f
 - `updatedAt`: a column to stores when the baseEntity is updated.
 - `deletedAt`: a column to stores when the baseEntity is deleted.
 - `name`: a column to stores the name of the baseEntity.
+
+## API Functions <a name="api-functions"></a>
 
 ## Tech Stakes <a name="tech-stakes"></a>
 
