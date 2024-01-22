@@ -37,9 +37,8 @@ const LaundromatAddPage = () => {
   const navigate = useNavigate();
 
   const form = useForm<FormValues>({
+    validateInputOnChange: true,
     initialValues,
-    validateInputOnBlur: true,
-
     validate: {
       laundromat: {
         name: hasLength({ min: 3 }, 'Name must be at least 3 characters long'),
