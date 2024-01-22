@@ -76,7 +76,7 @@ export const finalizeBalanceTransaction = async (
   const func = async (transactionalEntityManager: EntityManager) => {
     if (balanceTransaction.type === 'topup') {
       balanceTransaction.to.balance += balanceTransaction.amount;
-    } else {
+    } else if (balanceTransaction.from!.id !== balanceTransaction.to.id) {
       balanceTransaction.from!.balance -= balanceTransaction.amount;
       balanceTransaction.to.balance += balanceTransaction.amount;
     }
