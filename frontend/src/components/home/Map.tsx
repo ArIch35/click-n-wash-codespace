@@ -1,4 +1,4 @@
-import { MapContainer, Marker, TileLayer, useMap } from 'react-leaflet';
+import { MapContainer, Marker, TileLayer, Tooltip, useMap } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
 import Laundromat from '../../interfaces/entities/laundromat';
 import { useMemo } from 'react';
@@ -64,7 +64,9 @@ const CustomMap: React.FC<CustomMapProps> = ({
               handleItemClick(item);
             },
           }}
-        />
+        >
+          <Tooltip>{`${item.name}${!loggedIn ? ' (Login needed before booking)' : ''}`}</Tooltip>
+        </Marker>
       ))}
       {!loggedIn && <AuthenticationForm opened={modalOpened} onClose={modalHandlers.close} />}
     </MapContainer>
