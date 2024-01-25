@@ -21,6 +21,7 @@ const Header = ({ toggle, setVisible }: NavbarControllerProps) => {
       {!loggedIn && <AuthenticationForm opened={modalOpened} onClose={modalHandlers.close} />}
       <Group>
         <Burger
+          size={'sm'}
           onClick={() => {
             if (!loggedIn) {
               modalHandlers.open();
@@ -36,7 +37,7 @@ const Header = ({ toggle, setVisible }: NavbarControllerProps) => {
       </Group>
       <Group>
         <Group ml={50} gap={5} className={classes.links} visibleFrom="sm">
-          <UserMenu open={modalHandlers.open} />
+          {/* <UserMenu open={modalHandlers.open} /> */}
           <DarkModeToggle />
         </Group>
       </Group>
