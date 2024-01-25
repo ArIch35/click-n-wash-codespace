@@ -111,7 +111,7 @@ const Navbar = ({ toggle, setVisible }: NavbarControllerProps) => {
     <nav className={classes.navbar}>
       <div className={classes.navbarMain}>
         <Group className={classes.title} justify="space-between">
-          <Text fw={700} style={{ fontSize: 28 }}>
+          <Text fw={700} style={{ fontSize: 24 }}>
             Click n&apos; Wash
           </Text>
         </Group>
