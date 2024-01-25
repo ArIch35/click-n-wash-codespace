@@ -113,7 +113,7 @@ const WashingMachineDetailsPage = () => {
         <Button
           variant="filled"
           color="red"
-          disabled={contract.status === 'cancelled'}
+          disabled={contract.status === 'cancelled' || contract.status === 'finished'}
           onClick={(event) => {
             handleCancelContract(event, contract.id);
           }}
