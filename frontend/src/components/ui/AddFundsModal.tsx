@@ -46,10 +46,10 @@ function AddFundsModal() {
                 onClick={() => setAmount(value)}
               >
                 {NumberFormatter({
-                  value: value,
+                  value,
                   decimalSeparator: '.',
                   thousandSeparator: ',',
-                  prefix: '€',
+                  prefix: '€ ',
                 })}
               </Button>
             ))}
