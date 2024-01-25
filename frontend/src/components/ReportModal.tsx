@@ -58,7 +58,7 @@ const ReportModal = ({ contractId }: ReportModalProps) => {
         centered
       >
         <Stack gap="xl">
-          <FormInputFields form={form} object={form.values} />
+          <FormInputFields form={form} object={form.values} textAreaKeys={['description']} />
           <Button radius="md" size="md" color="red" onClick={onSubmit}>
             Submit report
           </Button>
