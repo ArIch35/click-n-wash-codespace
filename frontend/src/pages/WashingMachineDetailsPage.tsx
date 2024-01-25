@@ -170,7 +170,7 @@ const WashingMachineDetailsPage = () => {
         {
           /* FIXME: return to laundromat page */
         }
-        navigate('/manage-laundromats'); // TODO: Navigate to laundromat page
+        navigate(-1); // TODO: Navigate to laundromat page
       })
       .catch((error) => {
         console.error(error);
