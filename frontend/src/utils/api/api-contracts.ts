@@ -1,5 +1,5 @@
 import { headers, Message } from '.';
-import Contract, { BulkCancelContracts } from '../../interfaces/entities/contract';
+import Contract, { BulkCancelContracts, ReportContract } from '../../interfaces/entities/contract';
 import entityParser from '../entity-parser';
 import loadEnv from '../load-env';
 
@@ -77,6 +77,25 @@ export const bulkCancelContracts = async (bulkCancelContracts: BulkCancelContrac
     method: 'POST',
     headers: { ...(await headers()) },
     body: JSON.stringify(bulkCancelContracts),
+  });
+
+  const data = (await response.json()) as unknown;
+  if (!response.ok) {
+    throw new Error((data as Message).message);
+  }
+};
+
+/**
+ * Sends a report for a contract with the specified ID.
+ * @param id - The ID of the contract.
+ * @param body - The report contract data.
+ * @throws Error if the request fails.
+ */
+export const reportContract = async (id: string, body: ReportContract) => {
+  const response = await fetch(`${route}/${id}/report`, {
+    method: 'POST',
+    headers: { ...(await headers()) },
+    body: JSON.stringify(body),
   });
 
   const data = (await response.json()) as unknown;

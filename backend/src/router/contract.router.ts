@@ -6,6 +6,7 @@ import Contract, {
   bulkCancelContractSchema,
   createContractSchema,
   finalizeContract,
+  reportContractSchema,
   updateContractSchema,
 } from '../entities/contract';
 import Notification from '../interfaces/notification';
@@ -199,6 +200,57 @@ router.post('/bulkcancel', (async (req, res) => {
     return res
       .status(STATUS_OK)
       .json(customMessage(true, `${contracts.length} contracts cancelled`));
+  } catch (error: unknown) {
+    if (error instanceof ValidationError) {
+      return res.status(STATUS_BAD_REQUEST).json(customMessage(false, error.errors.join(', ')));
+    } else if (error instanceof StatusError) {
+      return res.status(error.status).json(customMessage(false, error.message));
+    }
+    return res.status(STATUS_SERVER_ERROR).json(MESSAGE_SERVER_ERROR);
+  }
+}) as RequestHandler);
+
+router.post('/:id/report', (async (req, res) => {
+  try {
+    const validated = await reportContractSchema.validate(req.body, { abortEarly: false });
+    const uid = res.locals.uid as string;
+
+    // Check whether contract exists
+    const contract = await getDb().contractRepository.findOne({
+      where: { id: req.params.id },
+      relations: { user: true, washingMachine: { laundromat: { owner: true } } },
+    });
+    if (!contract) {
+      return res.status(STATUS_NOT_FOUND).json(MESSAGE_NOT_FOUND);
+    }
+
+    // Check whether the user in contract is the same as the user
+    if (uid !== contract.user.id) {
+      return res.status(STATUS_FORBIDDEN).json(MESSAGE_FORBIDDEN_NOT_OWNER);
+    }
+    const title = `Someone has reported a problem! #${contract.id}`;
+    const message = `A problem has been reported for washing machine ${
+      contract.washingMachine.name
+    } in laundromat ${
+      contract.washingMachine.laundromat.name
+    } from ${contract.startDate.toLocaleString()} to ${contract.endDate.toLocaleString()}`;
+    const notification: Notification = {
+      title,
+      message,
+      color: 'red',
+      autoClose: false,
+    };
+    sendNotification(contract.washingMachine.laundromat.owner.id, notification);
+    const newMessage = getDb().messageRepository.create({
+      name: title,
+      content: `${message}\n\nReason: ${validated.reason}\n\nDescription: ${validated.description}`,
+      to: contract.washingMachine.laundromat.owner,
+      forVendor: true,
+    });
+    await getDb().messageRepository.save(newMessage);
+    return res
+      .status(STATUS_OK)
+      .json(customMessage(true, `Report for contract #${contract.id} sent`));
   } catch (error: unknown) {
     if (error instanceof ValidationError) {
       return res.status(STATUS_BAD_REQUEST).json(customMessage(false, error.errors.join(', ')));

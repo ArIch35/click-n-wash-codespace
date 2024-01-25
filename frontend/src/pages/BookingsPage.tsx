@@ -1,6 +1,17 @@
-import { Badge, Box, Button, Card, Center, Group, Stack, Text, Title } from '@mantine/core';
+import {
+  Badge,
+  Button,
+  Card,
+  Center,
+  Group,
+  NumberFormatter,
+  Stack,
+  Text,
+  Title,
+} from '@mantine/core';
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
+import ReportModal from '../components/ReportModal';
 import Contract from '../interfaces/entities/contract';
 import { cancelContract, getContracts } from '../utils/api';
 import formatDate from '../utils/format-date';
@@ -65,21 +76,30 @@ const BookingsPage = () => {
   const ContractCard = (contract: Contract) => {
     return (
       <Card shadow="sm" padding="lg" radius="md" withBorder>
-        <Badge bg={getColor(contract.status)} radius="sm">
-          {contract.status}
-        </Badge>
+        <Group justify="space-between">
+          <Badge bg={getColor(contract.status)} radius="sm">
+            {contract.status}
+          </Badge>
+          <ReportModal contractId={contract.id} />
+        </Group>
 
-        <Group justify="space-between" mt="md" mb="xs">
-          <Box>
-            <Title order={4}>{contract.washingMachine.laundromat.name}</Title>
-            <Title order={5}>{contract.washingMachine.name}</Title>
-          </Box>
-          <Box style={{ textAlign: 'end' }}>
-            <Text size="sm">Price: {contract.price}€</Text>
+        <Stack mt="md" mb="xs">
+          <Stack>
+            <Group justify="space-between">
+              <Title order={4}>Laundromat</Title>
+              <Title order={4}>{contract.washingMachine.laundromat.name}</Title>
+            </Group>
+            <Group justify="space-between">
+              <Title order={4}>Washing Machine</Title>
+              <Title order={4}>{contract.washingMachine.name}</Title>
+            </Group>
+          </Stack>
+          <Stack>
+            <Text size="sm">Price: {NumberFormatter({ value: contract.price, suffix: '€' })}</Text>
             <Text size="sm">From: {formatDate(contract.startDate)}</Text>
             <Text size="sm">To: {formatDate(contract.endDate)}</Text>
-          </Box>
-        </Group>
+          </Stack>
+        </Stack>
 
         <Button
           color="red"

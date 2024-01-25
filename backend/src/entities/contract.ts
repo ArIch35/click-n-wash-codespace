@@ -159,3 +159,8 @@ export const bulkCancelContractSchema = object({
   .test('is-in-future', 'Start date must be in the future', (value) => {
     return value.startDate > new Date();
   });
+
+export const reportContractSchema = object({
+  reason: string().required(),
+  description: string().required(),
+});
