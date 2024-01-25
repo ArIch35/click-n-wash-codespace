@@ -20,6 +20,7 @@ const BalancePage = () => {
   const ths = (
     <Table.Tr>
       <Table.Th fz="lg">Transaction Date</Table.Th>
+      <Table.Th fz="lg">Contract Id</Table.Th>
       <Table.Th fz="lg">Transaction Status</Table.Th>
       <Table.Th fz="lg">Transaction Amount</Table.Th>
     </Table.Tr>
@@ -48,6 +49,7 @@ const BalancePage = () => {
               .map((transaction) => (
                 <Table.Tr key={transaction.id}>
                   <Table.Td>{formatDate(transaction.createdAt)}</Table.Td>
+                  <Table.Td>{transaction.id}</Table.Td>
                   <Table.Td>
                     {transaction.type.charAt(0).toUpperCase() + transaction.type.slice(1)}
                   </Table.Td>
