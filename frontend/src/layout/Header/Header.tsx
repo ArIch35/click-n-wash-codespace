@@ -37,7 +37,7 @@ const Header = ({ toggle, setVisible }: NavbarControllerProps) => {
       </Group>
       <Group>
         <Group ml={50} gap={5} className={classes.links} visibleFrom="sm">
-          {/* <UserMenu open={modalHandlers.open} /> */}
+          <UserMenu open={modalHandlers.open} />
           <DarkModeToggle />
         </Group>
       </Group>

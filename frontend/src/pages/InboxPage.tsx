@@ -68,14 +68,12 @@ const InboxPage = () => {
 
   return (
     <Container p="2rem">
-       {user.isAlsoVendor && (
-          <Tabs defaultValue="user">
-            <Tabs.List>
-              <Tabs.Tab value="user">User Inbox</Tabs.Tab>
-              <Tabs.Tab value="vendor">
-                Vendor Inbox
-              </Tabs.Tab>
-            </Tabs.List>
+      {user.isAlsoVendor && (
+        <Tabs defaultValue="user">
+          <Tabs.List>
+            <Tabs.Tab value="user">User Inbox</Tabs.Tab>
+            <Tabs.Tab value="vendor">Vendor Inbox</Tabs.Tab>
+          </Tabs.List>
 
           <Tabs.Panel value="user" pt="xs">
             <Table>
