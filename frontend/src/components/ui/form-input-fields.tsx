@@ -117,6 +117,19 @@ const renderInputs = <T extends object>(props: FormInputFieldsProps<T>) => {
             label={upperFirst(key)}
             min={0}
             {...form.getInputProps(parentKey)}
+            onChange={(value) => {
+              if (value === '') {
+                form.setFieldValue(
+                  parentKey,
+                  0 as string extends keyof T ? T[keyof T & string] : unknown,
+                );
+                return;
+              }
+              form.setFieldValue(
+                parentKey,
+                value as string extends keyof T ? T[keyof T & string] : unknown,
+              );
+            }}
           />
         );
       }
