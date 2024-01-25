@@ -26,7 +26,7 @@ import {
 } from '../utils/api';
 import { showErrorNotification, showSuccessNotification } from '../utils/mantine-notifications';
 
-const ManageLaundromatsPage = () => {
+const LaundromatDetailPage = () => {
   const { id } = useParams();
   const navigate = useNavigate();
   const [laundromat, setLaundromat] = useState<Laundromat>();
@@ -374,4 +374,4 @@ const ManageLaundromatsPage = () => {
   );
 };
 
-export default ManageLaundromatsPage;
+export default LaundromatDetailPage;
