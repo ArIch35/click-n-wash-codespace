@@ -1,12 +1,15 @@
-import { Button, Flex, Modal } from '@mantine/core';
+import { Button, Group, Modal, NumberFormatter, Stack, useMantineTheme } from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
 import React from 'react';
 import { topupBalance } from '../../utils/api';
 
 function AddFundsModal() {
   const [opened, { open, close }] = useDisclosure(false);
+  const theme = useMantineTheme();
   // Topup functions
   const [amount, setAmount] = React.useState(0);
+
+  const values = [10, 20, 50];
 
   function onSubmit() {
     // Use topup function here
@@ -27,65 +30,37 @@ function AddFundsModal() {
         opened={opened}
         onClose={close}
         title="Add Funds"
-        overlayProps={{
-          backgroundOpacity: 0.55,
-          blur: 3,
-        }}
+        overlayProps={{ backgroundOpacity: 0.55, blur: 3 }}
+        radius="md"
         size="lg"
         centered
       >
-        <Flex direction="column" gap="xl">
-          <Flex justify="center" direction="row" gap="xl">
-            <Button
-              radius={100}
-              onClick={() => setAmount(10)}
-              size="md"
-              style={() => {
-                if (amount != 10) {
-                  return {
-                    backgroundColor: 'transparent',
-                  };
-                }
-              }}
-            >
-              $10
-            </Button>
-            <Button
-              radius={100}
-              onClick={() => setAmount(20)}
-              size="md"
-              style={() => {
-                if (amount != 20) {
-                  return {
-                    backgroundColor: 'transparent',
-                  };
-                }
-              }}
-            >
-              $20
-            </Button>
-            <Button
-              radius={100}
-              onClick={() => setAmount(50)}
-              size="md"
-              style={() => {
-                if (amount != 50) {
-                  return {
-                    backgroundColor: 'transparent',
-                  };
-                }
-              }}
-            >
-              $50
-            </Button>
-          </Flex>
-          <Button radius={100} color="green" onClick={() => onSubmit()}>
-            Okay
+        <Stack gap="xl">
+          <Group justify="center" gap="xl">
+            {values.map((value) => (
+              <Button
+                key={`${value}`}
+                radius="md"
+                size="md"
+                color={amount === value ? undefined : theme.colors.gray[6]}
+                onClick={() => setAmount(value)}
+              >
+                {NumberFormatter({
+                  value,
+                  decimalSeparator: '.',
+                  thousandSeparator: ',',
+                  prefix: '€ ',
+                })}
+              </Button>
+            ))}
+          </Group>
+          <Button radius="md" size="md" color="green" onClick={() => onSubmit()}>
+            Topup
           </Button>
-        </Flex>
+        </Stack>
       </Modal>
 
-      <Button onClick={open} radius={100} size="lg">
+      <Button onClick={open} radius="md" size="lg">
         Add Funds
       </Button>
     </>

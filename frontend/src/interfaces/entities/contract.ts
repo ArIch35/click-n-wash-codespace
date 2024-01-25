@@ -17,4 +17,9 @@ export type BulkCancelContracts = Pick<Contract, 'startDate' | 'endDate'> & {
   laundromat: string;
 };
 
+export type ReportContract = {
+  reason: string;
+  description: string;
+};
+
 export default Contract;

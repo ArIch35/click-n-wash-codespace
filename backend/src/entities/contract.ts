@@ -38,7 +38,7 @@ class Contract extends BaseEntity {
    */
   async rules(): Promise<void> {
     await checkAvailability(this.washingMachine, this.startDate, this.endDate);
-    setName(this);
+    autoGenerateName(this);
   }
 
   @AfterLoad()
@@ -95,39 +95,44 @@ const checkAvailability = async (
  * Sets the name of a contract
  * @param contract The contract to set the name
  */
-const setName = (contract: Contract): void => {
-  contract.name = `Contract between ${contract.user.name} and ${
-    contract.washingMachine.name
-  } from ${contract.startDate.toISOString()} to ${contract.endDate.toISOString()} for ${
-    contract.price
-  }€`;
+const autoGenerateName = (contract: Contract): void => {
+  if (contract.name) {
+    return;
+  }
+  contract.name = `Contract #${contract.id} for ${contract.washingMachine.name} with the price of ${contract.price}€`;
 };
 
 /**
- * Finalizes a contract by creating a balance transaction and updating the contract status.
- * If the contract is cancelled, a refund balance transaction is created.
+ * Finalizes a contract by creating balance transactions and updating the contract status.
+ * If the 'cancel' parameter is set to true, the contract will be cancelled and a refund transaction will be created.
+ *
  * @param contract - The contract to be finalized.
- * @param cancel - Optional. Specifies whether the contract is being cancelled.
+ * @param cancel - Optional. If true, the contract will be cancelled.
  */
 export const finalizeContract = async (contract: Contract, cancel?: boolean) => {
   await getDb().entityManager.transaction(async (transactionalEntityManager) => {
-    // Create balance transaction
-    const balanceTransaction = getDb().balanceTransactionRepository.create({
-      type: 'payment',
-      from: contract.user,
-      to: contract.washingMachine.laundromat.owner,
-      amount: contract.price,
-    });
+    let name = `Contract #${contract.id}`;
 
     // Check whether the contract is gonna be cancelled
     if (cancel) {
       contract.status = 'cancelled';
-      balanceTransaction.type = 'refund';
-      balanceTransaction.from = contract.washingMachine.laundromat.owner;
-      balanceTransaction.to = contract.user;
+      name = `Refund for ${name}`;
     }
 
-    await finalizeBalanceTransaction(balanceTransaction, transactionalEntityManager);
+    // Create balance transactions
+    const senderBalance = getDb().balanceTransactionRepository.create({
+      name,
+      amount: contract.price * -1,
+      user: cancel ? contract.user : contract.washingMachine.laundromat.owner,
+    });
+    const receiverBalance = getDb().balanceTransactionRepository.create({
+      name,
+      amount: contract.price,
+      user: cancel ? contract.washingMachine.laundromat.owner : contract.user,
+    });
+
+    await finalizeBalanceTransaction(senderBalance, transactionalEntityManager);
+    await finalizeBalanceTransaction(receiverBalance, transactionalEntityManager);
     await transactionalEntityManager.save(contract);
   });
 };
@@ -159,3 +164,8 @@ export const bulkCancelContractSchema = object({
   .test('is-in-future', 'Start date must be in the future', (value) => {
     return value.startDate > new Date();
   });
+
+export const reportContractSchema = object({
+  reason: string().required(),
+  description: string().required(),
+});
