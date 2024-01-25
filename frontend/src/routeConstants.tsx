@@ -19,7 +19,7 @@ import LaundromatSimulationPage from './pages/LaundromatSimulationPage.tsx';
 import LaundromatsManagePage from './pages/LaundromatsManagePage.tsx';
 import MissingPage from './pages/MissingPage';
 import SettingsPage from './pages/SettingsPage';
-import WashingMachineDetailsPage from './pages/WashingMachineDetailsPage.tsx';
+import WashingMachineDetailsPage from './pages/WashingMachineDetailsPage/WashingMachineDetailsPage.tsx';
 
 type Route = RouteProps & {
   label: string;
