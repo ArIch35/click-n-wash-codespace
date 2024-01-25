@@ -1,4 +1,4 @@
-import { Grid, NumberInput, Stack, Text, TextInput, Title } from '@mantine/core';
+import { Grid, NumberInput, Stack, Text, TextInput, Textarea, Title } from '@mantine/core';
 import { UseFormReturnType } from '@mantine/form';
 import { upperFirst } from '@mantine/hooks';
 
@@ -9,6 +9,7 @@ interface FormInputFieldsProps<T> {
   supportArrays?: boolean;
   supportObjects?: boolean;
   preview?: boolean;
+  textAreaKeys?: string[];
 }
 
 /**
@@ -35,7 +36,7 @@ const formatName = (name: string) => {
  * Renders the inputs for a form based on the provided props.
  *
  * @template T - The type of the form object.
- * @param props - The props containing the form, object, baseKey, supportArrays, supportObjects, and readOnly values.
+ * @param props - The props containing the form, object, baseKey, supportArrays, supportObjects, preview, and textAreaKeys.
  * @returns An array of JSX elements representing the rendered inputs.
  */
 const renderInputs = <T extends object>(props: FormInputFieldsProps<T>) => {
@@ -104,6 +105,8 @@ const renderInputs = <T extends object>(props: FormInputFieldsProps<T>) => {
         return [nameElement, ...data];
       }
 
+      const isTextArea = props.textAreaKeys?.includes(parentKey);
+
       if (typeof value === 'number') {
         return preview ? (
           previewElement(parentKey, key, value)
@@ -121,6 +124,16 @@ const renderInputs = <T extends object>(props: FormInputFieldsProps<T>) => {
       if (typeof value === 'string') {
         return preview ? (
           previewElement(parentKey, key, value)
+        ) : isTextArea ? (
+          <Textarea
+            key={parentKey}
+            name={key}
+            label={upperFirst(key)}
+            autosize
+            minRows={5}
+            maxRows={10}
+            {...form.getInputProps(parentKey)}
+          />
         ) : (
           <TextInput
             key={parentKey}
@@ -138,6 +151,20 @@ const renderInputs = <T extends object>(props: FormInputFieldsProps<T>) => {
   return elements;
 };
 
+/**
+ * Renders a stack of form input fields.
+ *
+ * @template T - The type of the form data object.
+ * @param props - The props for the form input fields.
+ * @param props.form - The form object.
+ * @param props.object - The object to be rendered.
+ * @param props.baseKey - The base key for the object.
+ * @param props.supportArrays - Whether or not to support arrays.
+ * @param props.supportObjects - Whether or not to support objects.
+ * @param props.preview - Whether or not to render the inputs as a preview.
+ * @param props.textAreaKeys - The keys to be rendered as text areas.
+ * @returns The rendered stack of form input fields.
+ */
 const FormInputFields = <T extends object>(props: FormInputFieldsProps<T>) => {
   return <Stack gap="md">{renderInputs(props)}</Stack>;
 };
