@@ -134,7 +134,7 @@ router.post('/topup', (async (req, res) => {
     const balanceTransaction = getDb().balanceTransactionRepository.create({
       ...validated,
       type: 'topup',
-      to: user,
+      user: user,
     });
     await finalizeBalanceTransaction(balanceTransaction);
     return res.status(STATUS_OK).json(balanceTransaction);

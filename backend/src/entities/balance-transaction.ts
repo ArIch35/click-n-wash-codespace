@@ -6,7 +6,7 @@ import { STATUS_BAD_REQUEST } from '../utils/http-status-codes';
 import BaseEntity from './base-entity';
 import User from './user';
 
-type TransactionType = 'topup' | 'payment' | 'refund';
+type TransactionType = 'topup' | 'money sent' | 'money received';
 
 @Entity()
 class BalanceTransaction extends BaseEntity {
@@ -16,77 +16,79 @@ class BalanceTransaction extends BaseEntity {
   @Column()
   type!: TransactionType;
 
-  @ManyToOne(() => User)
-  from?: User;
-
   @ManyToOne(() => User, { nullable: false })
-  to!: User;
+  user!: User;
 
   @BeforeInsert()
   /**
    * Rules to check before inserting a balance transaction.
    */
   rules() {
-    checkFromWithType(this.from, this.type);
-    setName(this);
+    autoGenerateType(this);
+    autoGenerateName(this);
   }
 }
 
 export default BalanceTransaction;
 
 /**
- * Checks whether a from user is specified for a transaction type
- * @param from From user
- * @param type Transaction type
- * @throws StatusError if the from user is specified for topup or if the from user is not specified for other types
+ * Auto-generates the type for a balance transaction if it is not already set.
+ * If the amount is greater than 0, sets the type to 'money received'.
+ * Otherwise, sets the type to 'money sent'.
+ * @param balanceTransaction - The balance transaction object to auto-generate the type for.
  */
-const checkFromWithType = (from: User | undefined, type: TransactionType) => {
-  if (type === 'topup') {
-    if (from !== undefined) {
-      throw new StatusError('From must not be specified for topup', STATUS_BAD_REQUEST);
-    }
+const autoGenerateType = (balanceTransaction: BalanceTransaction) => {
+  if (balanceTransaction.type) {
     return;
   }
-
-  if (from === undefined) {
-    throw new StatusError('From must be specified for type other than topup', STATUS_BAD_REQUEST);
+  if (balanceTransaction.amount > 0) {
+    balanceTransaction.type = 'money received';
+  } else {
+    balanceTransaction.type = 'money sent';
   }
 };
 
 /**
- * Sets the name of a balance transaction
- * @param balanceTransaction Balance transaction to set name
+ * Auto-generates the name for a balance transaction if it is not already set.
+ * The name is determined based on the type of the balance transaction.
+ * @param balanceTransaction - The balance transaction object.
  */
-const setName = (balanceTransaction: BalanceTransaction) => {
-  const message = balanceTransaction.from
-    ? `from ${balanceTransaction.from.id} to ${balanceTransaction.to.id}`
-    : `to ${balanceTransaction.to.id}`;
-  balanceTransaction.name = `${balanceTransaction.amount}€ ${message}`;
+const autoGenerateName = (balanceTransaction: BalanceTransaction) => {
+  if (balanceTransaction.name) {
+    return;
+  }
+  if (balanceTransaction.type === 'topup') {
+    balanceTransaction.name = 'Topup';
+  } else if (balanceTransaction.type === 'money sent') {
+    balanceTransaction.name = 'Money sent';
+  } else if (balanceTransaction.type === 'money received') {
+    balanceTransaction.name = 'Money received';
+  }
 };
 
 /**
- * Finalizes a balance transaction by updating the balances of the involved accounts and saving the transaction.
+ * Finalizes a balance transaction by updating the user's balance and saving the transaction.
  * @param balanceTransaction - The balance transaction to be finalized.
- * @param transactionalEntityManager - Optional transactional entity manager to use for the operation (For using existing transaction).
+ * @param transactionalEntityManager - Optional transactional entity manager to use for the operation.
  */
 export const finalizeBalanceTransaction = async (
   balanceTransaction: BalanceTransaction,
   transactionalEntityManager?: EntityManager,
 ) => {
   const func = async (transactionalEntityManager: EntityManager) => {
-    if (balanceTransaction.type === 'topup') {
-      balanceTransaction.to.balance += balanceTransaction.amount;
-    } else if (balanceTransaction.from!.id !== balanceTransaction.to.id) {
-      balanceTransaction.from!.balance -= balanceTransaction.amount;
-      balanceTransaction.to.balance += balanceTransaction.amount;
+    const user = await transactionalEntityManager.findOne(User, {
+      where: { id: balanceTransaction.user.id },
+    });
+    if (!user) {
+      throw new StatusError('User not found', STATUS_BAD_REQUEST);
     }
-    if (balanceTransaction.from) {
-      if (balanceTransaction.from.balance < 0) {
-        throw new StatusError('Insufficient balance', STATUS_BAD_REQUEST);
-      }
-      await transactionalEntityManager.save(balanceTransaction.from);
+
+    user.balance += balanceTransaction.amount;
+    if (user.balance < 0) {
+      throw new StatusError('Insufficient balance', STATUS_BAD_REQUEST);
     }
-    await transactionalEntityManager.save(balanceTransaction.to);
+    balanceTransaction.user = user;
+    await transactionalEntityManager.save(user);
     await transactionalEntityManager.save(balanceTransaction);
   };
 
