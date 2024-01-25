@@ -228,7 +228,7 @@ router.post('/:id/report', (async (req, res) => {
     if (uid !== contract.user.id) {
       return res.status(STATUS_FORBIDDEN).json(MESSAGE_FORBIDDEN_NOT_OWNER);
     }
-    const title = `Someone has reported a problem! #${contract.id}`;
+    const title = `Contract #${contract.id} - Problem Reported!`;
     const message = `A problem has been reported for washing machine ${
       contract.washingMachine.name
     } in laundromat ${
