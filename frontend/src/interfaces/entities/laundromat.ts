@@ -19,4 +19,6 @@ export type CreateLaundromat = Pick<
   'name' | 'street' | 'city' | 'country' | 'postalCode' | 'price'
 >;
 
+export type GetLocationLaundromat = Pick<Laundromat, 'street' | 'city' | 'country' | 'postalCode'>;
+
 export default Laundromat;
