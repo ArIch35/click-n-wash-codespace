@@ -95,6 +95,8 @@ export const createLaundromatSchema = object({
   country: string().required(),
   postalCode: string().required(),
   price: number().required(),
+  lat: string(),
+  lon: string(),
 }).noUnknown(true);
 
 export const updateLaundromatSchema = object({
