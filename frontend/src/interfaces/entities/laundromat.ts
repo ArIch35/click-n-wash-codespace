@@ -11,6 +11,8 @@ interface Laundromat extends BaseEntity {
   price: number;
   owner: User;
   washingMachines?: WashingMachine[];
+  lat?: string;
+  lon?: string;
   position?: LatLngExpression;
 }
 
