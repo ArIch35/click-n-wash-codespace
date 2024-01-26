@@ -10,6 +10,7 @@ interface FormInputFieldsProps<T> {
   supportObjects?: boolean;
   preview?: boolean;
   textAreaKeys?: string[];
+  hideKeys?: string[];
 }
 
 /**
@@ -36,7 +37,7 @@ const formatName = (name: string) => {
  * Renders the inputs for a form based on the provided props.
  *
  * @template T - The type of the form object.
- * @param props - The props containing the form, object, baseKey, supportArrays, supportObjects, preview, and textAreaKeys.
+ * @param props - The props containing the form, object, baseKey, supportArrays, supportObjects, preview, textAreaKeys, and hideKeys.
  * @returns An array of JSX elements representing the rendered inputs.
  */
 const renderInputs = <T extends object>(props: FormInputFieldsProps<T>) => {
@@ -63,6 +64,10 @@ const renderInputs = <T extends object>(props: FormInputFieldsProps<T>) => {
   elements.push(
     ...Object.entries(object).flatMap(([key, value]) => {
       const parentKey = baseKey ? `${baseKey}.${key}` : key;
+
+      if (props.hideKeys?.includes(parentKey)) {
+        return [];
+      }
 
       if (supportArrays && Array.isArray(value)) {
         return value.flatMap((item, index) => {
@@ -176,6 +181,7 @@ const renderInputs = <T extends object>(props: FormInputFieldsProps<T>) => {
  * @param props.supportObjects - Whether or not to support objects.
  * @param props.preview - Whether or not to render the inputs as a preview.
  * @param props.textAreaKeys - The keys to be rendered as text areas.
+ * @param props.hideKeys - The keys to be hidden.
  * @returns The rendered stack of form input fields.
  */
 const FormInputFields = <T extends object>(props: FormInputFieldsProps<T>) => {
