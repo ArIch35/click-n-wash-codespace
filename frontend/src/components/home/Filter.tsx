@@ -78,7 +78,10 @@ const Filter: React.FC<FilterProps> = ({ onFilterSelected, onFilterReset }) => {
           step={1}
           minRange={5}
           defaultValue={[requestFilter.minPrice, requestFilter.maxPrice]}
-          value={[searchFilter.priceFrom!, searchFilter.priceTo!]}
+          value={[
+            searchFilter.priceFrom! === -1 ? requestFilter.minPrice : searchFilter.priceFrom!,
+            searchFilter.priceTo! === -1 ? requestFilter.maxPrice : searchFilter.priceTo!,
+          ]}
           onChange={(value) => {
             setSearchFilter({ ...searchFilter, priceFrom: value[0], priceTo: value[1] });
           }}

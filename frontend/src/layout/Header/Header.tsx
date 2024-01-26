@@ -21,6 +21,7 @@ const Header = ({ toggle, setVisible }: NavbarControllerProps) => {
       {!loggedIn && <AuthenticationForm opened={modalOpened} onClose={modalHandlers.close} />}
       <Group>
         <Burger
+          size={'sm'}
           onClick={() => {
             if (!loggedIn) {
               modalHandlers.open();

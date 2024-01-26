@@ -1,4 +1,5 @@
-import { Flex, Space, Table, Text } from '@mantine/core';
+import { Flex, NumberFormatter, Space, Table, Text } from '@mantine/core';
+import { upperFirst } from '@mantine/hooks';
 import React from 'react';
 import AddFundsModal from '../components/ui/AddFundsModal';
 import BalanceTransaction from '../interfaces/entities/balance-transaction';
@@ -19,9 +20,14 @@ const BalancePage = () => {
 
   const ths = (
     <Table.Tr>
+      <Table.Th fz="lg">Transaction Name</Table.Th>
       <Table.Th fz="lg">Transaction Date</Table.Th>
+<<<<<<< HEAD
       <Table.Th fz="lg">Contract Id</Table.Th>
       <Table.Th fz="lg">Transaction Status</Table.Th>
+=======
+      <Table.Th fz="lg">Transaction Type</Table.Th>
+>>>>>>> backend-updates
       <Table.Th fz="lg">Transaction Amount</Table.Th>
     </Table.Tr>
   );
@@ -34,7 +40,8 @@ const BalancePage = () => {
         </Text>
         <Space />
         <Text fz={35} fw={700}>
-          Current Balance: ${user?.balance}
+          Current Balance:{' '}
+          {NumberFormatter({ value: user?.balance, thousandSeparator: true, suffix: ' € EUR' })}
         </Text>
       </Flex>
       <Flex mt="m" justify={'flex-end'} px="md">
@@ -48,12 +55,18 @@ const BalancePage = () => {
               .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
               .map((transaction) => (
                 <Table.Tr key={transaction.id}>
+                  <Table.Td>{transaction.name}</Table.Td>
                   <Table.Td>{formatDate(transaction.createdAt)}</Table.Td>
+<<<<<<< HEAD
                   <Table.Td>{transaction.id}</Table.Td>
                   <Table.Td>
                     {transaction.type.charAt(0).toUpperCase() + transaction.type.slice(1)}
+=======
+                  <Table.Td>{upperFirst(transaction.type)}</Table.Td>
+                  <Table.Td style={{ textAlign: 'end' }}>
+                    <NumberFormatter value={transaction.amount} thousandSeparator suffix=" € EUR" />
+>>>>>>> backend-updates
                   </Table.Td>
-                  <Table.Td>${transaction.amount}</Table.Td>
                 </Table.Tr>
               ))}
           </Table.Tbody>

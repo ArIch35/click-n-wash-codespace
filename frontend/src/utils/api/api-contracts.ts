@@ -1,5 +1,5 @@
 import { headers, Message } from '.';
-import Contract, { BulkCancelContracts } from '../../interfaces/entities/contract';
+import Contract, { BulkCancelContracts, ReportContract } from '../../interfaces/entities/contract';
 import entityParser from '../entity-parser';
 import loadEnv from '../load-env';
 
@@ -48,12 +48,15 @@ const ONE_HOUR = 3600000;
  * @throws Error if the API request fails.
  */
 export const bookWashingMachine = async (id: string, startDate: Date) => {
+  const dateWithTimezoneOffset = new Date(
+    startDate.getTime() + startDate.getTimezoneOffset() * 60 * 1000,
+  );
   const response = await fetch(`${route}`, {
     method: 'POST',
     headers: { ...(await headers()) },
     body: JSON.stringify({
-      startDate: startDate,
-      endDate: new Date(startDate.getTime() + ONE_HOUR * 2),
+      startDate: dateWithTimezoneOffset,
+      endDate: new Date(dateWithTimezoneOffset.getTime() + ONE_HOUR * 2),
       washingMachine: id,
     }),
   });
@@ -74,6 +77,25 @@ export const bulkCancelContracts = async (bulkCancelContracts: BulkCancelContrac
     method: 'POST',
     headers: { ...(await headers()) },
     body: JSON.stringify(bulkCancelContracts),
+  });
+
+  const data = (await response.json()) as unknown;
+  if (!response.ok) {
+    throw new Error((data as Message).message);
+  }
+};
+
+/**
+ * Sends a report for a contract with the specified ID.
+ * @param id - The ID of the contract.
+ * @param body - The report contract data.
+ * @throws Error if the request fails.
+ */
+export const reportContract = async (id: string, body: ReportContract) => {
+  const response = await fetch(`${route}/${id}/report`, {
+    method: 'POST',
+    headers: { ...(await headers()) },
+    body: JSON.stringify(body),
   });
 
   const data = (await response.json()) as unknown;
