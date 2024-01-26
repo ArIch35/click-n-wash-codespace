@@ -18,7 +18,7 @@ router.get('/', (async (_, res) => {
   const id = res.locals.uid as string;
   try {
     const balanceTransactions = await getDb().balanceTransactionRepository.find({
-      where: [{ from: { id } }, { to: { id } }],
+      where: { user: { id } },
       withDeleted: true,
     });
     return res.status(STATUS_OK).json(balanceTransactions);
@@ -31,10 +31,7 @@ router.get('/:id', (async (req, res) => {
   const id = res.locals.uid as string;
   try {
     const balanceTransaction = await getDb().balanceTransactionRepository.findOne({
-      where: [
-        { id: req.params.id, from: { id } },
-        { id: req.params.id, to: { id } },
-      ],
+      where: { id: req.params.id, user: { id } },
       withDeleted: true,
     });
     if (!balanceTransaction) {

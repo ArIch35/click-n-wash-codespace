@@ -9,17 +9,17 @@ import {
   TablerIconsProps,
 } from '@tabler/icons-react';
 import { RouteProps } from 'react-router-dom';
-import LaundromatAddPage from './pages/LaundromatAddPage.tsx';
 import BalancePage from './pages/BalancePage';
 import BookingsPage from './pages/BookingsPage';
 import HomePage from './pages/HomePage';
 import InboxPage from './pages/InboxPage';
-import LaundromatDetailsPage from './pages/LaundromatDetailsPage';
+import LaundromatAddPage from './pages/LaundromatAddPage.tsx';
+import LaundromatDetailsPage from './pages/LaundromatDetailsPage/LaundromatDetailsPage.tsx';
+import LaundromatSimulationPage from './pages/LaundromatSimulationPage.tsx';
 import LaundromatsManagePage from './pages/LaundromatsManagePage.tsx';
 import MissingPage from './pages/MissingPage';
 import SettingsPage from './pages/SettingsPage';
-import LaundromatSimulationPage from './pages/LaundromatSimulationPage.tsx';
-import WashingMachineDetailsPage from './pages/WashingMachineDetailsPage.tsx';
+import WashingMachineDetailsPage from './pages/WashingMachineDetailsPage/WashingMachineDetailsPage.tsx';
 
 type Route = RouteProps & {
   label: string;

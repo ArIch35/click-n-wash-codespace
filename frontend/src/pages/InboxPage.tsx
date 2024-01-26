@@ -1,4 +1,4 @@
-import { Center, Group, SegmentedControl, Stack, Table, Title } from '@mantine/core';
+import { Tabs, Table, Container } from '@mantine/core';
 import { useLocalStorage } from '@mantine/hooks';
 import React from 'react';
 import { useAuth } from '../providers/authentication/Authentication.Context';
@@ -67,33 +67,30 @@ const InboxPage = () => {
   );
 
   return (
-    <Stack p="2rem">
-      <Group justify="flex-end">
-        {user.isAlsoVendor && (
-          <SegmentedControl
-            size="md"
-            radius="xs"
-            value={inboxMode}
-            onChange={setInboxMode}
-            data={[
-              { value: 'user', label: 'User inbox' },
-              { value: 'vendor', label: 'Vendor inbox' },
-            ]}
-          />
-        )}
-      </Group>
-      <Center>
-        <Stack>
-          <Center>
-            <Title order={1}>Inbox</Title>
-          </Center>
-          <Table>
-            <Table.Thead>{ths}</Table.Thead>
-            <Table.Tbody>{inboxMode === 'user' ? userRows : vendorRows}</Table.Tbody>
-          </Table>
-        </Stack>
-      </Center>
-    </Stack>
+    <Container p="2rem">
+      {user.isAlsoVendor && (
+        <Tabs defaultValue="user">
+          <Tabs.List>
+            <Tabs.Tab value="user">User Inbox</Tabs.Tab>
+            <Tabs.Tab value="vendor">Vendor Inbox</Tabs.Tab>
+          </Tabs.List>
+
+          <Tabs.Panel value="user" pt="xs">
+            <Table>
+              <Table.Thead>{ths}</Table.Thead>
+              <Table.Tbody>{userRows}</Table.Tbody>
+            </Table>
+          </Tabs.Panel>
+
+          <Tabs.Panel value="vendor" pt="xs">
+            <Table>
+              <Table.Thead>{ths}</Table.Thead>
+              <Table.Tbody>{vendorRows}</Table.Tbody>
+            </Table>
+          </Tabs.Panel>
+        </Tabs>
+      )}
+    </Container>
   );
 };
 
