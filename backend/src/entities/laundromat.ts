@@ -27,7 +27,7 @@ class Laundromat extends BaseEntity {
   lat?: string;
 
   @Column({ nullable: true })
-  long?: string;
+  lon?: string;
 
   @ManyToOne(() => User, (user) => user.laundromats, { nullable: false })
   owner!: User;
