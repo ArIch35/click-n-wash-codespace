@@ -1,16 +1,17 @@
-import { Box, Button, Container, Flex, Group, Stepper, rem } from '@mantine/core';
+import { Button, Container, Flex, Group, Stack, Stepper, rem } from '@mantine/core';
 import { hasLength, isInRange, useForm } from '@mantine/form';
 import { IconCircleCheck } from '@tabler/icons-react';
 import { useState } from 'react';
+import { MapContainer, Marker, TileLayer, useMap } from 'react-leaflet';
 import { useNavigate } from 'react-router-dom';
 import FormInputFields from '../components/ui/form-input-fields';
 import { CreateLaundromat } from '../interfaces/entities/laundromat';
 import { CreateWashingMachine } from '../interfaces/entities/washing-machine';
-import { createLaundromat, createWashingMachine } from '../utils/api';
+import { createLaundromat, createWashingMachine, getPositionFromAddress } from '../utils/api';
 import { showErrorNotification, showSuccessNotification } from '../utils/mantine-notifications';
 
 type FormValues = {
-  laundromat: CreateLaundromat;
+  laundromat: CreateLaundromat & { lat: string; lon: string };
   washingMachines: Omit<CreateWashingMachine, 'laundromat'>[];
 };
 
@@ -22,6 +23,8 @@ const initialValues: FormValues = {
     country: '',
     postalCode: '',
     price: 0,
+    lat: '',
+    lon: '',
   },
   washingMachines: [
     {
@@ -35,6 +38,14 @@ const initialValues: FormValues = {
 const LaundromatAddPage = () => {
   const [active, setActive] = useState(0);
   const navigate = useNavigate();
+
+  function MapContext() {
+    const map = useMap();
+    map.whenReady(() => {
+      map.invalidateSize();
+    });
+    return null;
+  }
 
   const form = useForm<FormValues>({
     validateInputOnChange: true,
@@ -94,6 +105,21 @@ const LaundromatAddPage = () => {
     ]);
   };
 
+  const removeWashingMachine = () => {
+    form.setFieldValue('washingMachines', form.values.washingMachines.slice(0, -1));
+  };
+
+  const findLocation = () => {
+    getPositionFromAddress(form.values.laundromat)
+      .then((location) => {
+        form.setFieldValue('laundromat.lat', location.lat);
+        form.setFieldValue('laundromat.lon', location.lon);
+      })
+      .catch((error) => {
+        showErrorNotification('Laundromat', 'find location of the', String(error));
+      });
+  };
+
   const nextStep = () => {
     if (form.validate().hasErrors) {
       return;
@@ -109,7 +135,12 @@ const LaundromatAddPage = () => {
         completedIcon={<IconCircleCheck style={{ width: rem(18), height: rem(18) }} />}
       >
         <Stepper.Step label="First step" description="Laundramat Profile">
-          <FormInputFields form={form} object={form.values.laundromat} baseKey="laundromat" />
+          <FormInputFields
+            form={form}
+            object={form.values.laundromat}
+            baseKey="laundromat"
+            hideKeys={['laundromat.lat', 'laundromat.lon']}
+          />
         </Stepper.Step>
         <Stepper.Step label="Second step" description="Washing Mashine">
           <FormInputFields
@@ -123,21 +154,45 @@ const LaundromatAddPage = () => {
           <FormInputFields form={form} object={form.values} supportArrays supportObjects preview />
         </Stepper.Step>
       </Stepper>
-      <Group justify="space-between" mt="xl">
-        <Box>
-          {active === 1 && (
-            <Button onClick={addMoreWashingMachines}>Add more washing machines</Button>
-          )}
-        </Box>
-        <Flex gap="1rem">
-          {active > 0 && <Button onClick={prevStep}>Back</Button>}
-          {active === 2 ? (
-            <Button onClick={onSubmit}>Submit</Button>
-          ) : (
-            <Button onClick={nextStep}>Next</Button>
-          )}
-        </Flex>
-      </Group>
+      <Stack mt="xl">
+        {active === 0 && form.values.laundromat.lat && form.values.laundromat.lon && (
+          <MapContainer
+            center={[Number(form.values.laundromat.lat), Number(form.values.laundromat.lon)]}
+            zoom={13}
+            scrollWheelZoom="center"
+            dragging={false}
+            style={{ height: '25rem', width: '100%' }}
+          >
+            <TileLayer
+              attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+              url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+            />
+            <MapContext />
+            <Marker
+              position={[Number(form.values.laundromat.lat), Number(form.values.laundromat.lon)]}
+            />
+          </MapContainer>
+        )}
+        <Group justify="space-between">
+          <Group>
+            {active === 0 && <Button onClick={findLocation}>Find location</Button>}
+            {active === 1 && (
+              <Button onClick={addMoreWashingMachines}>Add more washing machines</Button>
+            )}
+            {active === 1 && form.values.washingMachines.length > 1 && (
+              <Button onClick={removeWashingMachine}>Remove the last washing machine</Button>
+            )}
+          </Group>
+          <Flex gap="1rem">
+            {active > 0 && <Button onClick={prevStep}>Back</Button>}
+            {active === 2 ? (
+              <Button onClick={onSubmit}>Submit</Button>
+            ) : (
+              <Button onClick={nextStep}>Next</Button>
+            )}
+          </Flex>
+        </Group>
+      </Stack>
     </Container>
   );
 };
