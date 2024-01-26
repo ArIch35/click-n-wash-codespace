@@ -1,18 +1,14 @@
-import { Grid, Stack } from '@mantine/core';
+import { Group, Stack } from '@mantine/core';
 import { useForm } from '@mantine/form';
 import { useEffect, useState } from 'react';
+import Filter, { SearchFilter } from '../components/home/Filter';
+import CustomMap from '../components/home/Map';
 import WashingMachinePicker from '../components/home/WashingMachinePicker';
 import BaseList from '../components/ui/BaseList.component';
 import IndividualLaundromat from '../components/ui/IndividualLaundromat.component';
 import Laundromat from '../interfaces/entities/laundromat';
 import { getFilteredLaundromats, getLaundromats } from '../utils/api';
-import Filter, { SearchFilter } from '../components/home/Filter';
-import {
-  showCustomNotification,
-  showErrorNotification,
-  showSuccessNotification,
-} from '../utils/mantine-notifications';
-import CustomMap from '../components/home/Map';
+import { showCustomNotification, showErrorNotification } from '../utils/mantine-notifications';
 
 const HomePage = () => {
   const [allLaundromats, setAllLaundromats] = useState<Laundromat[]>([]);
@@ -51,7 +47,12 @@ const HomePage = () => {
           setAllLaundromats([]);
           return;
         }
-        showSuccessNotification('Laundromat', `searced with ${laundromats.length} results`);
+        showCustomNotification({
+          title: 'Search',
+          message: `${laundromats.length} laundromats found`,
+          color: 'green',
+          autoClose: true,
+        });
         setAllLaundromats(laundromats);
       })
       .catch((error) => {
@@ -103,8 +104,8 @@ const HomePage = () => {
   }, [form.values]);
 
   return (
-    <Grid gutter="md">
-      <Grid.Col span={9}>
+    <Group h="100%" gap={0}>
+      <Stack h="inherit" w="80%">
         {allLaundromats && (
           <CustomMap
             laundromats={allLaundromats}
@@ -112,31 +113,29 @@ const HomePage = () => {
             focusedLaundromat={focusedLaundromat}
           />
         )}
-      </Grid.Col>
-      <Grid.Col span={3}>
-        <Stack>
-          <Filter onFilterSelected={onFilterSelected} onFilterReset={getAllLaundromats} />
-          {allLaundromats && (
-            <BaseList
-              items={allLaundromats}
-              IndividualComponent={IndividualLaundromat}
-              onItemClick={onLaundromatChosen}
-              onLocationClick={onLocationClick}
-            />
-          )}
-          {chosenLaundromat && (
-            <WashingMachinePicker
-              isOpen={isOpen}
-              onClose={() => {
-                setIsOpen(false);
-                setChosenLaundromat(null);
-              }}
-              laundromat={chosenLaundromat}
-            />
-          )}
-        </Stack>
-      </Grid.Col>
-    </Grid>
+      </Stack>
+      <Stack h="inherit" align="center" w="20%">
+        <Filter onFilterSelected={onFilterSelected} onFilterReset={getAllLaundromats} />
+        {allLaundromats && (
+          <BaseList
+            items={allLaundromats}
+            IndividualComponent={IndividualLaundromat}
+            onItemClick={onLaundromatChosen}
+            onLocationClick={onLocationClick}
+          />
+        )}
+        {chosenLaundromat && (
+          <WashingMachinePicker
+            isOpen={isOpen}
+            onClose={() => {
+              setIsOpen(false);
+              setChosenLaundromat(null);
+            }}
+            laundromat={chosenLaundromat}
+          />
+        )}
+      </Stack>
+    </Group>
   );
 };
 

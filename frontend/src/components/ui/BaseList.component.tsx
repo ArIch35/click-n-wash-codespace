@@ -15,7 +15,7 @@ const BaseList = <T,>({
   onLocationClick,
 }: BaseListProps<T>) => {
   return (
-    <List>
+    <List w="100%">
       {items.map((item, index) => (
         <IndividualComponent
           key={index}

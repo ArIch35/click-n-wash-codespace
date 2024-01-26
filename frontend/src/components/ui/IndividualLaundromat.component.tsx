@@ -1,11 +1,10 @@
-import { Button, Card, Stack } from '@mantine/core';
+import { Button, Card, Stack, Text } from '@mantine/core';
+import { useDisclosure } from '@mantine/hooks';
+import React from 'react';
 import Laundromat from '../../interfaces/entities/laundromat';
 import { Individual } from '../../interfaces/ui/individual';
-import { Text } from '@mantine/core';
 import { useAuth } from '../../providers/authentication/Authentication.Context';
-import React from 'react';
 import { AuthenticationForm } from '../auth/AuthentificationForm';
-import { useDisclosure } from '@mantine/hooks';
 
 const IndividualLaundromat: React.FC<Individual<Laundromat>> = ({
   item: laundromat,
@@ -32,7 +31,7 @@ const IndividualLaundromat: React.FC<Individual<Laundromat>> = ({
   };
 
   return (
-    <Card>
+    <Card w="100%">
       <Stack onClick={() => onLocationClick!(laundromat)}>
         <Text>{laundromat.name}</Text>
         <Text>{getFullAddress()}</Text>
