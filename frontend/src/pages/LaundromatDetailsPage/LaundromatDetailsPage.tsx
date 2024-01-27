@@ -12,19 +12,20 @@ import {
 import { useNavigate } from 'react-router-dom';
 import FormInputFields from '../../components/ui/form-input-fields';
 import useLaundromatDetail from './useLaundromatDetail';
+import AddWashingMachine from '../../components/ui/AddWashingMachine';
 
 const LaundromatDetailPage = () => {
   const navigate = useNavigate();
   const {
     laundromat,
     washingMachines,
+    setWashingMachines,
     loading,
     opened,
     laundromatForm,
     handleDeleteLaundromat,
     handleDeleteLaundromatModal,
     handleUpdateLaundromat,
-    handleCreateRandomWashingMachine,
     handleDeleteWashingMachine,
   } = useLaundromatDetail();
 
@@ -134,11 +135,11 @@ const LaundromatDetailPage = () => {
           </Box>
           <Flex justify={'space-between'} py={30}>
             <Text size="xl">My Washing Machines</Text>
-            <form onSubmit={handleCreateRandomWashingMachine}>
-              <Button radius={'100'} type="submit">
-                + Add Random Washing Machine
-              </Button>
-            </form>
+            <AddWashingMachine
+              laundromatId={laundromat.id}
+              washingMachines={washingMachines}
+              setWashingMachines={setWashingMachines}
+            ></AddWashingMachine>
           </Flex>
           <Table>
             <Table.Thead>{ths}</Table.Thead>
