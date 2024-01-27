@@ -1,6 +1,6 @@
+import { Button, Card, RangeSlider, Select, Stack, TextInput } from '@mantine/core';
 import React, { useEffect } from 'react';
 import { getLaundromatFilters } from '../../utils/api';
-import { Stack, Select, TextInput, Button, RangeSlider } from '@mantine/core';
 
 export interface SearchFilter {
   name?: string;
@@ -51,63 +51,67 @@ const Filter: React.FC<FilterProps> = ({ onFilterSelected, onFilterReset }) => {
   };
 
   return (
-    <Stack>
-      <TextInput
-        label="Laundromat name"
-        placeholder="Pick Name"
-        value={searchFilter.name}
-        onChange={(event) => setSearchFilter({ ...searchFilter, name: event.currentTarget.value })}
-      />
-      {requestFilter && (
-        <Select
-          key={searchFilter.city}
-          label="Laundromat City"
-          placeholder="Pick City"
-          data={requestFilter.cities}
-          searchable
-          value={searchFilter.city}
-          onChange={(value) => {
-            setSearchFilter({ ...searchFilter, city: value! });
-          }}
+    <Card w="100%">
+      <Stack w="inherit">
+        <TextInput
+          label="Laundromat name"
+          placeholder="Pick Name"
+          value={searchFilter.name}
+          onChange={(event) =>
+            setSearchFilter({ ...searchFilter, name: event.currentTarget.value })
+          }
         />
-      )}
-      {requestFilter && (
-        <RangeSlider
-          min={requestFilter.minPrice}
-          max={requestFilter.maxPrice}
-          step={1}
-          minRange={5}
-          defaultValue={[requestFilter.minPrice, requestFilter.maxPrice]}
-          value={[
-            searchFilter.priceFrom! === -1 ? requestFilter.minPrice : searchFilter.priceFrom!,
-            searchFilter.priceTo! === -1 ? requestFilter.maxPrice : searchFilter.priceTo!,
-          ]}
-          onChange={(value) => {
-            setSearchFilter({ ...searchFilter, priceFrom: value[0], priceTo: value[1] });
+        {requestFilter && (
+          <Select
+            key={searchFilter.city}
+            label="Laundromat City"
+            placeholder="Pick City"
+            data={requestFilter.cities}
+            searchable
+            value={searchFilter.city}
+            onChange={(value) => {
+              setSearchFilter({ ...searchFilter, city: value! });
+            }}
+          />
+        )}
+        {requestFilter && (
+          <RangeSlider
+            min={requestFilter.minPrice}
+            max={requestFilter.maxPrice}
+            step={1}
+            minRange={5}
+            defaultValue={[requestFilter.minPrice, requestFilter.maxPrice]}
+            value={[
+              searchFilter.priceFrom! === -1 ? requestFilter.minPrice : searchFilter.priceFrom!,
+              searchFilter.priceTo! === -1 ? requestFilter.maxPrice : searchFilter.priceTo!,
+            ]}
+            onChange={(value) => {
+              setSearchFilter({ ...searchFilter, priceFrom: value[0], priceTo: value[1] });
+            }}
+          />
+        )}
+        <Button
+          onClick={() => {
+            returnValidFilter(searchFilter);
           }}
-        />
-      )}
-      <Button
-        onClick={() => {
-          returnValidFilter(searchFilter);
-        }}
-      >
-        Filter
-      </Button>
-      <Button
-        onClick={() => {
-          setSearchFilter({
-            name: '',
-            city: '',
-            priceFrom: requestFilter!.minPrice,
-            priceTo: requestFilter!.maxPrice,
-          });
-          onFilterReset();
-        }}
-      >
-        Reset
-      </Button>
-    </Stack>
+        >
+          Filter
+        </Button>
+        <Button
+          onClick={() => {
+            setSearchFilter({
+              name: '',
+              city: '',
+              priceFrom: requestFilter!.minPrice,
+              priceTo: requestFilter!.maxPrice,
+            });
+            onFilterReset();
+          }}
+        >
+          Reset
+        </Button>
+      </Stack>
+    </Card>
   );
 };
 

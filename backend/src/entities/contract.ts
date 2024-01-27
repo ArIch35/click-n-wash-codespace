@@ -123,12 +123,12 @@ export const finalizeContract = async (contract: Contract, cancel?: boolean) => 
     const senderBalance = getDb().balanceTransactionRepository.create({
       name,
       amount: contract.price * -1,
-      user: cancel ? contract.user : contract.washingMachine.laundromat.owner,
+      user: cancel ? contract.washingMachine.laundromat.owner : contract.user,
     });
     const receiverBalance = getDb().balanceTransactionRepository.create({
       name,
       amount: contract.price,
-      user: cancel ? contract.washingMachine.laundromat.owner : contract.user,
+      user: cancel ? contract.user : contract.washingMachine.laundromat.owner,
     });
 
     await finalizeBalanceTransaction(senderBalance, transactionalEntityManager);

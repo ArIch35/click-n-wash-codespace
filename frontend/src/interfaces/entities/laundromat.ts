@@ -11,6 +11,8 @@ interface Laundromat extends BaseEntity {
   price: number;
   owner: User;
   washingMachines?: WashingMachine[];
+  lat?: string;
+  lon?: string;
   position?: LatLngExpression;
 }
 
@@ -18,5 +20,7 @@ export type CreateLaundromat = Pick<
   Laundromat,
   'name' | 'street' | 'city' | 'country' | 'postalCode' | 'price'
 >;
+
+export type GetLocationLaundromat = Pick<Laundromat, 'street' | 'city' | 'country' | 'postalCode'>;
 
 export default Laundromat;

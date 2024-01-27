@@ -1,9 +1,9 @@
-import { MapContainer, Marker, TileLayer, Tooltip, useMap } from 'react-leaflet';
-import 'leaflet/dist/leaflet.css';
-import Laundromat from '../../interfaces/entities/laundromat';
-import { useMemo } from 'react';
-import { useAuth } from '../../providers/authentication/Authentication.Context';
 import { useDisclosure } from '@mantine/hooks';
+import 'leaflet/dist/leaflet.css';
+import { useMemo } from 'react';
+import { MapContainer, Marker, TileLayer, Tooltip, useMap } from 'react-leaflet';
+import Laundromat from '../../interfaces/entities/laundromat';
+import { useAuth } from '../../providers/authentication/Authentication.Context';
 import { AuthenticationForm } from '../auth/AuthentificationForm';
 
 interface CustomMapProps {
@@ -22,8 +22,8 @@ const CustomMap: React.FC<CustomMapProps> = ({
     map.whenReady(() => {
       map.invalidateSize();
     });
-    if (focusedLaundromat) {
-      map.flyTo(focusedLaundromat.position!);
+    if (focusedLaundromat && focusedLaundromat.position) {
+      map.flyTo(focusedLaundromat.position);
     }
     return null;
   }
@@ -31,6 +31,8 @@ const CustomMap: React.FC<CustomMapProps> = ({
   const { user } = useAuth();
   const [modalOpened, modalHandlers] = useDisclosure(false);
   const loggedIn = useMemo(() => user, [user]);
+
+  const darmstadtPosition = { lat: 49.8728, lng: 8.6512 };
 
   const handleItemClick = (laundromat: Laundromat) => {
     // Check if the user already signed in using the authentication provider
@@ -45,9 +47,9 @@ const CustomMap: React.FC<CustomMapProps> = ({
 
   return (
     <MapContainer
-      center={[51.0586, 8.0419]}
+      center={laundromats.length > 0 ? laundromats[0].position! : darmstadtPosition}
       zoom={13}
-      scrollWheelZoom={false}
+      scrollWheelZoom={true}
       style={{ height: '100%', width: '100%' }}
     >
       <TileLayer

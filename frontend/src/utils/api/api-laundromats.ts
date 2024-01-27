@@ -23,12 +23,11 @@ export const getLaundromats = async (onlyOwned?: boolean) => {
   if (!response.ok) {
     throw new Error((data as Message).message);
   }
-  // TODO: Remove this when the langitude and longitude are added to the laundromat entity on the backend.
   const laundromats = data as Laundromat[];
   laundromats.forEach((laundromat) => {
-    const randomLat = parseFloat((Math.random() * (55 - 48) + 48).toFixed(4));
-    const randomLang = parseFloat((Math.random() * (15 - 6) + 6).toFixed(4));
-    laundromat.position = { lat: randomLat, lng: randomLang };
+    if (laundromat.lat && laundromat.lon) {
+      laundromat.position = { lat: Number(laundromat.lat), lng: Number(laundromat.lon) };
+    }
   });
   return entityParser<Laundromat[]>(data as Laundromat[]);
 };
@@ -163,12 +162,11 @@ export const getFilteredLaundromats = async (filter: SearchFilter) => {
   if (!response.ok) {
     throw new Error((data as Message).message);
   }
-  // TODO: Remove this when the langitude and longitude are added to the laundromat entity on the backend.
   const laundromats = data as Laundromat[];
   laundromats.forEach((laundromat) => {
-    const randomLat = parseFloat((Math.random() * (55 - 48) + 48).toFixed(4));
-    const randomLang = parseFloat((Math.random() * (15 - 6) + 6).toFixed(4));
-    laundromat.position = { lat: randomLat, lng: randomLang };
+    if (laundromat.lat && laundromat.lon) {
+      laundromat.position = { lat: Number(laundromat.lat), lng: Number(laundromat.lon) };
+    }
   });
   return entityParser<Laundromat[]>(laundromats);
 };
