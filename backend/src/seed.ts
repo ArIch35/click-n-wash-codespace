@@ -48,6 +48,8 @@ const seed = async () => {
       postalCode: fakerDE.location.zipCode(),
       price: Number(fakerDE.commerce.price()),
       owner: users[Math.floor(Math.random() * users.length)],
+      lat: fakerDE.location.latitude().toString(),
+      lon: fakerDE.location.longitude().toString(),
     });
     laundromats.push(laundromat);
   }

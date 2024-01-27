@@ -1,4 +1,5 @@
 import { RequestHandler, Router } from 'express';
+import { Between, FindOperator, ILike } from 'typeorm';
 import { ValidationError } from 'yup';
 import getDb from '../db';
 import { createLaundromatSchema, updateLaundromatSchema } from '../entities/laundromat';
@@ -19,7 +20,6 @@ import {
   STATUS_OK,
   STATUS_SERVER_ERROR,
 } from '../utils/http-status-codes';
-import { Between, FindOperator, ILike } from 'typeorm';
 
 interface TimeSlot {
   start: Date;
@@ -84,8 +84,8 @@ router.get('/filter-params', (async (_, res) => {
         .distinct(true)
         .getRawMany()
     ).map((city: { laundromat_city: string }) => city.laundromat_city);
-    const maxPrice = await getDb().laundromatRepository.maximum('price');
-    const minPrice = await getDb().laundromatRepository.minimum('price');
+    const maxPrice = (await getDb().laundromatRepository.maximum('price')) || 0;
+    const minPrice = (await getDb().laundromatRepository.minimum('price')) || 0;
     return res.status(STATUS_OK).json({ cities, maxPrice, minPrice });
   } catch (error) {
     return res.status(STATUS_SERVER_ERROR).json(MESSAGE_SERVER_ERROR);
