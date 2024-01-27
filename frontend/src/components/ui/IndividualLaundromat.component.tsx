@@ -1,4 +1,4 @@
-import { Button, Card, Stack, Text } from '@mantine/core';
+import { Button, Card, Stack, Text, Tooltip } from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
 import React from 'react';
 import Laundromat from '../../interfaces/entities/laundromat';
@@ -32,11 +32,16 @@ const IndividualLaundromat: React.FC<Individual<Laundromat>> = ({
 
   return (
     <Card w="100%">
-      <Stack onClick={() => onLocationClick!(laundromat)}>
-        <Text>{laundromat.name}</Text>
-        <Text>{getFullAddress()}</Text>
-        <Text>{laundromat.price}</Text>
-      </Stack>
+      <Tooltip label={laundromat.position ? 'Click to see on map' : 'No position available'}>
+        <Stack
+          style={{ cursor: laundromat.position ? 'pointer' : 'default' }}
+          onClick={() => onLocationClick!(laundromat)}
+        >
+          <Text>{laundromat.name}</Text>
+          <Text>{getFullAddress()}</Text>
+          <Text>{laundromat.price}</Text>
+        </Stack>
+      </Tooltip>
       <Button onClick={() => handleItemClick(laundromat)}>See Available</Button>
       {!loggedIn && <AuthenticationForm opened={modalOpened} onClose={modalHandlers.close} />}
     </Card>
