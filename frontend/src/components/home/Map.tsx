@@ -22,8 +22,8 @@ const CustomMap: React.FC<CustomMapProps> = ({
     map.whenReady(() => {
       map.invalidateSize();
     });
-    if (focusedLaundromat) {
-      map.flyTo(focusedLaundromat.position!);
+    if (focusedLaundromat && focusedLaundromat.position) {
+      map.flyTo(focusedLaundromat.position);
     }
     return null;
   }

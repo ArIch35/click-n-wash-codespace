@@ -25,7 +25,9 @@ export const getLaundromats = async (onlyOwned?: boolean) => {
   }
   const laundromats = data as Laundromat[];
   laundromats.forEach((laundromat) => {
-    laundromat.position = { lat: Number(laundromat.lat), lng: Number(laundromat.lon) };
+    if (laundromat.lat && laundromat.lon) {
+      laundromat.position = { lat: Number(laundromat.lat), lng: Number(laundromat.lon) };
+    }
   });
   return entityParser<Laundromat[]>(data as Laundromat[]);
 };
@@ -162,7 +164,9 @@ export const getFilteredLaundromats = async (filter: SearchFilter) => {
   }
   const laundromats = data as Laundromat[];
   laundromats.forEach((laundromat) => {
-    laundromat.position = { lat: Number(laundromat.lat), lng: Number(laundromat.lon) };
+    if (laundromat.lat && laundromat.lon) {
+      laundromat.position = { lat: Number(laundromat.lat), lng: Number(laundromat.lon) };
+    }
   });
   return entityParser<Laundromat[]>(laundromats);
 };

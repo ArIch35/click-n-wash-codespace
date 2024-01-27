@@ -108,7 +108,7 @@ const HomePage = () => {
       <Stack h="inherit" w="80%">
         {allLaundromats && (
           <CustomMap
-            laundromats={allLaundromats}
+            laundromats={allLaundromats.filter((laundromat) => laundromat.position)}
             onMarkerClick={onLaundromatChosen}
             focusedLaundromat={focusedLaundromat}
           />
