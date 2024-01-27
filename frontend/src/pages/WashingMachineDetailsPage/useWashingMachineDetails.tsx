@@ -183,10 +183,7 @@ const useWashingMachineDetails = () => {
       .then(() => {
         showSuccessNotification('Washing Machine', 'delete');
         setLoading(false);
-        {
-          /* FIXME: return to laundromat page */
-        }
-        navigate('/manage-laundromats'); // TODO: Navigate to laundromat page
+        navigate(-1);
       })
       .catch((error) => {
         console.error(error);
