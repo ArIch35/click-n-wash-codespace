@@ -1,4 +1,4 @@
-import { Tabs, Table, Container } from '@mantine/core';
+import { Container, Table, Tabs } from '@mantine/core';
 import { useLocalStorage } from '@mantine/hooks';
 import React from 'react';
 import { useAuth } from '../providers/authentication/Authentication.Context';
@@ -68,28 +68,28 @@ const InboxPage = () => {
 
   return (
     <Container p="2rem">
-      {user.isAlsoVendor && (
-        <Tabs defaultValue="user">
-          <Tabs.List>
-            <Tabs.Tab value="user">User Inbox</Tabs.Tab>
-            <Tabs.Tab value="vendor">Vendor Inbox</Tabs.Tab>
-          </Tabs.List>
+      <Tabs defaultValue="user">
+        <Tabs.List>
+          <Tabs.Tab value="user">User Inbox</Tabs.Tab>
+          {user.isAlsoVendor && <Tabs.Tab value="vendor">Vendor Inbox</Tabs.Tab>}
+        </Tabs.List>
 
-          <Tabs.Panel value="user" pt="xs">
-            <Table>
-              <Table.Thead>{ths}</Table.Thead>
-              <Table.Tbody>{userRows}</Table.Tbody>
-            </Table>
-          </Tabs.Panel>
+        <Tabs.Panel value="user" pt="xs">
+          <Table>
+            <Table.Thead>{ths}</Table.Thead>
+            <Table.Tbody>{userRows}</Table.Tbody>
+          </Table>
+        </Tabs.Panel>
 
+        {user.isAlsoVendor && (
           <Tabs.Panel value="vendor" pt="xs">
             <Table>
               <Table.Thead>{ths}</Table.Thead>
               <Table.Tbody>{vendorRows}</Table.Tbody>
             </Table>
           </Tabs.Panel>
-        </Tabs>
-      )}
+        )}
+      </Tabs>
     </Container>
   );
 };
