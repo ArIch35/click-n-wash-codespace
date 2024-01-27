@@ -5,8 +5,17 @@ import { useNavigate, useParams } from 'react-router-dom';
 import Contract from '../../interfaces/entities/contract';
 import WashingMachine from '../../interfaces/entities/washing-machine';
 import { WashingMachineForm } from '../../interfaces/forms/WashingMachineFrom';
-import { deleteWashingMachine, getWashingMachineById, updateWashingMachine } from '../../utils/api';
-import { showErrorNotification, showSuccessNotification } from '../../utils/mantine-notifications';
+import {
+  cancelContract,
+  deleteWashingMachine,
+  getWashingMachineById,
+  updateWashingMachine,
+} from '../../utils/api';
+import {
+  showCustomNotification,
+  showErrorNotification,
+  showSuccessNotification,
+} from '../../utils/mantine-notifications';
 
 const useWashingMachineDetails = () => {
   const { id } = useParams();
@@ -75,10 +84,30 @@ const useWashingMachineDetails = () => {
   ) => {
     event.preventDefault();
 
-    if (!id) {
-      showErrorNotification('Contract', 'cancel', 'Contract Id not found');
-      return;
-    }
+    cancelContract(id)
+      .then(() => {
+        const newContracts = contracts.map((c) => {
+          if (c.id === id) {
+            c.status = 'cancelled';
+          }
+          return c;
+        });
+        setContracts(newContracts);
+        showCustomNotification({
+          title: 'Success',
+          message: 'Contract cancelled successfully',
+          color: 'green',
+          autoClose: false,
+        });
+      })
+      .catch(() =>
+        showCustomNotification({
+          title: 'Error',
+          message: 'Error cancelling contract',
+          color: 'red',
+          autoClose: false,
+        }),
+      );
   };
 
   const handleUpdateWashingMachine = (event: React.FormEvent<HTMLFormElement>) => {
