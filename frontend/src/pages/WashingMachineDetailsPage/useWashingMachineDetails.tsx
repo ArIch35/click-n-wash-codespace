@@ -6,6 +6,7 @@ import Contract from '../../interfaces/entities/contract';
 import WashingMachine from '../../interfaces/entities/washing-machine';
 import { WashingMachineForm } from '../../interfaces/forms/WashingMachineFrom';
 import {
+  bulkCancelContracts,
   cancelContract,
   deleteWashingMachine,
   getWashingMachineById,
@@ -77,6 +78,38 @@ const useWashingMachineDetails = () => {
       brand: hasLength({ min: 1 }, 'Brand must be at least 1 character long'),
     },
   });
+
+  const cancelAllContracts = (event: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
+    event.preventDefault();
+    if (!id) {
+      showErrorNotification('Washing Machine', 'cancel', 'Washing Machine not found');
+      return;
+    }
+    bulkCancelContracts({ startDate: new Date(), endDate: new Date(), laundromat: id })
+      .then(() => {
+        const newContracts = contracts.map((c) => {
+          if (c.status === 'ongoing') {
+            c.status = 'cancelled';
+          }
+          return c;
+        });
+        setContracts(newContracts);
+        showCustomNotification({
+          title: 'Success',
+          message: 'All contracts cancelled successfully',
+          color: 'green',
+          autoClose: false,
+        });
+      })
+      .catch(() =>
+        showCustomNotification({
+          title: 'Error',
+          message: 'Error cancelling contracts',
+          color: 'red',
+          autoClose: false,
+        }),
+      );
+  };
 
   const handleCancelContract = (
     event: React.MouseEvent<HTMLButtonElement, MouseEvent>,
@@ -185,6 +218,7 @@ const useWashingMachineDetails = () => {
     washingMachineForm,
     close,
     handleCancelContract,
+    cancelAllContracts,
     handleUpdateWashingMachine,
     handleDeleteWashingMachineModal,
     handleDeleteWashingmachine,

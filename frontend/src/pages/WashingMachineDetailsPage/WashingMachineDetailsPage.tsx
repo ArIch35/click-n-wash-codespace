@@ -11,6 +11,7 @@ const WashingMachineDetailsPage = () => {
     washingMachineForm,
     close,
     handleCancelContract,
+    cancelAllContracts,
     handleUpdateWashingMachine,
     handleDeleteWashingMachineModal,
     handleDeleteWashingmachine,
@@ -114,7 +115,14 @@ const WashingMachineDetailsPage = () => {
           <Flex justify={'space-between'} py={30}>
             <Text size="xl">My Washing Machines</Text>
             <form>
-              <Button radius={'100'} type="submit" color="red">
+              <Button
+                radius={'100'}
+                type="submit"
+                color="red"
+                onClick={(event) => {
+                  cancelAllContracts(event);
+                }}
+              >
                 Cancel All Contracts
               </Button>
             </form>
