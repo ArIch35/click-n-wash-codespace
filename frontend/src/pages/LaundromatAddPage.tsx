@@ -161,6 +161,7 @@ const LaundromatAddPage = () => {
             zoom={13}
             scrollWheelZoom="center"
             dragging={false}
+            zoomControl={false}
             style={{ height: '25rem', width: '100%' }}
           >
             <TileLayer

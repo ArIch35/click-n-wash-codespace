@@ -50,6 +50,7 @@ const CustomMap: React.FC<CustomMapProps> = ({
       center={laundromats.length > 0 ? laundromats[0].position! : darmstadtPosition}
       zoom={13}
       scrollWheelZoom={true}
+      zoomControl={false}
       style={{ height: '100%', width: '100%' }}
     >
       <TileLayer
