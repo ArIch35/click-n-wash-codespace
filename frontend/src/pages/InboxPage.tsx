@@ -7,7 +7,7 @@ import formatDate from '../utils/format-date';
 
 const InboxPage = () => {
   const { user } = useAuth();
-  const [inboxMode, setInboxMode] = useLocalStorage<string>({
+  const [inboxMode, setInboxMode] = useLocalStorage<string | null>({
     key: 'inboxMode',
     defaultValue: 'user',
   });
@@ -68,7 +68,7 @@ const InboxPage = () => {
 
   return (
     <Container p="2rem">
-      <Tabs defaultValue="user">
+      <Tabs value={inboxMode} onChange={setInboxMode}>
         <Tabs.List>
           <Tabs.Tab value="user">User Inbox</Tabs.Tab>
           {user.isAlsoVendor && <Tabs.Tab value="vendor">Vendor Inbox</Tabs.Tab>}
