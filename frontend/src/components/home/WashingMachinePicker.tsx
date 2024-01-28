@@ -3,6 +3,7 @@ import { notifications } from '@mantine/notifications';
 import React, { useEffect, useState } from 'react';
 import Laundromat from '../../interfaces/entities/laundromat';
 import WashingMachine from '../../interfaces/entities/washing-machine';
+import { useAuth } from '../../providers/authentication/Authentication.Context';
 import { bookWashingMachine, getLaundromatTimeSlots } from '../../utils/api';
 import BaseList from '../ui/BaseList.component';
 import IndividualWashingMachine from '../ui/IndividualWashingMachineComponent';
@@ -19,6 +20,7 @@ const WashingMachinePicker: React.FC<WashingMachinePickerProps> = ({
   onClose,
   laundromat,
 }) => {
+  const { refreshUser } = useAuth();
   const [selectedDate, setSelectedDate] = useState<Date | null>(null);
   const [bookedDatesMap, setBookedDatesMap] = useState<Map<string, Map<string, string[]>> | null>(
     null,
@@ -91,6 +93,7 @@ const WashingMachinePicker: React.FC<WashingMachinePickerProps> = ({
     onPickerClose();
     bookWashingMachine(washingMachine.id, selectedDate!)
       .then(() => {
+        refreshUser();
         notifications.show({
           title: 'Success!',
           message: 'Washing machine booked successfully',

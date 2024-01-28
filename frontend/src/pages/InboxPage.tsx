@@ -6,7 +6,7 @@ import { markAsRead } from '../utils/api';
 import formatDate from '../utils/format-date';
 
 const InboxPage = () => {
-  const { user } = useAuth();
+  const { user, refreshUser } = useAuth();
   const [inboxMode, setInboxMode] = useLocalStorage<string | null>({
     key: 'inboxMode',
     defaultValue: 'user',
@@ -29,10 +29,12 @@ const InboxPage = () => {
             !message.read && (inboxMode === 'user' ? !message.forVendor : message.forVendor),
         )
         .map((message) => message.id) || [],
-    ).catch((error) => {
-      console.log(error);
-    });
-  }, [inboxMode, setInboxMode, user]);
+    )
+      .then(() => refreshUser())
+      .catch((error) => {
+        console.log(error);
+      });
+  }, [inboxMode, refreshUser, setInboxMode, user]);
 
   if (!user) {
     return null;
