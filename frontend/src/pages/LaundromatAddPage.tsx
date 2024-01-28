@@ -134,7 +134,7 @@ const LaundromatAddPage = () => {
         active={active}
         completedIcon={<IconCircleCheck style={{ width: rem(18), height: rem(18) }} />}
       >
-        <Stepper.Step label="First step" description="Laundramat Profile">
+        <Stepper.Step label="First step" description="Laundromat Profile">
           <FormInputFields
             form={form}
             object={form.values.laundromat}
