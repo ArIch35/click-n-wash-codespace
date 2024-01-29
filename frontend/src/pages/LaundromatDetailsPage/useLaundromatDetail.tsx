@@ -6,7 +6,6 @@ import Laundromat from '../../interfaces/entities/laundromat';
 import WashingMachine from '../../interfaces/entities/washing-machine';
 import { LaundromatForm } from '../../interfaces/forms/LaundromatForm';
 import {
-  createWashingMachine,
   deleteLaundromat,
   deleteWashingMachine,
   getLaundromatById,
@@ -141,36 +140,6 @@ const useLaundromatDetail = () => {
       });
   };
 
-  const handleCreateRandomWashingMachine = (event: React.FormEvent<HTMLFormElement>) => {
-    event?.preventDefault();
-
-    if (!id || !laundromat) {
-      showErrorNotification('Laundromat', 'delete', 'Laundromat Id not found');
-      return;
-    }
-
-    const washingMachine = {
-      name: Math.random().toString(36).substring(7),
-      description: Math.random().toString(36).substring(7),
-      brand: Math.random().toString(36).substring(7),
-      laundromat: laundromat.id,
-    };
-
-    createWashingMachine(washingMachine)
-      .then((response) => {
-        console.log(response);
-
-        // Append to the washing machines state
-        const newWashingMachines = [...(washingMachines ?? []), response];
-        setWashingMachines(newWashingMachines);
-        showSuccessNotification('Random Washing Machine', 'create');
-      })
-      .catch((error) => {
-        console.error(error);
-        showErrorNotification('Washing Machine', 'create', String(error));
-      });
-  };
-
   const handleDeleteWashingMachine = (
     event: React.MouseEvent<HTMLButtonElement, MouseEvent>,
     id: string,
@@ -205,13 +174,13 @@ const useLaundromatDetail = () => {
   return {
     laundromat,
     washingMachines,
+    setWashingMachines,
     loading,
     opened,
     laundromatForm,
     handleDeleteLaundromat,
     handleDeleteLaundromatModal,
     handleUpdateLaundromat,
-    handleCreateRandomWashingMachine,
     handleDeleteWashingMachine,
   };
 };

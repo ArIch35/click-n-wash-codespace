@@ -22,6 +22,8 @@ const BalancePage = () => {
     <Table.Tr>
       <Table.Th fz="lg">Transaction Name</Table.Th>
       <Table.Th fz="lg">Transaction Date</Table.Th>
+      <Table.Th fz="lg">Contract Id</Table.Th>
+      <Table.Th fz="lg">Transaction Status</Table.Th>
       <Table.Th fz="lg">Transaction Type</Table.Th>
       <Table.Th fz="lg">Transaction Amount</Table.Th>
     </Table.Tr>
@@ -52,6 +54,10 @@ const BalancePage = () => {
                 <Table.Tr key={transaction.id}>
                   <Table.Td>{transaction.name}</Table.Td>
                   <Table.Td>{formatDate(transaction.createdAt)}</Table.Td>
+                  <Table.Td>{transaction.id}</Table.Td>
+                  <Table.Td>
+                    {transaction.type.charAt(0).toUpperCase() + transaction.type.slice(1)}
+                  </Table.Td>
                   <Table.Td>{upperFirst(transaction.type)}</Table.Td>
                   <Table.Td style={{ textAlign: 'end' }}>
                     <NumberFormatter value={transaction.amount} thousandSeparator suffix=" € EUR" />
