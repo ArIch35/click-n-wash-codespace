@@ -34,7 +34,8 @@ const InboxPage = () => {
       .catch((error) => {
         console.log(error);
       });
-  }, [inboxMode, refreshUser, setInboxMode, user]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [inboxMode, setInboxMode]);
 
   if (!user) {
     return null;
