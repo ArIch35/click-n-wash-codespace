@@ -54,7 +54,7 @@ export function AuthenticationForm({ ...props }: ModalProps) {
         .then((userCredential) => {
           props.onClose();
           showCustomNotification({
-            title: `Welcome back ${userCredential.user?.displayName || userCredential.user.email}!`,
+            title: `Welcome ${userCredential.user?.displayName || userCredential.user.email}!`,
             message: 'You have been successfully logged in',
             color: 'green',
             autoClose: true,
@@ -102,9 +102,7 @@ export function AuthenticationForm({ ...props }: ModalProps) {
           radius="xl"
           onSuccessfulSignIn={(userCredential) => {
             showCustomNotification({
-              title: `Welcome back ${
-                userCredential.user?.displayName || userCredential.user.email
-              }!`,
+              title: `Welcome ${userCredential.user?.displayName || userCredential.user.email}!`,
               message: 'You have been successfully logged in',
               color: 'green',
               autoClose: true,
