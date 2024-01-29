@@ -28,8 +28,12 @@ const ReportModal = ({ contractId }: ReportModalProps) => {
     },
   });
 
-  const onSubmit = () => {
-    reportContract(contractId, form.values)
+  const onSubmit = (values: ReportContract, e: React.FormEvent<HTMLFormElement> | undefined) => {
+    e?.preventDefault();
+    if (form.validate().hasErrors) {
+      return;
+    }
+    reportContract(contractId, values)
       .then(() => {
         showSuccessNotification('Report', 'create');
         close();
@@ -58,10 +62,12 @@ const ReportModal = ({ contractId }: ReportModalProps) => {
         centered
       >
         <Stack gap="xl">
-          <FormInputFields form={form} object={form.values} textAreaKeys={['description']} />
-          <Button radius="md" size="md" color="red" onClick={onSubmit}>
-            Submit report
-          </Button>
+          <form onSubmit={form.onSubmit(onSubmit)}>
+            <FormInputFields form={form} values={form.values} textArea={{ description: true }} />
+            <Button type="submit" radius="md" size="md" color="red">
+              Submit report
+            </Button>
+          </form>
         </Stack>
       </Modal>
       <Button color="red" mt="md" radius="md" onClick={open}>

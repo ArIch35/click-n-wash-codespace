@@ -134,24 +134,24 @@ const LaundromatAddPage = () => {
         active={active}
         completedIcon={<IconCircleCheck style={{ width: rem(18), height: rem(18) }} />}
       >
-        <Stepper.Step label="First step" description="Laundramat Profile">
+        <Stepper.Step label="First step" description="Laundromat Profile">
           <FormInputFields
             form={form}
-            object={form.values.laundromat}
+            values={form.values.laundromat}
             baseKey="laundromat"
-            hideKeys={['laundromat.lat', 'laundromat.lon']}
+            hide={{ 'laundromat.lat': true, 'laundromat.lon': true }}
           />
         </Stepper.Step>
         <Stepper.Step label="Second step" description="Washing Mashine">
           <FormInputFields
             form={form}
-            object={form.values.washingMachines}
+            values={form.values.washingMachines}
             baseKey="washingMachines"
-            supportObjects
+            supportNested
           />
         </Stepper.Step>
         <Stepper.Step label="Third step" description="Preview">
-          <FormInputFields form={form} object={form.values} supportArrays supportObjects preview />
+          <FormInputFields form={form} values={form.values} supportArrays supportNested preview />
         </Stepper.Step>
       </Stepper>
       <Stack mt="xl">
@@ -161,6 +161,7 @@ const LaundromatAddPage = () => {
             zoom={13}
             scrollWheelZoom="center"
             dragging={false}
+            zoomControl={false}
             style={{ height: '25rem', width: '100%' }}
           >
             <TileLayer

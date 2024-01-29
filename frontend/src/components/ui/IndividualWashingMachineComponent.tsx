@@ -1,7 +1,6 @@
-import { Button, Card } from '@mantine/core';
-import { Individual } from '../../interfaces/ui/individual';
-import { Text } from '@mantine/core';
+import { Button, Card, Text } from '@mantine/core';
 import WashingMachine from '../../interfaces/entities/washing-machine';
+import { Individual } from '../../interfaces/ui/individual';
 
 const IndividualWashingMachine: React.FC<Individual<WashingMachine>> = ({
   item: washingMachine,
@@ -9,7 +8,7 @@ const IndividualWashingMachine: React.FC<Individual<WashingMachine>> = ({
 }: Individual<WashingMachine>) => {
   return (
     <Card>
-      <Text>{washingMachine.brand}</Text>
+      <Text>{washingMachine.name}</Text>
       <Button onClick={() => onItemClick!(washingMachine)}>Book</Button>
     </Card>
   );

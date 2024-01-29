@@ -1,9 +1,11 @@
 import { Button, Group, Modal, NumberFormatter, Stack, useMantineTheme } from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
 import React from 'react';
+import { useAuth } from '../../providers/authentication/Authentication.Context';
 import { topupBalance } from '../../utils/api';
 
 function AddFundsModal() {
+  const { refreshUser } = useAuth();
   const [opened, { open, close }] = useDisclosure(false);
   const theme = useMantineTheme();
   // Topup functions
@@ -15,6 +17,7 @@ function AddFundsModal() {
     // Use topup function here
     topupBalance(amount)
       .then(() => {
+        refreshUser();
         close();
         // Window reload to update balance
         window.location.reload();

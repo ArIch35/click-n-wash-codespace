@@ -6,8 +6,8 @@ import { markAsRead } from '../utils/api';
 import formatDate from '../utils/format-date';
 
 const InboxPage = () => {
-  const { user } = useAuth();
-  const [inboxMode, setInboxMode] = useLocalStorage<string>({
+  const { user, refreshUser } = useAuth();
+  const [inboxMode, setInboxMode] = useLocalStorage<string | null>({
     key: 'inboxMode',
     defaultValue: 'user',
   });
@@ -29,10 +29,13 @@ const InboxPage = () => {
             !message.read && (inboxMode === 'user' ? !message.forVendor : message.forVendor),
         )
         .map((message) => message.id) || [],
-    ).catch((error) => {
-      console.log(error);
-    });
-  }, [inboxMode, setInboxMode, user]);
+    )
+      .then(() => refreshUser())
+      .catch((error) => {
+        console.log(error);
+      });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [inboxMode, setInboxMode]);
 
   if (!user) {
     return null;
@@ -68,7 +71,7 @@ const InboxPage = () => {
 
   return (
     <Container p="2rem">
-      <Tabs defaultValue="user">
+      <Tabs value={inboxMode} onChange={setInboxMode}>
         <Tabs.List>
           <Tabs.Tab value="user">User Inbox</Tabs.Tab>
           {user.isAlsoVendor && <Tabs.Tab value="vendor">Vendor Inbox</Tabs.Tab>}
