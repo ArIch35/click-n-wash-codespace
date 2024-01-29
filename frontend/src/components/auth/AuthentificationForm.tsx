@@ -1,37 +1,27 @@
-import {
-  Anchor,
-  Button,
-  Checkbox,
-  Divider,
-  Group,
-  Modal,
-  ModalProps,
-  PasswordInput,
-  Stack,
-  Text,
-  TextInput,
-} from '@mantine/core';
+import { Anchor, Button, Divider, Group, Modal, ModalProps, Text } from '@mantine/core';
 import { useForm } from '@mantine/form';
 import { upperFirst, useMediaQuery, useToggle } from '@mantine/hooks';
 import { createUserWithEmailAndPassword, signInWithEmailAndPassword } from 'firebase/auth';
 import React from 'react';
 import firebaseAuth from '../../firebase';
 import { useAuth } from '../../providers/authentication/Authentication.Context';
+import { showErrorNotification } from '../../utils/mantine-notifications';
+import FormInputFields from '../ui/form-input-fields';
 import { GoogleButton } from './GoogleButton';
 
 interface FormValues {
-  email: string;
   name: string;
+  email: string;
   password: string;
-  confirm: string;
+  confirmPassword: string;
   terms: boolean;
 }
 
 const initialValues: FormValues = {
-  email: '',
   name: '',
+  email: '',
   password: '',
-  confirm: '',
+  confirmPassword: '',
   terms: false,
 };
 
@@ -48,23 +38,29 @@ export function AuthenticationForm({ ...props }: ModalProps) {
         val.length <= 6 && type === 'register'
           ? 'Password should have at least 6 characters'
           : null,
-      confirm: (value, values) =>
+      confirmPassword: (value, values) =>
         value !== values.password && type === 'register' ? 'Passwords do not match' : null,
       terms: (val) => (type === 'register' && !val ? 'You must accept terms and conditions' : null),
     },
   });
 
-  const handleSubmit = (values: FormValues) => {
+  const onSubmit = (values: FormValues, e: React.FormEvent<HTMLFormElement> | undefined) => {
+    e?.preventDefault();
+    if (form.validate().hasErrors) {
+      return;
+    }
     if (type === 'login') {
       signInWithEmailAndPassword(firebaseAuth, values.email, values.password).catch((error) =>
-        console.error(error),
+        showErrorNotification('User', 'login', String(error)),
       );
+      props.onClose();
       return;
     }
     setRegisteredName(values.name);
     createUserWithEmailAndPassword(firebaseAuth, values.email, values.password).catch((error) =>
-      console.error(error),
+      showErrorNotification('User', 'register', String(error)),
     );
+    props.onClose();
   };
 
   React.useEffect(() => {
@@ -95,52 +91,19 @@ export function AuthenticationForm({ ...props }: ModalProps) {
 
       <Divider label="Or continue with email" labelPosition="center" my="lg" />
 
-      <form onSubmit={form.onSubmit(handleSubmit)}>
-        <Stack>
-          {type === 'register' && (
-            <TextInput
-              label="Name"
-              placeholder="Your name"
-              radius="md"
-              {...form.getInputProps('name')}
-            />
-          )}
-
-          <TextInput
-            required
-            label="Email"
-            placeholder="Email address"
-            radius="md"
-            {...form.getInputProps('email')}
-          />
-
-          <PasswordInput
-            required
-            label="Password"
-            placeholder="Your password"
-            radius="md"
-            {...form.getInputProps('password')}
-          />
-
-          {type === 'register' && (
-            <PasswordInput
-              required
-              label="Confirm password"
-              placeholder="Confirm password"
-              radius="md"
-              {...form.getInputProps('confirm')}
-            />
-          )}
-
-          {type === 'register' && (
-            <Checkbox
-              label="I accept terms and conditions"
-              checked={form.values.terms}
-              onChange={(event) => form.setFieldValue('terms', event.currentTarget.checked)}
-              error={form.errors.terms}
-            />
-          )}
-        </Stack>
+      <form onSubmit={form.onSubmit(onSubmit)}>
+        <FormInputFields
+          form={form}
+          values={form.values}
+          hide={{ name: type !== 'register', confirmPassword: type !== 'register' }}
+          required={{
+            email: true,
+            password: true,
+            confirmPassword: type === 'register',
+            terms: type === 'register',
+          }}
+          label={{ terms: 'I accept terms and conditions' }}
+        />
 
         <Group justify="space-between" mt="xl">
           <Anchor component="button" type="button" c="dimmed" onClick={() => toggle()} size="xs">

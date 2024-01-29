@@ -10,9 +10,9 @@ import {
   Text,
 } from '@mantine/core';
 import { useNavigate } from 'react-router-dom';
+import AddWashingMachine from '../../components/ui/AddWashingMachine';
 import FormInputFields from '../../components/ui/form-input-fields';
 import useLaundromatDetail from './useLaundromatDetail';
-import AddWashingMachine from '../../components/ui/AddWashingMachine';
 
 const LaundromatDetailPage = () => {
   const navigate = useNavigate();
@@ -22,7 +22,7 @@ const LaundromatDetailPage = () => {
     setWashingMachines,
     loading,
     opened,
-    laundromatForm,
+    form,
     handleDeleteLaundromat,
     handleDeleteLaundromatModal,
     handleUpdateLaundromat,
@@ -71,7 +71,7 @@ const LaundromatDetailPage = () => {
     <Modal opened={opened} onClose={close} title={`Delete Laundromat ${laundromat?.name}`}>
       <Text>Are you sure you want to delete Laundromat {laundromat?.name}?</Text>
       <Flex justify="flex-end" mt="md">
-        <form onSubmit={handleDeleteLaundromatModal}>
+        <form onSubmit={form.onSubmit(handleDeleteLaundromatModal)}>
           <Button variant="filled" color="red" type="submit">
             Delete
           </Button>
@@ -99,14 +99,14 @@ const LaundromatDetailPage = () => {
             Laundromat {laundromat.name} Details Page
           </Text>
           <Box maw={340} mx="auto">
-            <form onSubmit={handleUpdateLaundromat}>
-              <FormInputFields form={laundromatForm} object={laundromatForm.values} />
+            <form onSubmit={form.onSubmit(handleUpdateLaundromat)}>
+              <FormInputFields form={form} values={form.values} />
               <Flex justify="flex-end" mt="md">
                 <Button
                   variant="filled"
                   color="red"
                   onClick={handleDeleteLaundromat}
-                  disabled={laundromatForm.isDirty()}
+                  disabled={form.isDirty()}
                 >
                   Delete
                 </Button>
@@ -114,9 +114,9 @@ const LaundromatDetailPage = () => {
                   variant="filled"
                   color="yellow"
                   ml="sm"
-                  disabled={!laundromatForm.isDirty()}
+                  disabled={!form.isDirty()}
                   onClick={() => {
-                    laundromatForm.reset();
+                    form.reset();
                   }}
                 >
                   Cancel
@@ -125,7 +125,7 @@ const LaundromatDetailPage = () => {
                   variant="filled"
                   color="green"
                   ml="sm"
-                  disabled={!laundromatForm.isValid() || !laundromatForm.isDirty()}
+                  disabled={!form.isValid() || !form.isDirty()}
                   type="submit"
                 >
                   Save

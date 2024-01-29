@@ -3,8 +3,7 @@ import { useDisclosure } from '@mantine/hooks';
 import React, { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import Contract from '../../interfaces/entities/contract';
-import WashingMachine from '../../interfaces/entities/washing-machine';
-import { WashingMachineForm } from '../../interfaces/forms/WashingMachineFrom';
+import WashingMachine, { UpdateWashingMachine } from '../../interfaces/entities/washing-machine';
 import {
   bulkCancelContracts,
   cancelContract,
@@ -17,6 +16,12 @@ import {
   showErrorNotification,
   showSuccessNotification,
 } from '../../utils/mantine-notifications';
+
+const initialValues: UpdateWashingMachine = {
+  name: '',
+  description: '',
+  brand: '',
+};
 
 const useWashingMachineDetails = () => {
   const { id } = useParams();
@@ -36,13 +41,13 @@ const useWashingMachineDetails = () => {
       .then((washingMachine) => {
         setWashingMachine(washingMachine);
 
-        washingMachineForm.setInitialValues({
+        form.setInitialValues({
           name: washingMachine.name,
           description: washingMachine.description ?? '',
           brand: washingMachine.brand,
         });
 
-        washingMachineForm.reset();
+        form.reset();
 
         if (!washingMachine.contracts) {
           showErrorNotification('contracts', 'load', 'failed to load contracts');
@@ -64,15 +69,9 @@ const useWashingMachineDetails = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [id]);
 
-  const initialWashingMachineValues: WashingMachineForm = {
-    name: '',
-    description: '',
-    brand: '',
-  };
-
-  const washingMachineForm = useForm<WashingMachineForm>({
+  const form = useForm<UpdateWashingMachine>({
     validateInputOnChange: true,
-    initialValues: initialWashingMachineValues,
+    initialValues,
     validate: {
       name: hasLength({ min: 1 }, 'Name must be at least 1 character long'),
       brand: hasLength({ min: 1 }, 'Brand must be at least 1 character long'),
@@ -143,8 +142,14 @@ const useWashingMachineDetails = () => {
       );
   };
 
-  const handleUpdateWashingMachine = (event: React.FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
+  const handleUpdateWashingMachine = (
+    values: UpdateWashingMachine,
+    event: React.FormEvent<HTMLFormElement> | undefined,
+  ) => {
+    event?.preventDefault();
+    if (form.validate().hasErrors) {
+      return;
+    }
 
     if (!id) {
       showErrorNotification('Washing Machine', 'update', 'Washing Machine not found');
@@ -152,9 +157,9 @@ const useWashingMachineDetails = () => {
     }
 
     setLoading(true);
-    updateWashingMachine(id, washingMachineForm.values)
+    updateWashingMachine(id, values)
       .then((response) => {
-        washingMachineForm.setInitialValues({
+        form.setInitialValues({
           name: response.name,
           description: response.description ?? '',
           brand: response.brand,
@@ -171,8 +176,11 @@ const useWashingMachineDetails = () => {
       });
   };
 
-  const handleDeleteWashingMachineModal = (event: React.FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
+  const handleDeleteWashingMachineModal = (
+    _: UpdateWashingMachine,
+    event: React.FormEvent<HTMLFormElement> | undefined,
+  ) => {
+    event?.preventDefault();
 
     if (!id) {
       showErrorNotification('Washing Machine', 'delete', 'Washing Machine not found');
@@ -212,7 +220,7 @@ const useWashingMachineDetails = () => {
     contracts,
     loading,
     opened,
-    washingMachineForm,
+    form,
     close,
     handleCancelContract,
     cancelAllContracts,

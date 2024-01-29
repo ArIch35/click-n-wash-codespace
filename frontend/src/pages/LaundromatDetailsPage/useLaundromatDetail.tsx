@@ -2,9 +2,8 @@ import { hasLength, isInRange, useForm } from '@mantine/form';
 import { useDisclosure } from '@mantine/hooks';
 import React, { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import Laundromat from '../../interfaces/entities/laundromat';
+import Laundromat, { CreateLaundromat } from '../../interfaces/entities/laundromat';
 import WashingMachine from '../../interfaces/entities/washing-machine';
-import { LaundromatForm } from '../../interfaces/forms/LaundromatForm';
 import {
   deleteLaundromat,
   deleteWashingMachine,
@@ -12,6 +11,15 @@ import {
   updateLaundromat,
 } from '../../utils/api';
 import { showErrorNotification, showSuccessNotification } from '../../utils/mantine-notifications';
+
+const initialValues: CreateLaundromat = {
+  name: '',
+  street: '',
+  postalCode: '',
+  city: '',
+  price: 0,
+  country: '',
+};
 
 const useLaundromatDetail = () => {
   const { id } = useParams();
@@ -33,7 +41,7 @@ const useLaundromatDetail = () => {
         setWashingMachines(response.washingMachines);
 
         // Set form default values
-        laundromatForm.setInitialValues({
+        form.setInitialValues({
           name: response.name,
           street: response.street,
           city: response.city,
@@ -42,7 +50,7 @@ const useLaundromatDetail = () => {
           price: response.price,
         });
 
-        laundromatForm.reset();
+        form.reset();
         setLoading(false);
       })
       .catch((error) => {
@@ -52,18 +60,9 @@ const useLaundromatDetail = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [id]);
 
-  const initialLaundromatValues: LaundromatForm = {
-    name: '',
-    street: '',
-    postalCode: '',
-    city: '',
-    price: 0,
-    country: '',
-  };
-
-  const laundromatForm = useForm<LaundromatForm>({
+  const form = useForm<CreateLaundromat>({
     validateInputOnChange: true,
-    initialValues: initialLaundromatValues,
+    initialValues,
     validate: {
       name: hasLength({ min: 3 }, 'Name must be at least 3 characters long'),
       street: hasLength({ min: 3 }, 'Street name must be at least 3 characters long'),
@@ -88,7 +87,10 @@ const useLaundromatDetail = () => {
     open(); // Open modal
   };
 
-  const handleDeleteLaundromatModal = (event: React.FormEvent<HTMLFormElement>) => {
+  const handleDeleteLaundromatModal = (
+    _: CreateLaundromat,
+    event: React.FormEvent<HTMLFormElement> | undefined,
+  ) => {
     event?.preventDefault();
 
     close();
@@ -110,7 +112,10 @@ const useLaundromatDetail = () => {
       });
   };
 
-  const handleUpdateLaundromat = (event: React.FormEvent<HTMLFormElement>) => {
+  const handleUpdateLaundromat = (
+    values: CreateLaundromat,
+    event: React.FormEvent<HTMLFormElement> | undefined,
+  ) => {
     event?.preventDefault();
 
     if (!id) {
@@ -119,9 +124,9 @@ const useLaundromatDetail = () => {
     }
 
     setLoading(true);
-    updateLaundromat(id, laundromatForm.values)
+    updateLaundromat(id, values)
       .then((response) => {
-        laundromatForm.setInitialValues({
+        form.setInitialValues({
           name: response.name,
           street: response.street,
           city: response.city,
@@ -177,7 +182,7 @@ const useLaundromatDetail = () => {
     setWashingMachines,
     loading,
     opened,
-    laundromatForm,
+    form,
     handleDeleteLaundromat,
     handleDeleteLaundromatModal,
     handleUpdateLaundromat,

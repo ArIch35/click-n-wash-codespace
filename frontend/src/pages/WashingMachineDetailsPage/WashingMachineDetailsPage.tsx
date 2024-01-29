@@ -8,7 +8,7 @@ const WashingMachineDetailsPage = () => {
     contracts,
     loading,
     opened,
-    washingMachineForm,
+    form,
     close,
     handleCancelContract,
     cancelAllContracts,
@@ -50,7 +50,7 @@ const WashingMachineDetailsPage = () => {
     <Modal opened={opened} onClose={close} title={`Delete Laundromat ${washingMachine?.name}`}>
       <Text>Are you sure you want to delete Washing Machine {washingMachine?.name}?</Text>
       <Flex justify="flex-end" mt="md">
-        <form onSubmit={handleDeleteWashingMachineModal}>
+        <form onSubmit={form.onSubmit(handleDeleteWashingMachineModal)}>
           <Button variant="filled" color="red" type="submit">
             Delete
           </Button>
@@ -78,14 +78,14 @@ const WashingMachineDetailsPage = () => {
             Washing Machine {washingMachine.name} Details Page
           </Text>
           <Box maw={340} mx="auto">
-            <form onSubmit={handleUpdateWashingMachine}>
-              <FormInputFields form={washingMachineForm} object={washingMachineForm.values} />
+            <form onSubmit={form.onSubmit(handleUpdateWashingMachine)}>
+              <FormInputFields form={form} values={form.values} />
               <Flex justify="flex-end" mt="md">
                 <Button
                   variant="filled"
                   color="red"
                   onClick={handleDeleteWashingmachine}
-                  disabled={washingMachineForm.isDirty()}
+                  disabled={form.isDirty()}
                 >
                   Delete
                 </Button>
@@ -93,9 +93,9 @@ const WashingMachineDetailsPage = () => {
                   variant="filled"
                   color="yellow"
                   ml="sm"
-                  disabled={!washingMachineForm.isDirty()}
+                  disabled={!form.isDirty()}
                   onClick={() => {
-                    washingMachineForm.reset();
+                    form.reset();
                   }}
                 >
                   Cancel
@@ -104,7 +104,7 @@ const WashingMachineDetailsPage = () => {
                   variant="filled"
                   color="green"
                   ml="sm"
-                  disabled={!washingMachineForm.isValid() || !washingMachineForm.isDirty()}
+                  disabled={!form.isValid() || !form.isDirty()}
                   type="submit"
                 >
                   Save
@@ -113,7 +113,7 @@ const WashingMachineDetailsPage = () => {
             </form>
           </Box>
           <Flex justify={'space-between'} py={30}>
-            <Text size="xl">My Washing Machines</Text>
+            <Text size="xl">My Contracts</Text>
             <form>
               <Button
                 radius={'100'}
