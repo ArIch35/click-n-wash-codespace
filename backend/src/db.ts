@@ -6,11 +6,13 @@ import Laundromat from './entities/laundromat';
 import Message from './entities/message';
 import User from './entities/user';
 import WashingMachine from './entities/washing-machine';
+import admin from './firebase-admin';
 
 interface Db {
   dataSource: DataSource;
   entityManager: EntityManager;
   dropDatabase: () => Promise<void>;
+  syncAuth: () => Promise<void>;
   userRepository: Repository<User>;
   laundromatRepository: Repository<Laundromat>;
   washingMachineRepository: Repository<WashingMachine>;
@@ -47,6 +49,21 @@ export const connectToDb = async (test?: boolean): Promise<void> => {
       await getDb().washingMachineRepository.delete({});
       await getDb().laundromatRepository.delete({});
       await getDb().userRepository.delete({});
+    },
+    syncAuth: async () => {
+      const firebaseUserIds: string[] = [];
+      const dbUserIds = (await getDb().userRepository.find()).map((user) => user.id);
+      let exists = true;
+      let nextPageToken: string | undefined = undefined;
+      while (exists) {
+        const listUsersResult = await admin.auth().listUsers(1000, nextPageToken);
+        firebaseUserIds.push(...listUsersResult.users.map((user) => user.uid));
+        nextPageToken = listUsersResult.pageToken;
+        exists = !!nextPageToken;
+      }
+      const toDelete = firebaseUserIds.filter((id) => !dbUserIds.includes(id));
+      await admin.auth().deleteUsers(toDelete);
+      console.log(`Deleted ${toDelete.length} unused users in Firebase`);
     },
     userRepository: em.getRepository(User),
     laundromatRepository: em.getRepository(Laundromat),
