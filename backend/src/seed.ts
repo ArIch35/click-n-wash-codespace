@@ -47,7 +47,7 @@ const seed = async () => {
         city: fakerDE.location.city(),
         country: fakerDE.location.country(),
         postalCode: fakerDE.location.zipCode(),
-        price: Number(fakerDE.commerce.price()),
+        price: Number(fakerDE.commerce.price({ min: 2, max: 5 })),
         owner: user,
         lat: fakerDE.location.latitude().toString(),
         lon: fakerDE.location.longitude().toString(),
