@@ -8,6 +8,7 @@ import FormInputFields from '../components/ui/form-input-fields';
 import { CreateLaundromat } from '../interfaces/entities/laundromat';
 import { CreateWashingMachine } from '../interfaces/entities/washing-machine';
 import { createLaundromat, createWashingMachine, getPositionFromAddress } from '../utils/api';
+import { wmIcon } from '../utils/icon/CustomIcons';
 import { showErrorNotification, showSuccessNotification } from '../utils/mantine-notifications';
 
 type FormValues = {
@@ -171,6 +172,7 @@ const LaundromatAddPage = () => {
             <MapContext />
             <Marker
               position={[Number(form.values.laundromat.lat), Number(form.values.laundromat.lon)]}
+              icon={wmIcon}
             />
           </MapContainer>
         )}
