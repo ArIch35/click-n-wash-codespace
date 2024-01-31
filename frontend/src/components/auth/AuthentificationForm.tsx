@@ -5,7 +5,7 @@ import { createUserWithEmailAndPassword, signInWithEmailAndPassword } from 'fire
 import React from 'react';
 import firebaseAuth from '../../firebase';
 import { useAuth } from '../../providers/authentication/Authentication.Context';
-import { showErrorNotification } from '../../utils/mantine-notifications';
+import { showCustomNotification, showErrorNotification } from '../../utils/mantine-notifications';
 import FormInputFields from '../ui/form-input-fields';
 import { GoogleButton } from './GoogleButton';
 
@@ -50,17 +50,31 @@ export function AuthenticationForm({ ...props }: ModalProps) {
       return;
     }
     if (type === 'login') {
-      signInWithEmailAndPassword(firebaseAuth, values.email, values.password).catch((error) =>
-        showErrorNotification('User', 'login', String(error)),
-      );
-      props.onClose();
+      signInWithEmailAndPassword(firebaseAuth, values.email, values.password)
+        .then((userCredential) => {
+          props.onClose();
+          showCustomNotification({
+            title: `Welcome ${userCredential.user?.displayName || userCredential.user.email}!`,
+            message: 'You have been successfully logged in',
+            color: 'green',
+            autoClose: true,
+          });
+        })
+        .catch((error) => showErrorNotification('User', 'login', String(error)));
       return;
     }
     setRegisteredName(values.name);
-    createUserWithEmailAndPassword(firebaseAuth, values.email, values.password).catch((error) =>
-      showErrorNotification('User', 'register', String(error)),
-    );
-    props.onClose();
+    createUserWithEmailAndPassword(firebaseAuth, values.email, values.password)
+      .then(() => {
+        props.onClose();
+        showCustomNotification({
+          title: 'Welcome',
+          message: 'Your account has been created',
+          color: 'green',
+          autoClose: true,
+        });
+      })
+      .catch((error) => showErrorNotification('User', 'register', String(error)));
   };
 
   React.useEffect(() => {
@@ -84,7 +98,18 @@ export function AuthenticationForm({ ...props }: ModalProps) {
       </Text>
 
       <Group grow mb="md" mt="md">
-        <GoogleButton radius="xl" onSuccessfulSignIn={() => props.onClose()}>
+        <GoogleButton
+          radius="xl"
+          onSuccessfulSignIn={(userCredential) => {
+            showCustomNotification({
+              title: `Welcome ${userCredential.user?.displayName || userCredential.user.email}!`,
+              message: 'You have been successfully logged in',
+              color: 'green',
+              autoClose: true,
+            });
+            props.onClose();
+          }}
+        >
           Google
         </GoogleButton>
       </Group>
@@ -95,7 +120,11 @@ export function AuthenticationForm({ ...props }: ModalProps) {
         <FormInputFields
           form={form}
           values={form.values}
-          hide={{ name: type !== 'register', confirmPassword: type !== 'register' }}
+          hide={{
+            name: type !== 'register',
+            confirmPassword: type !== 'register',
+            terms: type !== 'register',
+          }}
           required={{
             email: true,
             password: true,

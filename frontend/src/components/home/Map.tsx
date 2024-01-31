@@ -5,6 +5,7 @@ import { MapContainer, Marker, TileLayer, Tooltip, useMap } from 'react-leaflet'
 import Laundromat from '../../interfaces/entities/laundromat';
 import { useAuth } from '../../providers/authentication/Authentication.Context';
 import { AuthenticationForm } from '../auth/AuthentificationForm';
+import { wmIcon } from '../../utils/icon/CustomIcons';
 
 interface CustomMapProps {
   laundromats: Laundromat[];
@@ -62,6 +63,7 @@ const CustomMap: React.FC<CustomMapProps> = ({
         <Marker
           key={item.id}
           position={item.position!}
+          icon={wmIcon}
           eventHandlers={{
             click: () => {
               handleItemClick(item);

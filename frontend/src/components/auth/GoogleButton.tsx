@@ -1,5 +1,5 @@
 import { Button, ButtonProps } from '@mantine/core';
-import { GoogleAuthProvider, signInWithPopup } from 'firebase/auth';
+import { GoogleAuthProvider, UserCredential, signInWithPopup } from 'firebase/auth';
 import firebaseAuth from '../../firebase';
 
 function GoogleIcon(props: React.ComponentPropsWithoutRef<'svg'>) {
@@ -36,7 +36,7 @@ export function GoogleButton({
   ...props
 }: ButtonProps &
   React.ComponentPropsWithoutRef<'button'> & {
-    onSuccessfulSignIn: () => void;
+    onSuccessfulSignIn: (userCredential: UserCredential) => void;
   }) {
   return (
     <Button
@@ -45,7 +45,7 @@ export function GoogleButton({
       onClick={() => {
         const provider = new GoogleAuthProvider();
         signInWithPopup(firebaseAuth, provider)
-          .then(() => onSuccessfulSignIn())
+          .then((userCredential) => onSuccessfulSignIn(userCredential))
           .catch((error) => {
             console.error(error);
           });
