@@ -51,8 +51,8 @@ const Filter: React.FC<FilterProps> = ({ onFilterSelected, onFilterReset }) => {
   };
 
   return (
-    <Card w="100%">
-      <Stack w="inherit">
+    <Card withBorder>
+      <Stack>
         <TextInput
           label="Laundromat name"
           placeholder="Pick Name"
