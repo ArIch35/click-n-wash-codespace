@@ -22,11 +22,7 @@ const BaseLayout = ({ children }: { children: ReactNode }) => {
         <Header toggle={navbarHandlers.open} setVisible={setVisible} />
       </AppShell.Header>
 
-      <AppShell.Main
-        pt={sizes.headerHeight}
-        h={`calc(100vh - ${rem(sizes.headerHeight)})`}
-        style={{ overflowY: 'scroll' }}
-      >
+      <AppShell.Main pt={sizes.headerHeight} h={`calc(100vh - ${rem(sizes.headerHeight)})`}>
         {children}
         {visible && (
           <Overlay
