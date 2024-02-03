@@ -1,6 +1,10 @@
 import { headers, Message } from '.';
 import { RequestFilter, SearchFilter } from '../../components/home/Filter';
-import Laundromat, { CreateLaundromat } from '../../interfaces/entities/laundromat';
+import Laundromat, {
+  CreateLaundromat,
+  GetLaundromatAnalytics,
+  LaundromatAnalytics,
+} from '../../interfaces/entities/laundromat';
 import LaundromatTimeSlots from '../../interfaces/laundromat-time-slots';
 import entityParser from '../entity-parser';
 import loadEnv from '../load-env';
@@ -66,6 +70,29 @@ export const getLaundromatTimeSlots = async (id: string) => {
     throw new Error((data as Message).message);
   }
   return entityParser<LaundromatTimeSlots[]>(data as LaundromatTimeSlots[]);
+};
+
+/**
+ * Retrieves the analytics data for a specific laundromat.
+ * @param id - The ID of the laundromat.
+ * @param query - The query parameters for filtering the analytics data.
+ * @returns A promise that resolves to an array of LaundromatTimeSlots representing the analytics data.
+ * @throws An error if the API request fails or returns an error message.
+ */
+export const getLaundromatAnalytics = async (id: string, query: GetLaundromatAnalytics) => {
+  const url = new URL(`${route}/${id}/analytics`);
+  Object.entries(query).forEach(([key, value]) => {
+    url.searchParams.append(key, value.toString());
+  });
+  const response = await fetch(url, {
+    headers: { ...(await headers()) },
+  });
+
+  const data = (await response.json()) as unknown;
+  if (!response.ok) {
+    throw new Error((data as Message).message);
+  }
+  return entityParser<LaundromatAnalytics>(data as LaundromatAnalytics);
 };
 
 /**

@@ -1,5 +1,5 @@
 import { BeforeInsert, BeforeUpdate, Column, Entity, ManyToOne, Not, OneToMany } from 'typeorm';
-import { number, object, string } from 'yup';
+import { date, number, object, string } from 'yup';
 import getDb from '../db';
 import StatusError from '../utils/error-with-status';
 import BaseEntity from './base-entity';
@@ -111,3 +111,13 @@ export const updateLaundromatSchema = object({
   .test('at-least-one-field', 'You must provide at least one field', (value) =>
     Object.values(value).some((field) => field !== undefined && field !== null),
   );
+
+export const analyticsLaundromatSchema = object({
+  startDate: date().required(),
+  endDate: date().required(),
+  span: string().oneOf(['day', 'week', 'month', 'year']).required(),
+})
+  .noUnknown(true)
+  .test('is-valid-date', 'Start date must be before end date', (value) => {
+    return value.startDate < value.endDate;
+  });
