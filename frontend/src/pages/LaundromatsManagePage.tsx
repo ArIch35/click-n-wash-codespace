@@ -1,5 +1,15 @@
 import { BarChart } from '@mantine/charts';
-import { Button, Container, Group, Select, Stack, Table, Text } from '@mantine/core';
+import {
+  Button,
+  Container,
+  Group,
+  NumberFormatter,
+  Select,
+  Stack,
+  Table,
+  Text,
+  Title,
+} from '@mantine/core';
 import { DatePicker } from '@mantine/dates';
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
@@ -117,16 +127,29 @@ const LaundromatsManagePage = () => {
         </Stack>
       </Container>
 
-      <Stack>
+      <Stack px="xl">
         {analytics.map((laundromatAnalytics) => (
-          <BarChart
-            key={laundromatAnalytics.laundromat.id}
-            h="20rem"
-            data={laundromatAnalytics.analytics}
-            dataKey="date"
-            withLegend
-            series={laundromatAnalytics.series}
-          />
+          <Stack key={laundromatAnalytics.laundromat.id}>
+            <Group>
+              <Title order={3}>{laundromatAnalytics.laundromat.name}, </Title>
+              <Text fw={700} size="xl">
+                Total revenue:{' '}
+                {NumberFormatter({
+                  value: laundromatAnalytics.analytics
+                    .map((el) => el.revenue)
+                    .reduce((a, b) => a + b, 0),
+                  suffix: '€',
+                })}
+              </Text>
+            </Group>
+            <BarChart
+              h="20rem"
+              data={laundromatAnalytics.analytics}
+              dataKey="date"
+              withLegend
+              series={laundromatAnalytics.series}
+            />
+          </Stack>
         ))}
       </Stack>
     </Stack>
