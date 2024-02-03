@@ -125,6 +125,12 @@ const LaundromatAddPage = () => {
     if (form.validate().hasErrors) {
       return;
     }
+
+    if (form.values.laundromat.lat === '' || form.values.laundromat.lon === '') {
+      findLocation();
+      return;
+    }
+
     setActive((current) => (current < 2 ? current + 1 : 2));
   };
   const prevStep = () => setActive((current) => (current > 0 ? current - 1 : 0));
@@ -178,7 +184,6 @@ const LaundromatAddPage = () => {
         )}
         <Group justify="space-between">
           <Group>
-            {active === 0 && <Button onClick={findLocation}>Find location</Button>}
             {active === 1 && (
               <Button onClick={addMoreWashingMachines}>Add more washing machines</Button>
             )}
@@ -191,7 +196,9 @@ const LaundromatAddPage = () => {
             {active === 2 ? (
               <Button onClick={onSubmit}>Submit</Button>
             ) : (
-              <Button onClick={nextStep}>Next</Button>
+              <Button onClick={nextStep}>
+                {form.values.laundromat.lat ? 'Next' : 'Find Location'}
+              </Button>
             )}
           </Flex>
         </Group>
