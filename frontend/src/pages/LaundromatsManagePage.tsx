@@ -101,7 +101,7 @@ const LaundromatsManagePage = () => {
       <Container>
         <Group justify="space-between">
           <Text size="xl">My Laundromats</Text>
-          <Button radius={'100'} onClick={() => navigate('/add-laundromat')}>
+          <Button variant="outline" radius={'100'} onClick={() => navigate('/add-laundromat')}>
             + Add
           </Button>
         </Group>
