@@ -55,7 +55,7 @@ const LaundromatsManagePage = () => {
   );
 
   return (
-    <Container>
+    <Container size={'xl'}>
       {loading && (
         <LoadingOverlay
           zIndex={1000}
@@ -73,6 +73,7 @@ const LaundromatsManagePage = () => {
           <Flex justify={'space-between'} py={30}>
             <Text size="xl">My Laundromats</Text>
             <Button
+              variant="outline"
               radius={'100'}
               onClick={(event) => {
                 event.preventDefault();
