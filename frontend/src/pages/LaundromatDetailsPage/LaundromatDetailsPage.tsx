@@ -42,7 +42,9 @@ const LaundromatDetailPage = () => {
     <Table.Tr key={element.name}>
       <Table.Td>{element.name}</Table.Td>
       <Table.Td>{element.description}</Table.Td>
-      <Table.Td>{element.contracts?.length ?? 0}</Table.Td>
+      <Table.Td>
+        {element.contracts?.filter((contract) => contract.status === 'ongoing').length ?? 0}
+      </Table.Td>
       <Table.Td>
         <form>
           <Group gap="1rem">
