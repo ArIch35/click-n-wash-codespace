@@ -2,9 +2,14 @@ import { RequestHandler, Router } from 'express';
 import { Between, FindOperator, ILike } from 'typeorm';
 import { ValidationError } from 'yup';
 import getDb from '../db';
-import { createLaundromatSchema, updateLaundromatSchema } from '../entities/laundromat';
+import Laundromat, {
+  analyticsLaundromatSchema,
+  createLaundromatSchema,
+  updateLaundromatSchema,
+} from '../entities/laundromat';
 import WashingMachine from '../entities/washing-machine';
 import StatusError from '../utils/error-with-status';
+import formatDate from '../utils/format-date';
 import {
   MESSAGE_FORBIDDEN_NOT_OWNER,
   MESSAGE_NOT_FOUND,
@@ -29,6 +34,24 @@ interface TimeSlot {
 interface washingMachineTimeSlots {
   washingMachine: WashingMachine;
   timeSlots: TimeSlot[];
+}
+
+interface Chart {
+  name: string;
+  label: string;
+  color: string;
+}
+
+interface LaundromatAnalytics {
+  laundromat: Laundromat;
+  analytics: {
+    date: string;
+    revenue: number;
+    totalFinishedContracts: number;
+    totalOngoingContracts: number;
+    totalCancelledContracts: number;
+  }[];
+  series: Chart[];
 }
 
 const router: Router = Router();
@@ -135,6 +158,118 @@ router.get('/:id/occupied-slots', (async (req, res) => {
     });
     return res.status(STATUS_OK).json(Array.from(laundromatTimeSlots));
   } catch (error) {
+    return res.status(STATUS_SERVER_ERROR).json(MESSAGE_SERVER_ERROR);
+  }
+}) as RequestHandler);
+
+router.get('/:id/analytics', (async (req, res) => {
+  try {
+    const validated = await analyticsLaundromatSchema.validate(
+      {
+        startDate: new Date(req.query.startDate as string),
+        endDate: new Date(req.query.endDate as string),
+        span: req.query.span as string,
+      },
+      { strict: true },
+    );
+    validated.startDate.setHours(0, 0, 0, 0);
+    validated.endDate.setHours(23, 59, 59, 999);
+    const laundromat = await getDb().laundromatRepository.findOne({
+      where: { id: req.params.id },
+      relations: { washingMachines: { contracts: true } },
+    });
+    if (!laundromat) {
+      return res.status(STATUS_NOT_FOUND).json(MESSAGE_NOT_FOUND);
+    }
+
+    const laundromatAnalytics: LaundromatAnalytics = {
+      laundromat,
+      analytics: [],
+      series: [
+        { name: 'totalFinishedContracts', label: 'Finished Contracts', color: 'blue' },
+        { name: 'totalOngoingContracts', label: 'Ongoing Contracts', color: 'green' },
+        { name: 'totalCancelledContracts', label: 'Cancelled Contracts', color: 'red' },
+      ],
+    };
+
+    let currentStartDate = new Date(validated.startDate);
+    while (currentStartDate <= validated.endDate) {
+      const currentEndDate = new Date(currentStartDate);
+      switch (validated.span) {
+        case 'day':
+          currentEndDate.setDate(currentEndDate.getDate() + 1);
+          break;
+        case 'week':
+          currentEndDate.setDate(currentEndDate.getDate() + 7);
+          break;
+        case 'month':
+          currentEndDate.setMonth(currentEndDate.getMonth() + 1);
+          break;
+        case 'year':
+          currentEndDate.setFullYear(currentEndDate.getFullYear() + 1);
+          break;
+      }
+
+      const revenue = laundromat.washingMachines
+        ?.flatMap(
+          (washingMachine) =>
+            washingMachine.contracts?.filter(
+              (contract) =>
+                contract.startDate >= currentStartDate && contract.startDate < currentEndDate,
+            ),
+        )
+        .reduce((acc, contract) => acc + (contract?.price || 0), 0);
+
+      const totalFinishedContracts = laundromat.washingMachines?.flatMap(
+        (washingMachine) =>
+          washingMachine.contracts?.filter(
+            (contract) =>
+              contract.startDate >= currentStartDate &&
+              contract.startDate < currentEndDate &&
+              contract.status === 'finished',
+          ),
+      ).length;
+
+      const totalOngoingContracts = laundromat.washingMachines?.flatMap(
+        (washingMachine) =>
+          washingMachine.contracts?.filter(
+            (contract) =>
+              contract.startDate >= currentStartDate &&
+              contract.startDate < currentEndDate &&
+              contract.status === 'ongoing',
+          ),
+      ).length;
+
+      const totalCancelledContracts = laundromat.washingMachines?.flatMap(
+        (washingMachine) =>
+          washingMachine.contracts?.filter(
+            (contract) =>
+              contract.startDate >= currentStartDate &&
+              contract.startDate < currentEndDate &&
+              contract.status === 'cancelled',
+          ),
+      ).length;
+
+      laundromatAnalytics.analytics.push({
+        date: `${formatDate(currentStartDate)} - ${formatDate(
+          new Date(currentEndDate.getTime() - 1),
+        )}`,
+        revenue: revenue || 0,
+        totalFinishedContracts: totalFinishedContracts || 0,
+        totalOngoingContracts: totalOngoingContracts || 0,
+        totalCancelledContracts: totalCancelledContracts || 0,
+      });
+
+      currentStartDate = currentEndDate;
+    }
+
+    return res.status(STATUS_OK).json(laundromatAnalytics);
+  } catch (error: unknown) {
+    if (error instanceof ValidationError) {
+      return res.status(STATUS_BAD_REQUEST).json(customMessage(false, error.errors.join(', ')));
+    } else if (error instanceof StatusError) {
+      return res.status(error.status).json(customMessage(false, error.message));
+    }
     return res.status(STATUS_SERVER_ERROR).json(MESSAGE_SERVER_ERROR);
   }
 }) as RequestHandler);
