@@ -1,12 +1,18 @@
 # Click n' Wash
 
+## Our Website
+
+Feel free to check our website at <a href="https://clicknwash.pro/"> clicknwash.pro </a>.
+
 ## Table of Contents
 
 - [About](#about)
 - [Features](#features)
-- [Tech Stakes](tech-stakes)
-- [Database Structures](database-structure)
-- [API Functions](api-functions)
+- [Tech Stakes](#tech-stakes)
+- [Database Structures](#database-structure)
+- [API Functions](#api-functions)
+- [Pages](#pages)
+- [Components](#components)
 - [Authors](#authors)
 
 ## About Click n' Wash <a name="about"></a>
@@ -15,8 +21,8 @@ Click n' Wash is a student-led initiative aimed at simplifying the laundry exper
 
 ## Features <a name="features"></a>
 
-- **Book a Washing machine**: a user can book a washing machine direct from the web, when the washing machine is available.
-- **Check the availability of a Washing machine**: a user can check the availability for a washing machine direct from the website, without the need to go to the laundromat.
+- **Book a Washing machine**: a user can book a washing machine directly from the web, when the washing machine is available.
+- **Check the availability of a Washing machine**: a user can check the availability for a washing machine directly from the website, without the need to go to the laundromat.
 - **Report a Problem**: a user can report a problem to the technician or the owner of the laundromat,when the washing machine has an issue.
 - **search the nearest Laundromat**: the user can search for the nearest Laundromat from their location.
 - **Manage a Laundromat**: a vendor can manage their own laundromat.
@@ -101,6 +107,113 @@ The `baseEntity` table stores a base entity. Each baseEntity has the following f
 
 ## API Functions <a name="api-functions"></a>
 
+In our Project we have a folders called API, to help us work with the data from backend. The API will be divided in some categories based on the Entity.
+
+### Balance Transactions API
+
+- `getBalanceTransactions`: This API will be use to retrieve a balance transactions.
+
+### Contracts API
+
+- `getContracts`: This API will retrieve the contracts from the server.
+- `getContractsById`: This API will retrieve a contract by its ID from the server.
+- `bookWashingMachine`: This API is used to books a washing machine for a specified start date.
+- `bulkCancelContracts`: This API will cancel multiple contracts in bulk.
+- `reportContract`: This API will sends a report for a contract with specified ID.
+- cancelContract`: This API is for the contract cancellation.
+
+### Laundromats API
+
+- `getLaundromats`: This will retrieve list of laundromats from the server.
+- `getLaundromatsById`: This will retrieve a laudromat with a specified ID.
+- `getLaundromatTimeSlots`: It will retrieve the time slots for a specific laundromat.
+- `createLaundromat`: API to creates a new laundromat.
+- `updateLaundromat`: API to updates laundromat with the specified ID.
+- `deleteLaundromat`: API to deletes a laundromat by its ID.
+- `getLaundromatFilters`: It will retrieve the filter parameters for the laundromats.
+- `getFilteredLaundromats`: Retrieves a list of filtered laundromats from the server.
+
+### Users API
+
+- `getUser`: Retrieves a user based on the ID.
+- `createUser`: Creates a new user.
+- `updateUser`: Updates a user's information.
+- `markAsRead`: Marks the specified messages as read.
+- `topUpBalance`: Top up the balance of a user.
+
+### Washing Machines API
+
+- `createWashingMachine`: Creates a washing machine.
+- `getWashingMachineById`: Retreives a washing machine by its ID.
+- `updateWashingMachines`: Updates a washing machine's informations.
+- `deleteWashingMachines`: Delete a washing machine by its ID.
+
+## Pages <a name="pages"></a>
+
+### Home Page
+
+In this page the user will see a map that shows the location of the laundromats and also a list of the available laundromats.
+
+### Inbox Page
+
+In this page the user and the vendor can see the list of messages that they got about their booking or about their laundromats.
+
+### Manange Bookings Page
+
+Here the user can see the list of their booking and the detail of the booking. the user can also cancel their booking or report a problem with the washing machine in this page.
+
+### Balance Page
+
+In this page the user can see their transaction list, their current balance and also top up their balance.
+
+### Manage Laundromats
+
+This page is only available to vendor. In this page the vendor can manage their laundromats informations and also add or delete a washing machine.
+
+### Washing Machine Detail Page
+
+In this page the vendor can see the detail of the washing machine and also change the information of the washing machine. Here the vendor can also see the list of contract and refund or cancel a contracts, when something's wrong happened to the washing machine.
+
+## Components <a name="components"></a>
+
+### Navbar
+
+We have a navigation bar as a component to help the user to navigate through our website comfortably.
+
+### Authentication Form
+
+This component will pop up in the middle of the screen and show the login or authetication form to the user.
+
+### Goggle Button
+
+This component will help the user to login to our website with their own google account.
+
+### Filter
+
+This component will the the user to find the nearest or cheapest laundromat. In this coomponent the user can set a filter for the laundromats.
+
+### Map
+
+This component will show a openstreetmap API in the homepage to show the location of the laundromats.
+
+### TimePicker
+
+With the help of this component the user can choose which date they want and also which time for the booking of the washing machine.
+
+### Washing Machine Picker
+
+With this component the user can pick which machine they want to book.
+
+### Add Funds Modal
+
+This component is used in the balance page to help the user top up their balance.
+
+### Add Washing Machine
+
+This component will show a form for the detail of the washing machine,that will be added to the laundromat.
+
+##
+
 ## Tech Stakes <a name="tech-stakes"></a>
 
 ### Frontend
@@ -110,6 +223,7 @@ The `baseEntity` table stores a base entity. Each baseEntity has the following f
 - [Vite](https://vitejs.dev/) - Build tool
 - [Mantine](https://mantine.dev/) - React CSS Framework
 - [Firebase](https://firebase.google.com/) - Google base login service
+- [Openstreetmap](https://www.openstreetmap.org/#map=6/51.330/10.453) - World map API
 
 ### Backend
 
