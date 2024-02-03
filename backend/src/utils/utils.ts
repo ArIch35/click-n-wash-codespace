@@ -43,3 +43,38 @@ export const statusSort = (contracts: Contract[]) => {
   };
   contracts.sort(sortBasedOnStatus);
 };
+
+/**
+ * Generates a random date within the specified range.
+ * @param start - The start date of the range.
+ * @param end - The end date of the range.
+ * @returns A random date within the specified range.
+ */
+export const randomDate = (start: Date, end: Date) => {
+  const VALID_BOOKING_HOURS_AS_STRING = [
+    '00:00',
+    '02:00',
+    '04:00',
+    '06:00',
+    '08:00',
+    '10:00',
+    '12:00',
+    '14:00',
+    '16:00',
+    '18:00',
+    '20:00',
+    '22:00',
+  ];
+
+  const startTimestamp = start.getTime();
+  const endTimestamp = end.getTime();
+  const randomTimestamp = randomNumber(startTimestamp, endTimestamp);
+  const randomDate = new Date(randomTimestamp);
+
+  const randomTimeString =
+    VALID_BOOKING_HOURS_AS_STRING[randomNumber(0, VALID_BOOKING_HOURS_AS_STRING.length - 1)];
+  const [hours, minutes] = randomTimeString.split(':');
+  randomDate.setHours(Number(hours), Number(minutes));
+
+  return randomDate;
+};
