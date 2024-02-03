@@ -21,6 +21,7 @@ import {
   STATUS_OK,
   STATUS_SERVER_ERROR,
 } from '../utils/http-status-codes';
+import { statusSort } from '../utils/utils';
 
 const router: Router = Router();
 
@@ -42,6 +43,7 @@ router.get('/:id', (async (req, res) => {
     if (!washingMachine) {
       return res.status(STATUS_NOT_FOUND).json(MESSAGE_NOT_FOUND);
     }
+    statusSort(washingMachine.contracts ?? []);
     return res.status(STATUS_OK).json(washingMachine);
   } catch (error) {
     return res.status(STATUS_SERVER_ERROR).json(MESSAGE_SERVER_ERROR);
