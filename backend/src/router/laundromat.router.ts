@@ -175,12 +175,7 @@ router.get('/:id/analytics', (async (req, res) => {
     validated.startDate.setHours(0, 0, 0, 0);
     validated.endDate.setHours(23, 59, 59, 999);
     const laundromat = await getDb().laundromatRepository.findOne({
-      where: {
-        id: req.params.id,
-        washingMachines: {
-          contracts: { startDate: Between(validated.startDate, validated.endDate) },
-        },
-      },
+      where: { id: req.params.id },
       relations: { washingMachines: { contracts: true } },
     });
     if (!laundromat) {
