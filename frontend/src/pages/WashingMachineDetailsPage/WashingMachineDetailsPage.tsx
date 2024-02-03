@@ -1,4 +1,14 @@
-import { Box, Button, Container, Flex, LoadingOverlay, Modal, Table, Text } from '@mantine/core';
+import {
+  Box,
+  Button,
+  Container,
+  Divider,
+  Flex,
+  LoadingOverlay,
+  Modal,
+  Table,
+  Text,
+} from '@mantine/core';
 import FormInputFields from '../../components/ui/form-input-fields';
 import useWashingMachineDetails from './useWashingMachineDetails';
 
@@ -51,11 +61,11 @@ const WashingMachineDetailsPage = () => {
       <Text>Are you sure you want to delete Washing Machine {washingMachine?.name}?</Text>
       <Flex justify="flex-end" mt="md">
         <form onSubmit={form.onSubmit(handleDeleteWashingMachineModal)}>
-          <Button variant="filled" color="red" type="submit">
-            Delete
-          </Button>
-          <Button variant="filled" color="yellow" ml="sm" onClick={close}>
+          <Button variant="filled" color="yellow" onClick={close}>
             Cancel
+          </Button>
+          <Button variant="filled" color="red" ml="sm" type="submit">
+            Delete
           </Button>
         </form>
       </Flex>
@@ -63,7 +73,7 @@ const WashingMachineDetailsPage = () => {
   );
 
   return (
-    <Container pos={'relative'}>
+    <Container pos={'relative'} py={30} size={'xl'}>
       {onDeleteModal}
       {loading && (
         <LoadingOverlay
@@ -75,9 +85,9 @@ const WashingMachineDetailsPage = () => {
       {!loading && washingMachine && contracts && (
         <>
           <Text ta="center" size="xl">
-            Washing Machine {washingMachine.name} Details Page
+            Washing Machine {washingMachine.name}
           </Text>
-          <Box maw={340} mx="auto">
+          <Box mx="auto">
             <form onSubmit={form.onSubmit(handleUpdateWashingMachine)}>
               <FormInputFields form={form} values={form.values} />
               <Flex justify="flex-end" mt="md">
@@ -112,7 +122,8 @@ const WashingMachineDetailsPage = () => {
               </Flex>
             </form>
           </Box>
-          <Flex justify={'space-between'} py={30}>
+          <Divider my={40} />
+          <Flex justify={'space-between'} py={10}>
             <Text size="xl">My Contracts</Text>
             <form>
               <Button

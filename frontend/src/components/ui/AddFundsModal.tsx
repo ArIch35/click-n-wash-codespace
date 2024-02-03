@@ -35,11 +35,10 @@ function AddFundsModal() {
         title="Add Funds"
         overlayProps={{ backgroundOpacity: 0.55, blur: 3 }}
         radius="md"
-        size="lg"
         centered
       >
         <Stack gap="xl">
-          <Group justify="center" gap="xl">
+          <Group justify="center" gap="xl" py={0}>
             {values.map((value) => (
               <Button
                 key={`${value}`}
@@ -57,13 +56,13 @@ function AddFundsModal() {
               </Button>
             ))}
           </Group>
-          <Button radius="md" size="md" color="green" onClick={() => onSubmit()}>
+          <Button variant="outline" radius="md" size="md" color="green" onClick={() => onSubmit()}>
             Topup
           </Button>
         </Stack>
       </Modal>
 
-      <Button onClick={open} radius="md" size="lg">
+      <Button onClick={open} variant="outline" radius={100}>
         Add Funds
       </Button>
     </>

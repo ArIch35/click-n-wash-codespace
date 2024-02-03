@@ -3,6 +3,8 @@ import {
   Button,
   Card,
   Center,
+  Container,
+  Flex,
   Group,
   NumberFormatter,
   Stack,
@@ -95,9 +97,11 @@ const BookingsPage = () => {
             </Group>
           </Stack>
           <Stack>
+            <Flex justify={'space-between'}>
+              <Text size="sm">From: {formatDate(contract.startDate)}</Text>
+              <Text size="sm">To: {formatDate(contract.endDate)}</Text>
+            </Flex>
             <NumberFormatter value={contract.price} thousandSeparator suffix=" € EUR" />
-            <Text size="sm">From: {formatDate(contract.startDate)}</Text>
-            <Text size="sm">To: {formatDate(contract.endDate)}</Text>
           </Stack>
         </Stack>
 
@@ -132,7 +136,7 @@ const BookingsPage = () => {
   }, []);
 
   return (
-    <Center p="2rem">
+    <Container py={30}>
       <Stack>
         <Center>
           <Title order={3}>Your Bookings</Title>
@@ -141,7 +145,7 @@ const BookingsPage = () => {
           <ContractCard key={contract.id} {...contract} />
         ))}
       </Stack>
-    </Center>
+    </Container>
   );
 };
 
