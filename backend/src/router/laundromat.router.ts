@@ -215,7 +215,9 @@ router.get('/:id/analytics', (async (req, res) => {
           (washingMachine) =>
             washingMachine.contracts?.filter(
               (contract) =>
-                contract.startDate >= currentStartDate && contract.startDate < currentEndDate,
+                contract.startDate >= currentStartDate &&
+                contract.startDate < currentEndDate &&
+                contract.status === 'finished',
             ),
         )
         .reduce((acc, contract) => acc + (contract?.price || 0), 0);
