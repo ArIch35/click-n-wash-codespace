@@ -67,7 +67,7 @@ const renderInputs = <T extends object>(props: FormInputFieldsProps<T>) => {
           <Text>:</Text>
         </Grid.Col>
         <Grid.Col span={9}>
-          <Text px="lg" style={{ border: '1px solid #ccc' }}>
+          <Text px="lg">
             {typeof value === 'boolean'
               ? value
               : (key === 'password' ? '*'.repeat((value as string).length) : value) || '-'}

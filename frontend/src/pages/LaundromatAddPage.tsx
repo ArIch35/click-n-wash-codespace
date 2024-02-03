@@ -136,7 +136,7 @@ const LaundromatAddPage = () => {
   const prevStep = () => setActive((current) => (current > 0 ? current - 1 : 0));
 
   return (
-    <Container py={30}>
+    <Container py={30} size={'xl'}>
       <Stepper
         active={active}
         completedIcon={<IconCircleCheck style={{ width: rem(18), height: rem(18) }} />}

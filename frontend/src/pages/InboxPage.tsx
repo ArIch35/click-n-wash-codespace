@@ -70,7 +70,7 @@ const InboxPage = () => {
   );
 
   return (
-    <Container p="2rem">
+    <Container py={30} size={'xl'}>
       <Tabs value={inboxMode} onChange={setInboxMode}>
         <Tabs.List>
           <Tabs.Tab value="user">User Inbox</Tabs.Tab>
