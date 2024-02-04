@@ -100,7 +100,11 @@ const LaundromatDetailPage = () => {
           </Text>
           <Box mx="auto">
             <form onSubmit={form.onSubmit(handleUpdateLaundromat)}>
-              <FormInputFields form={form} values={form.values} suffix={{ price: '€' }} />
+              <FormInputFields
+                form={form}
+                values={form.values}
+                props={{ price: { suffix: '€' } }}
+              />
               <Flex justify="flex-end" mt="md">
                 <Button
                   variant="filled"

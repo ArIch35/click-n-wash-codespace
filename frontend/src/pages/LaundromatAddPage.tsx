@@ -141,7 +141,7 @@ const LaundromatAddPage = () => {
             values={form.values.laundromat}
             baseKey="laundromat"
             hide={{ 'laundromat.lat': true, 'laundromat.lon': true }}
-            suffix={{ 'laundromat.price': '€' }}
+            props={{ 'laundromat.price': { min: 1, suffix: '€' } }}
           />
         </Stepper.Step>
         <Stepper.Step label="Second step" description="Washing Mashine">

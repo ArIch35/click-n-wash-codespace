@@ -21,10 +21,7 @@ interface FormInputFieldsProps<T> {
   preview?: boolean;
   textArea?: Record<string, boolean>;
   hide?: Record<string, boolean>;
-  required?: Record<string, boolean>;
-  label?: Record<string, string>;
-  placeholder?: Record<string, string>;
-  suffix?: Record<string, string>;
+  props?: Record<string, Record<string, unknown>>;
 }
 
 /**
@@ -60,7 +57,9 @@ const renderInputs = <T extends object>(props: FormInputFieldsProps<T>) => {
       <Grid key={parentKey}>
         <Grid.Col span={2}>
           <Text>
-            {props.label?.[parentKey] || props.label?.[key] || upperFirst(formatName(key))}
+            {(props.props?.[parentKey]?.label as string) ||
+              (props.props?.label?.[key] as string) ||
+              upperFirst(formatName(key))}
           </Text>
         </Grid.Col>
         <Grid.Col span={1}>
@@ -128,12 +127,9 @@ const renderInputs = <T extends object>(props: FormInputFieldsProps<T>) => {
           <NumberInput
             key={parentKey}
             name={key}
-            label={props.label?.[parentKey] || props.label?.[key] || upperFirst(formatName(key))}
-            required={props.required?.[parentKey]}
-            placeholder={props.placeholder?.[parentKey]}
-            suffix={props.suffix?.[parentKey]}
-            min={0}
+            label={upperFirst(formatName(key))}
             {...props.form.getInputProps(parentKey)}
+            {...props.props?.[parentKey]}
             onChange={(value) => {
               if (value === '') {
                 props.form.setFieldValue(
@@ -158,10 +154,9 @@ const renderInputs = <T extends object>(props: FormInputFieldsProps<T>) => {
           <Checkbox
             key={parentKey}
             name={key}
-            label={props.label?.[parentKey] || props.label?.[key] || upperFirst(formatName(key))}
-            required={props.required?.[parentKey]}
-            placeholder={props.placeholder?.[parentKey]}
+            label={upperFirst(formatName(key))}
             {...props.form.getInputProps(parentKey)}
+            {...props.props?.[parentKey]}
           />
         );
       }
@@ -173,31 +168,28 @@ const renderInputs = <T extends object>(props: FormInputFieldsProps<T>) => {
           <Textarea
             key={parentKey}
             name={key}
-            label={props.label?.[parentKey] || props.label?.[key] || upperFirst(formatName(key))}
-            required={props.required?.[parentKey]}
-            placeholder={props.placeholder?.[parentKey]}
+            label={upperFirst(formatName(key))}
             autosize
             minRows={5}
             maxRows={10}
             {...props.form.getInputProps(parentKey)}
+            {...props.props?.[parentKey]}
           />
         ) : key.toLocaleLowerCase().includes('password') ? (
           <PasswordInput
             key={parentKey}
             name={key}
-            label={props.label?.[parentKey] || props.label?.[key] || upperFirst(formatName(key))}
-            required={props.required?.[parentKey]}
-            placeholder={props.placeholder?.[parentKey]}
+            label={upperFirst(formatName(key))}
             {...props.form.getInputProps(parentKey)}
+            {...props.props?.[parentKey]}
           />
         ) : (
           <TextInput
             key={parentKey}
             name={key}
-            label={props.label?.[parentKey] || props.label?.[key] || upperFirst(formatName(key))}
-            required={props.required?.[parentKey]}
-            placeholder={props.placeholder?.[parentKey]}
+            label={upperFirst(formatName(key))}
             {...props.form.getInputProps(parentKey)}
+            {...props.props?.[parentKey]}
           />
         );
       }
@@ -222,14 +214,14 @@ const renderInputs = <T extends object>(props: FormInputFieldsProps<T>) => {
  * @param {boolean} [props.preview] - Whether to render the form input fields in preview mode.
  * @param {Record<string, boolean>} [props.textArea] - Keys that should be rendered as text areas.
  * @param {Record<string, boolean>} [props.hide] - Keys that should be hidden.
- * @param {Record<string, boolean>} [props.required] - Keys that should be required.
- * @param {Record<string, string>} [props.label] - The labels for the form input fields.
- * @param {Record<string, string>} [props.placeholder] - The placeholders for the form input fields.
- * @param {Record<string, string>} [props.suffix] - The suffixes for the form input fields (e.g. currency symbols).
+ * @param {Record<string, Record<string, unknown>>} [props.props] - Additional properties for the form input fields.
  * @returns The rendered stack of form input fields.
- *
- * @Notes List of params that may not be available in every input field:
- * - props.suffix
+ * @example
+ * <FormInputFields
+ *  form={form}
+ * values={form.values}
+ * props={{ price: { suffix: '€' } }}
+ * />
  */
 const FormInputFields = <T extends object>(props: FormInputFieldsProps<T>) => {
   return <Stack gap="md">{renderInputs(props)}</Stack>;
