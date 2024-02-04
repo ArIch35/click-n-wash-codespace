@@ -181,7 +181,11 @@ export const getLaundromatFilters = async () => {
  * @throws An error if the server response is not successful.
  */
 export const getFilteredLaundromats = async (filter: SearchFilter) => {
-  const response = await fetch(`${route}/${queryParamBuilder(filter)}`, {
+  const url = new URL(route);
+  Object.entries(filter).forEach(([key, value]) => {
+    url.searchParams.append(key, value as string);
+  });
+  const response = await fetch(url, {
     headers: { ...(await headers()) },
   });
 
@@ -196,14 +200,4 @@ export const getFilteredLaundromats = async (filter: SearchFilter) => {
     }
   });
   return entityParser<Laundromat[]>(laundromats);
-};
-
-const queryParamBuilder = (filter: SearchFilter) => {
-  let query: string = '?';
-  Object.keys(filter).forEach((key) => {
-    if (filter[key as keyof SearchFilter] !== undefined) {
-      query += `${key}=${filter[key as keyof SearchFilter]}&`;
-    }
-  });
-  return query;
 };
