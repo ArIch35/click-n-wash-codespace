@@ -60,15 +60,14 @@ router.get('/', (async (req, res) => {
   try {
     const uid = res.locals.uid as string;
     const onlyOwned = req.query.onlyOwned === 'true';
-    const name = req.query.name as string;
-    const city = req.query.city as string;
-    const priceFrom = req.query.priceFrom as string;
-    const priceTo = req.query.priceTo as string;
+    const name = req.query.name as string | undefined;
+    const city = req.query.city as string | undefined;
+    const price = (req.query.price as string | undefined)?.split(',');
 
     const laundromats = await getDb().laundromatRepository.find({
       where: {
         ...(onlyOwned ? { owner: { id: uid } } : {}),
-        ...filterConditionBuilder(name, city, priceFrom, priceTo),
+        ...filterConditionBuilder(name, city, price?.[0], price?.[1]),
       },
       relations: { washingMachines: true },
     });
@@ -90,7 +89,7 @@ const filterConditionBuilder = (
     filterCondition.name = ILike(`%${name}%`);
   }
   if (city) {
-    filterCondition.city = city;
+    filterCondition.city = ILike(`%${city}%`);
   }
   if (priceFrom && priceTo) {
     filterCondition.price = Between(priceFrom, priceTo);

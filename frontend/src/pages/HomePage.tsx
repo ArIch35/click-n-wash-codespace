@@ -11,24 +11,11 @@ import { showCustomNotification, showErrorNotification } from '../utils/mantine-
 const HomePage = () => {
   const [laundromats, setAllLaundromats] = useState<Laundromat[]>([]);
   const [chosenLaundromat, setChosenLaundromat] = useState<Laundromat | null>(null);
-  const [searchFilter, setSearchFilter] = useState<SearchFilter>({
-    name: '',
-    city: '',
-    priceFrom: -1,
-    priceTo: -1,
-  });
   const [isOpen, setIsOpen] = useState<boolean>(false);
 
   const refMap = React.useRef<Map>(null);
 
   const onFilterSelected = (filter: SearchFilter) => {
-    if (
-      JSON.stringify(filter) === JSON.stringify(searchFilter) ||
-      Object.values(filter).every((value) => value === undefined || value === -1)
-    ) {
-      return;
-    }
-
     getFilteredLaundromats(filter)
       .then((laundromats) => {
         if (laundromats.length === 0) {
@@ -53,7 +40,6 @@ const HomePage = () => {
         console.error(error);
         showErrorNotification('Laundromat', 'Search', 'search failed');
       });
-    setSearchFilter(filter);
   };
 
   const getAllLaundromats = () => {

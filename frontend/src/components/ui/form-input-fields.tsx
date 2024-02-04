@@ -1,9 +1,11 @@
 import {
+  Autocomplete,
   Checkbox,
   Grid,
   NumberInput,
   PasswordInput,
   RangeSlider,
+  Select,
   Stack,
   Text,
   TextInput,
@@ -13,7 +15,7 @@ import {
 import { UseFormReturnType } from '@mantine/form';
 import { upperFirst } from '@mantine/hooks';
 
-type Components = 'RangeSlider' | 'Textarea';
+type Components = 'RangeSlider' | 'Textarea' | 'Select' | 'Autocomplete';
 
 interface FormInputFieldsProps<T> {
   form: UseFormReturnType<T>;
@@ -138,6 +140,26 @@ const renderInputs = <T extends object>(props: FormInputFieldsProps<T>) => {
           case 'Textarea':
             return (
               <Textarea
+                key={parentKey}
+                name={key}
+                label={upperFirst(formatName(key))}
+                {...props.form.getInputProps(parentKey)}
+                {...props.props?.[parentKey]}
+              />
+            );
+          case 'Select':
+            return (
+              <Select
+                key={parentKey}
+                name={key}
+                label={upperFirst(formatName(key))}
+                {...props.form.getInputProps(parentKey)}
+                {...props.props?.[parentKey]}
+              />
+            );
+          case 'Autocomplete':
+            return (
+              <Autocomplete
                 key={parentKey}
                 name={key}
                 label={upperFirst(formatName(key))}
