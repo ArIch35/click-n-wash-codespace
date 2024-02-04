@@ -11,11 +11,11 @@ import {
   Table,
   Text,
 } from '@mantine/core';
+import { IconEdit, IconTrash } from '@tabler/icons-react';
 import { useNavigate } from 'react-router-dom';
 import AddWashingMachine from '../../components/ui/AddWashingMachine';
 import FormInputFields from '../../components/ui/form-input-fields';
 import useLaundromatDetail from './useLaundromatDetail';
-import { IconEdit, IconTrash } from '@tabler/icons-react';
 
 const LaundromatDetailPage = () => {
   const navigate = useNavigate();
@@ -100,7 +100,7 @@ const LaundromatDetailPage = () => {
           </Text>
           <Box mx="auto">
             <form onSubmit={form.onSubmit(handleUpdateLaundromat)}>
-              <FormInputFields form={form} values={form.values} />
+              <FormInputFields form={form} values={form.values} suffix={{ price: '€' }} />
               <Flex justify="flex-end" mt="md">
                 <Button
                   variant="filled"
