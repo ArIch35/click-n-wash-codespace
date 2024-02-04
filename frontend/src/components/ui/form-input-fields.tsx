@@ -3,6 +3,7 @@ import {
   Grid,
   NumberInput,
   PasswordInput,
+  RangeSlider,
   Stack,
   Text,
   TextInput,
@@ -12,6 +13,8 @@ import {
 import { UseFormReturnType } from '@mantine/form';
 import { upperFirst } from '@mantine/hooks';
 
+type Components = 'RangeSlider' | 'Textarea';
+
 interface FormInputFieldsProps<T> {
   form: UseFormReturnType<T>;
   values: object;
@@ -19,8 +22,8 @@ interface FormInputFieldsProps<T> {
   supportArrays?: boolean;
   supportNested?: boolean;
   preview?: boolean;
-  textArea?: Record<string, boolean>;
   hide?: Record<string, boolean>;
+  customComponent?: Record<string, Components>;
   props?: Record<string, Record<string, unknown>>;
 }
 
@@ -120,6 +123,31 @@ const renderInputs = <T extends object>(props: FormInputFieldsProps<T>) => {
         return [nameElement, ...data];
       }
 
+      if (props.customComponent?.[parentKey]) {
+        const component = props.customComponent?.[parentKey];
+        switch (component) {
+          case 'RangeSlider':
+            return (
+              <RangeSlider
+                key={parentKey}
+                name={key}
+                {...props.form.getInputProps(parentKey)}
+                {...props.props?.[parentKey]}
+              />
+            );
+          case 'Textarea':
+            return (
+              <Textarea
+                key={parentKey}
+                name={key}
+                label={upperFirst(formatName(key))}
+                {...props.form.getInputProps(parentKey)}
+                {...props.props?.[parentKey]}
+              />
+            );
+        }
+      }
+
       if (typeof value === 'number') {
         return props.preview ? (
           previewElement(parentKey, key, value)
@@ -164,17 +192,6 @@ const renderInputs = <T extends object>(props: FormInputFieldsProps<T>) => {
       if (typeof value === 'string') {
         return props.preview ? (
           previewElement(parentKey, key, value)
-        ) : props.textArea?.[parentKey] ? (
-          <Textarea
-            key={parentKey}
-            name={key}
-            label={upperFirst(formatName(key))}
-            autosize
-            minRows={5}
-            maxRows={10}
-            {...props.form.getInputProps(parentKey)}
-            {...props.props?.[parentKey]}
-          />
         ) : key.toLocaleLowerCase().includes('password') ? (
           <PasswordInput
             key={parentKey}
@@ -212,8 +229,8 @@ const renderInputs = <T extends object>(props: FormInputFieldsProps<T>) => {
  * @param {boolean} [props.supportArrays] - Whether to support arrays.
  * @param {boolean} [props.supportNested] - Whether to support nested objects.
  * @param {boolean} [props.preview] - Whether to render the form input fields in preview mode.
- * @param {Record<string, boolean>} [props.textArea] - Keys that should be rendered as text areas.
  * @param {Record<string, boolean>} [props.hide] - Keys that should be hidden.
+ * @param {Record<string, Components>} [props.customComponent] - Custom components for the form input fields.
  * @param {Record<string, Record<string, unknown>>} [props.props] - Additional properties for the form input fields.
  * @returns The rendered stack of form input fields.
  * @example
