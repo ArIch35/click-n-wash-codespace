@@ -1,20 +1,21 @@
 import { Group, Text } from '@mantine/core';
 import { IconUser, IconUserCheck } from '@tabler/icons-react';
-import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import React, { useState } from 'react';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { UpdateUser } from '../../interfaces/entities/user';
 import NavbarControllerProps from '../../interfaces/navbar-controller-props';
+import Notification from '../../interfaces/notification';
 import { useAuth } from '../../providers/authentication/Authentication.Context';
 import { routes } from '../../routeConstants';
 import { updateUser } from '../../utils/api';
-import classes from './Navbar.module.css';
-import Notification from '../../interfaces/notification';
 import { showCustomNotification } from '../../utils/mantine-notifications';
+import classes from './Navbar.module.css';
 
 const settings = routes.find((route) => route.label === 'Settings');
 
 const Navbar = ({ toggle, setVisible }: NavbarControllerProps) => {
   const { user, refreshUser } = useAuth();
+  const location = useLocation();
   const data = routes.filter(
     (route) =>
       route.onNavbar &&
@@ -26,6 +27,10 @@ const Navbar = ({ toggle, setVisible }: NavbarControllerProps) => {
   const [active, setActive] = useState(
     data.find((item) => item.path === window.location.pathname)?.label || '',
   );
+
+  React.useEffect(() => {
+    setActive(data.find((item) => item.path === location.pathname)?.label || '');
+  }, [data, location.pathname]);
 
   const customNotification: Notification = {
     title: 'Error',
