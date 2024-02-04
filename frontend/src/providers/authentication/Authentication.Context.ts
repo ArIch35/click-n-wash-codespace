@@ -1,13 +1,7 @@
 import React from 'react';
 import User from '../../interfaces/entities/user';
 
-export interface Auth {
-  token: string;
-  providerId: string;
-}
-
 interface AuthenticationContext {
-  auth: Auth | null;
   user: User | null;
   registeredName: string;
   setRegisteredName: (name: string) => void;
