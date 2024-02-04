@@ -8,6 +8,7 @@ import {
   deleteLaundromat,
   deleteWashingMachine,
   getLaundromatById,
+  getPositionFromAddress,
   updateLaundromat,
 } from '../../utils/api';
 import { showErrorNotification, showSuccessNotification } from '../../utils/mantine-notifications';
@@ -123,25 +124,31 @@ const useLaundromatDetail = () => {
       return;
     }
 
-    setLoading(true);
-    updateLaundromat(id, values)
-      .then((response) => {
-        form.setInitialValues({
-          name: response.name,
-          street: response.street,
-          city: response.city,
-          postalCode: response.postalCode,
-          country: response.country,
-          price: response.price,
-        });
+    getPositionFromAddress(values)
+      .then((location) => {
+        setLoading(true);
+        updateLaundromat(id, { ...values, ...location })
+          .then((response) => {
+            form.setInitialValues({
+              name: response.name,
+              street: response.street,
+              city: response.city,
+              postalCode: response.postalCode,
+              country: response.country,
+              price: response.price,
+            });
 
-        setLaundromat(response);
-        showSuccessNotification('Laudromat', 'update');
-        setLoading(false);
+            setLaundromat(response);
+            showSuccessNotification('Laudromat', 'update');
+            setLoading(false);
+          })
+          .catch((error) => {
+            showErrorNotification('Laudromat', 'update', String(error));
+            setLoading(false);
+          });
       })
       .catch((error) => {
-        showErrorNotification('Laudromat', 'update', String(error));
-        setLoading(false);
+        showErrorNotification('Laundromat', 'find location of the', String(error));
       });
   };
 
