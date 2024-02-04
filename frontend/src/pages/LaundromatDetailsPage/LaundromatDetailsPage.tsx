@@ -25,6 +25,7 @@ const LaundromatDetailPage = () => {
     setWashingMachines,
     loading,
     opened,
+    close,
     form,
     handleDeleteLaundromat,
     handleDeleteLaundromatModal,
@@ -69,17 +70,17 @@ const LaundromatDetailPage = () => {
 
   const onDeleteModal = (
     <Modal opened={opened} onClose={close} title={`Delete Laundromat ${laundromat?.name}`}>
-      <Text>Are you sure you want to delete Laundromat {laundromat?.name}?</Text>
-      <Flex justify="flex-end" mt="md">
-        <form onSubmit={form.onSubmit(handleDeleteLaundromatModal)}>
+      <form onSubmit={form.onSubmit(handleDeleteLaundromatModal)}>
+        <Text>Are you sure you want to delete Laundromat {laundromat?.name}?</Text>
+        <Flex justify="flex-end" mt="md">
           <Button variant="filled" color="yellow" onClick={close}>
             Cancel
           </Button>
-        </form>
-        <Button variant="filled" color="red" ml="sm" type="submit">
-          Delete
-        </Button>
-      </Flex>
+          <Button variant="filled" color="red" ml="sm" type="submit">
+            Delete
+          </Button>
+        </Flex>
+      </form>
     </Modal>
   );
 

@@ -189,6 +189,7 @@ const useLaundromatDetail = () => {
     setWashingMachines,
     loading,
     opened,
+    close,
     form,
     handleDeleteLaundromat,
     handleDeleteLaundromatModal,
