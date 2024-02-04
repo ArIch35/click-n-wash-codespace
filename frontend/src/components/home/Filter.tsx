@@ -39,8 +39,6 @@ const Filter: React.FC<FilterProps> = ({ onFilterSelected, onFilterReset }) => {
     onFilterSelected(values);
   };
 
-  console.log(form.values.price);
-
   useEffect(() => {
     getLaundromatFilters()
       .then((filters) => {
