@@ -1,5 +1,4 @@
 import 'reflect-metadata';
-import getDb from './db';
 import server from './server';
 import loadEnv from './utils/load-env';
 
@@ -14,11 +13,6 @@ server()
     app.listen(PORT, () => {
       console.log(`Server is running on port ${PORT}`);
     });
-    getDb()
-      .syncAuth()
-      .catch((err) => {
-        console.log(err);
-      });
   })
   .catch((err) => {
     console.log(err);

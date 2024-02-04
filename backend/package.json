@@ -13,6 +13,7 @@
     "start:background": "if pm2 status | grep -q 'click-n-wash-backend'; then pm2 restart click-n-wash-backend --update-env; else pm2 start dist/index.js --name click-n-wash-backend; fi",
     "production": "npm run clean && npm run build && npm run start:background",
     "seed": "tsc && node ./dist/seed.js",
+    "sync:auth": "tsc && node ./dist/sync-auth.js",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
     "prettier:check": "prettier --check .",

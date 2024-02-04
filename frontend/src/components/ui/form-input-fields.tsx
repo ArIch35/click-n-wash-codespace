@@ -24,6 +24,7 @@ interface FormInputFieldsProps<T> {
   required?: Record<string, boolean>;
   label?: Record<string, string>;
   placeholder?: Record<string, string>;
+  suffix?: Record<string, string>;
 }
 
 /**
@@ -66,7 +67,7 @@ const renderInputs = <T extends object>(props: FormInputFieldsProps<T>) => {
           <Text>:</Text>
         </Grid.Col>
         <Grid.Col span={9}>
-          <Text px="lg" style={{ border: '1px solid #ccc' }}>
+          <Text px="lg">
             {typeof value === 'boolean'
               ? value
               : (key === 'password' ? '*'.repeat((value as string).length) : value) || '-'}
@@ -130,6 +131,7 @@ const renderInputs = <T extends object>(props: FormInputFieldsProps<T>) => {
             label={props.label?.[parentKey] || props.label?.[key] || upperFirst(formatName(key))}
             required={props.required?.[parentKey]}
             placeholder={props.placeholder?.[parentKey]}
+            suffix={props.suffix?.[parentKey]}
             min={0}
             {...props.form.getInputProps(parentKey)}
             onChange={(value) => {
@@ -223,7 +225,11 @@ const renderInputs = <T extends object>(props: FormInputFieldsProps<T>) => {
  * @param {Record<string, boolean>} [props.required] - Keys that should be required.
  * @param {Record<string, string>} [props.label] - The labels for the form input fields.
  * @param {Record<string, string>} [props.placeholder] - The placeholders for the form input fields.
- * @returns {JSX.Element} - The rendered stack of form input fields.
+ * @param {Record<string, string>} [props.suffix] - The suffixes for the form input fields (e.g. currency symbols).
+ * @returns The rendered stack of form input fields.
+ *
+ * @Notes List of params that may not be available in every input field:
+ * - props.suffix
  */
 const FormInputFields = <T extends object>(props: FormInputFieldsProps<T>) => {
   return <Stack gap="md">{renderInputs(props)}</Stack>;

@@ -1,7 +1,6 @@
 import { AfterLoad, BeforeInsert, Column, Entity, ManyToOne } from 'typeorm';
 import { date, object, string } from 'yup';
 import getDb from '../db';
-import { timeBuffer } from '../utils/constants';
 import StatusError from '../utils/error-with-status';
 import { finalizeBalanceTransaction } from './balance-transaction';
 import BaseEntity from './base-entity';
@@ -67,21 +66,18 @@ const checkAvailability = async (
   startDate: Date,
   endDate: Date,
 ) => {
-  const startDateBuffer = new Date(startDate.getTime() - timeBuffer);
-  const endDateBuffer = new Date(endDate.getTime() + timeBuffer);
   const conflictingContract = await getDb()
     .contractRepository.createQueryBuilder('contract')
     .where('contract.washingMachine = :washingMachine', { washingMachine: washingMachine.id })
     .andWhere('contract.status = :status', { status: 'ongoing' })
     .andWhere(
-      '(contract.startDate BETWEEN :startDateBuffer AND :endDateBuffer OR contract.endDate BETWEEN :startDateBuffer AND :endDateBuffer OR :startDateBuffer BETWEEN contract.startDate AND contract.endDate OR :endDateBuffer BETWEEN contract.startDate AND contract.endDate)',
+      '(contract.startDate BETWEEN :startDate AND :endDate OR contract.endDate BETWEEN :startDate AND :endDate OR :startDate BETWEEN contract.startDate AND contract.endDate OR :endDate BETWEEN contract.startDate AND contract.endDate)',
       {
-        startDateBuffer,
-        endDateBuffer,
+        startDate,
+        endDate,
       },
     )
     .getOne();
-  console.log('conflictingContract', conflictingContract);
 
   if (conflictingContract) {
     throw new StatusError(
@@ -157,13 +153,9 @@ export const bulkCancelContractSchema = object({
   startDate: date().required(),
   endDate: date().required(),
   laundromat: string().required(),
-})
-  .test('is-valid-date', 'Start date must be before end date', (value) => {
-    return value.startDate < value.endDate;
-  })
-  .test('is-in-future', 'Start date must be in the future', (value) => {
-    return value.startDate > new Date();
-  });
+}).test('is-valid-date', 'Start date must be before end date', (value) => {
+  return value.startDate < value.endDate;
+});
 
 export const reportContractSchema = object({
   reason: string().required(),

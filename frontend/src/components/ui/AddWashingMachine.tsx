@@ -97,7 +97,7 @@ function AddWashingMachine({
       </Modal>
 
       <Button onClick={open} radius={100}>
-        Add New Washing machine
+        Add Washing machine
       </Button>
     </>
   );

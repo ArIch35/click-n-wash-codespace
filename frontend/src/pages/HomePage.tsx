@@ -1,19 +1,16 @@
-import { Group, Stack } from '@mantine/core';
-import { useForm } from '@mantine/form';
-import { useEffect, useState } from 'react';
+import { Box, Button, Group, NumberFormatter, Paper, Stack, Text, Title } from '@mantine/core';
+import { Map } from 'leaflet';
+import React, { useEffect, useState } from 'react';
 import Filter, { SearchFilter } from '../components/home/Filter';
 import CustomMap from '../components/home/Map';
 import WashingMachinePicker from '../components/home/WashingMachinePicker';
-import BaseList from '../components/ui/BaseList.component';
-import IndividualLaundromat from '../components/ui/IndividualLaundromat.component';
 import Laundromat from '../interfaces/entities/laundromat';
 import { getFilteredLaundromats, getLaundromats } from '../utils/api';
 import { showCustomNotification, showErrorNotification } from '../utils/mantine-notifications';
 
 const HomePage = () => {
-  const [allLaundromats, setAllLaundromats] = useState<Laundromat[]>([]);
+  const [laundromats, setAllLaundromats] = useState<Laundromat[]>([]);
   const [chosenLaundromat, setChosenLaundromat] = useState<Laundromat | null>(null);
-  const [focusedLaundromat, setFocusedLaundromat] = useState<Laundromat | null>(null);
   const [searchFilter, setSearchFilter] = useState<SearchFilter>({
     name: '',
     city: '',
@@ -21,11 +18,8 @@ const HomePage = () => {
     priceTo: -1,
   });
   const [isOpen, setIsOpen] = useState<boolean>(false);
-  const form = useForm({
-    initialValues: {
-      location: '',
-    },
-  });
+
+  const refMap = React.useRef<Map>(null);
 
   const onFilterSelected = (filter: SearchFilter) => {
     if (
@@ -77,53 +71,56 @@ const HomePage = () => {
     setIsOpen(true);
   };
 
-  const onLocationClick = (laundromat: Laundromat) => {
-    setFocusedLaundromat(laundromat);
+  const LaundromatCard = ({ laundromat }: { laundromat: Laundromat }) => {
+    return (
+      <Paper shadow="sm" radius="md" withBorder p="md">
+        <Stack gap="md">
+          <Title order={6}>
+            {laundromat.name} ({laundromat.city})
+          </Title>
+
+          <Stack>
+            <Text>
+              Address: {laundromat.street}, {laundromat.postalCode}, {laundromat.city},{' '}
+              {laundromat.country}
+            </Text>
+            <Text>Price: {NumberFormatter({ value: laundromat.price, suffix: '€' })}</Text>
+          </Stack>
+          <Button variant="transparent" onClick={() => refMap.current?.flyTo(laundromat.position!)}>
+            Show on map
+          </Button>
+          <Button variant="transparent" onClick={() => onLaundromatChosen(laundromat)}>
+            Book
+          </Button>
+        </Stack>
+      </Paper>
+    );
   };
 
   useEffect(() => {
     getAllLaundromats();
   }, []);
 
-  useEffect(() => {
-    const storedValue = window.localStorage.getItem('location-form');
-    if (storedValue) {
-      try {
-        const parsedValue = storedValue;
-        console.log(parsedValue);
-        form.setValues({ location: parsedValue });
-      } catch (e) {
-        console.error(e);
-      }
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-
-  useEffect(() => {
-    localStorage.setItem('location-form', form.values.location);
-  }, [form.values]);
-
   return (
-    <Group h="100%" gap={0}>
+    <Group h="inherit" gap={0}>
       <Stack h="inherit" w="80%">
-        {allLaundromats && (
+        {laundromats && (
           <CustomMap
-            laundromats={allLaundromats.filter((laundromat) => laundromat.position)}
+            laundromats={laundromats.filter((laundromat) => laundromat.position)}
             onMarkerClick={onLaundromatChosen}
-            focusedLaundromat={focusedLaundromat}
+            ref={refMap}
           />
         )}
       </Stack>
-      <Stack h="inherit" align="center" w="20%">
-        <Filter onFilterSelected={onFilterSelected} onFilterReset={getAllLaundromats} />
-        {allLaundromats && (
-          <BaseList
-            items={allLaundromats}
-            IndividualComponent={IndividualLaundromat}
-            onItemClick={onLaundromatChosen}
-            onLocationClick={onLocationClick}
-          />
-        )}
+      <Stack h="inherit" w="20%" gap={0}>
+        <Box>
+          <Filter onFilterSelected={onFilterSelected} onFilterReset={getAllLaundromats} />
+        </Box>
+        <Stack px="md" style={{ overflowY: 'auto' }}>
+          {laundromats.map((laundromat) => (
+            <LaundromatCard key={laundromat.id} laundromat={laundromat} />
+          ))}
+        </Stack>
         {chosenLaundromat && (
           <WashingMachinePicker
             isOpen={isOpen}

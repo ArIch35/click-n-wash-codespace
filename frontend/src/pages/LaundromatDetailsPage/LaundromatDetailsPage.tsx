@@ -1,7 +1,9 @@
 import {
+  ActionIcon,
   Box,
   Button,
   Container,
+  Divider,
   Flex,
   Group,
   LoadingOverlay,
@@ -13,6 +15,7 @@ import { useNavigate } from 'react-router-dom';
 import AddWashingMachine from '../../components/ui/AddWashingMachine';
 import FormInputFields from '../../components/ui/form-input-fields';
 import useLaundromatDetail from './useLaundromatDetail';
+import { IconEdit, IconTrash } from '@tabler/icons-react';
 
 const LaundromatDetailPage = () => {
   const navigate = useNavigate();
@@ -42,27 +45,24 @@ const LaundromatDetailPage = () => {
     <Table.Tr key={element.name}>
       <Table.Td>{element.name}</Table.Td>
       <Table.Td>{element.description}</Table.Td>
-      <Table.Td>{element.contracts?.length ?? 0}</Table.Td>
       <Table.Td>
-        <form>
-          <Group gap="1rem">
-            <Button
-              variant="filled"
-              color="red"
-              type="submit"
-              onClick={(event) => handleDeleteWashingMachine(event, element.id)}
-            >
-              Delete
-            </Button>
-            <Button
-              variant="filled"
-              color="yellow"
-              onClick={() => navigate(`/edit-washingmachine/${element.id}`)}
-            >
-              Edit
-            </Button>
-          </Group>
-        </form>
+        {element.contracts?.filter((contract) => contract.status === 'ongoing').length ?? 0}
+      </Table.Td>
+      <Table.Td>
+        <Group gap="1rem">
+          <ActionIcon
+            variant="transparent"
+            onClick={() => navigate(`/edit-washingmachine/${element.id}`)}
+          >
+            <IconEdit />
+          </ActionIcon>
+          <ActionIcon
+            variant="transparent"
+            onClick={(event) => handleDeleteWashingMachine(event, element.id)}
+          >
+            <IconTrash />
+          </ActionIcon>
+        </Group>
       </Table.Td>
     </Table.Tr>
   ));
@@ -72,19 +72,19 @@ const LaundromatDetailPage = () => {
       <Text>Are you sure you want to delete Laundromat {laundromat?.name}?</Text>
       <Flex justify="flex-end" mt="md">
         <form onSubmit={form.onSubmit(handleDeleteLaundromatModal)}>
-          <Button variant="filled" color="red" type="submit">
-            Delete
-          </Button>
-          <Button variant="filled" color="yellow" ml="sm" onClick={close}>
+          <Button variant="filled" color="yellow" onClick={close}>
             Cancel
           </Button>
         </form>
+        <Button variant="filled" color="red" ml="sm" type="submit">
+          Delete
+        </Button>
       </Flex>
     </Modal>
   );
 
   return (
-    <Container pos={'relative'}>
+    <Container pos={'relative'} py={30} size={'xl'}>
       {onDeleteModal}
       {loading && (
         <LoadingOverlay
@@ -96,9 +96,9 @@ const LaundromatDetailPage = () => {
       {!loading && laundromat && (
         <>
           <Text ta="center" size="xl">
-            Laundromat {laundromat.name} Details Page
+            Laundromat {laundromat.name}
           </Text>
-          <Box maw={340} mx="auto">
+          <Box mx="auto">
             <form onSubmit={form.onSubmit(handleUpdateLaundromat)}>
               <FormInputFields form={form} values={form.values} />
               <Flex justify="flex-end" mt="md">
@@ -133,7 +133,8 @@ const LaundromatDetailPage = () => {
               </Flex>
             </form>
           </Box>
-          <Flex justify={'space-between'} py={30}>
+          <Divider my={40} />
+          <Flex justify={'space-between'} py={10}>
             <Text size="xl">My Washing Machines</Text>
             <AddWashingMachine
               laundromatId={laundromat.id}

@@ -56,7 +56,7 @@ export const bookWashingMachine = async (id: string, startDate: Date) => {
     headers: { ...(await headers()) },
     body: JSON.stringify({
       startDate: dateWithTimezoneOffset,
-      endDate: new Date(dateWithTimezoneOffset.getTime() + ONE_HOUR * 2),
+      endDate: new Date(dateWithTimezoneOffset.getTime() + ONE_HOUR * 2 - 1),
       washingMachine: id,
     }),
   });
