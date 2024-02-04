@@ -38,7 +38,7 @@ const BalancePage = () => {
           <Flex gap={'md'}>
             <Text size="xl">
               Current Balance:{' '}
-              {NumberFormatter({ value: user?.balance, thousandSeparator: true, suffix: ' € EUR' })}
+              <NumberFormatter value={user?.balance} thousandSeparator suffix="€ EUR" />
             </Text>
             <AddFundsModal />
           </Flex>
@@ -62,7 +62,7 @@ const BalancePage = () => {
                       <NumberFormatter
                         value={transaction.amount}
                         thousandSeparator
-                        suffix=" € EUR"
+                        suffix="€ EUR"
                       />
                     </Table.Td>
                   </Table.Tr>

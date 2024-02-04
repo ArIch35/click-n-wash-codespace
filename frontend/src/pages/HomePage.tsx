@@ -70,7 +70,9 @@ const HomePage = () => {
               Address: {laundromat.street}, {laundromat.postalCode}, {laundromat.city},{' '}
               {laundromat.country}
             </Text>
-            <Text>Price: {NumberFormatter({ value: laundromat.price, suffix: '€' })}</Text>
+            <Text>
+              Price: <NumberFormatter value={laundromat.price} suffix="€" />
+            </Text>
           </Stack>
           <Button variant="transparent" onClick={() => refMap.current?.flyTo(laundromat.position!)}>
             Show on map
