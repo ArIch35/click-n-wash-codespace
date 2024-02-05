@@ -111,7 +111,7 @@ const LaundromatsManagePage = () => {
           <Table.Tbody>{rows}</Table.Tbody>
         </Table>
 
-        {analytics.length > 0 && (
+        {laundromats.length > 0 && (
           <Stack>
             <Text size="xl">Analytics</Text>
 
@@ -130,31 +130,30 @@ const LaundromatsManagePage = () => {
       </Container>
 
       <Stack px="xl">
-        {analytics.length > 0 &&
-          analytics.map((laundromatAnalytics) => (
-            <Stack key={laundromatAnalytics.laundromat.id}>
-              <Group>
-                <Title order={3}>{laundromatAnalytics.laundromat.name}, </Title>
-                <Text fw={700} size="xl">
-                  Total revenue:{' '}
-                  <NumberFormatter
-                    value={laundromatAnalytics.analytics
-                      .map((el) => el.revenue)
-                      .reduce((a, b) => a + b, 0)}
-                    thousandSeparator
-                    suffix="€"
-                  />
-                </Text>
-              </Group>
-              <BarChart
-                h="20rem"
-                data={laundromatAnalytics.analytics}
-                dataKey="date"
-                withLegend
-                series={laundromatAnalytics.series}
-              />
-            </Stack>
-          ))}
+        {analytics.map((laundromatAnalytics) => (
+          <Stack key={laundromatAnalytics.laundromat.id}>
+            <Group>
+              <Title order={3}>{laundromatAnalytics.laundromat.name}, </Title>
+              <Text fw={700} size="xl">
+                Total revenue:{' '}
+                <NumberFormatter
+                  value={laundromatAnalytics.analytics
+                    .map((el) => el.revenue)
+                    .reduce((a, b) => a + b, 0)}
+                  thousandSeparator
+                  suffix="€"
+                />
+              </Text>
+            </Group>
+            <BarChart
+              h="20rem"
+              data={laundromatAnalytics.analytics}
+              dataKey="date"
+              withLegend
+              series={laundromatAnalytics.series}
+            />
+          </Stack>
+        ))}
       </Stack>
     </Stack>
   );
