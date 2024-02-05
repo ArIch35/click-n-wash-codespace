@@ -67,28 +67,45 @@ const autoGenerateName = (balanceTransaction: BalanceTransaction) => {
 };
 
 /**
- * Finalizes a balance transaction by updating the user's balance and saving the transaction.
- * @param balanceTransaction - The balance transaction to be finalized.
- * @param transactionalEntityManager - Optional transactional entity manager to use for the operation.
+ * Finalizes the balance transaction by updating the user's balance and saving the changes to the database.
+ * If a transactionalEntityManager is provided, the operation will be performed within the existing transaction.
+ * Otherwise, a new transaction will be created.
+ *
+ * @param balanceTransaction - The balance transaction or an array of balance transactions to be finalized.
+ * @param transactionalEntityManager - Optional. The transactional entity manager to use for the operation.
  */
 export const finalizeBalanceTransaction = async (
-  balanceTransaction: BalanceTransaction,
+  balanceTransaction: BalanceTransaction | BalanceTransaction[],
   transactionalEntityManager?: EntityManager,
 ) => {
   const func = async (transactionalEntityManager: EntityManager) => {
-    const user = await transactionalEntityManager.findOne(User, {
-      where: { id: balanceTransaction.user.id },
+    const usersFromDb = await transactionalEntityManager.find(User, {
+      where:
+        balanceTransaction instanceof Array
+          ? balanceTransaction.map((bt) => ({ id: bt.user.id }))
+          : { id: balanceTransaction.user.id },
     });
-    if (!user) {
-      throw new StatusError('User not found', STATUS_BAD_REQUEST);
+    const userMap = new Map(usersFromDb.map((user) => [user.id, user]));
+
+    const updateUserBalance = (bt: BalanceTransaction) => {
+      const user = userMap.get(bt.user.id);
+      if (!user) {
+        throw new StatusError('User not found', STATUS_BAD_REQUEST);
+      }
+      user.balance += bt.amount;
+      if (user.balance < 0) {
+        throw new StatusError('Insufficient balance', STATUS_BAD_REQUEST);
+      }
+      bt.user = user;
+    };
+
+    if (balanceTransaction instanceof Array) {
+      balanceTransaction.forEach((bt) => updateUserBalance(bt));
+    } else {
+      updateUserBalance(balanceTransaction);
     }
 
-    user.balance += balanceTransaction.amount;
-    if (user.balance < 0) {
-      throw new StatusError('Insufficient balance', STATUS_BAD_REQUEST);
-    }
-    balanceTransaction.user = user;
-    await transactionalEntityManager.save(user);
+    await transactionalEntityManager.save(Array.from(userMap.values()));
     await transactionalEntityManager.save(balanceTransaction);
   };
 
