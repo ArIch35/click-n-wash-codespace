@@ -32,7 +32,7 @@ Click n' Wash is a student-led initiative aimed at simplifying the laundry exper
 - **Become a Vendor**: user can become a vendor to open their own laundromat.
 - **Refund System** : a vendor can refunds the transaction to the user, when there is an error with the machine.
 
-## Database Structures <a name="database-structures"></a>
+## Database Structures <a name="database-structure"></a>
 
 This website uses PostgreSQL as the database, with typeORM as the ODM. The database consists of 5 tables: `contract`, `laundromat`, `user`, `washingMachine`, and also the `baseEntity`.
 
