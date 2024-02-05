@@ -134,12 +134,13 @@ const LaundromatsManagePage = () => {
               <Title order={3}>{laundromatAnalytics.laundromat.name}, </Title>
               <Text fw={700} size="xl">
                 Total revenue:{' '}
-                {NumberFormatter({
-                  value: laundromatAnalytics.analytics
+                <NumberFormatter
+                  value={laundromatAnalytics.analytics
                     .map((el) => el.revenue)
-                    .reduce((a, b) => a + b, 0),
-                  suffix: '€',
-                })}
+                    .reduce((a, b) => a + b, 0)}
+                  thousandSeparator
+                  suffix="€"
+                />
               </Text>
             </Group>
             <BarChart

@@ -101,7 +101,7 @@ const BookingsPage = () => {
               <Text size="sm">From: {formatDate(contract.startDate)}</Text>
               <Text size="sm">To: {formatDate(contract.endDate)}</Text>
             </Flex>
-            <NumberFormatter value={contract.price} thousandSeparator suffix=" € EUR" />
+            <NumberFormatter value={contract.price} thousandSeparator suffix="€ EUR" />
           </Stack>
         </Stack>
 

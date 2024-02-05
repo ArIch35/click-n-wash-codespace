@@ -30,7 +30,7 @@ const UserMenu = ({ open }: UserMenuProps) => {
   };
 
   const Icon = user ? (
-    <ActionIcon variant="default" onClick={onIconClick} size={sizes.iconSizeLarge}>
+    <ActionIcon variant="outline" onClick={onIconClick} size={sizes.iconSizeLarge}>
       <IconUser size={sizes.iconSizeLarge} />
     </ActionIcon>
   ) : (

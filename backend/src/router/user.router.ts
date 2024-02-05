@@ -165,7 +165,7 @@ router.put('/', (async (req, res) => {
     }
 
     // Check whether the user was a vendor, and trying to disable it
-    if (userExists.isAlsoVendor && !validated.isAlsoVendor) {
+    if (userExists.isAlsoVendor && validated.isAlsoVendor === false) {
       const laundromatExists = await getDb().laundromatRepository.findOne({
         where: {
           owner: {

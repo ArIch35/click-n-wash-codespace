@@ -2,7 +2,7 @@ import React from 'react';
 import firebaseAuth from '../../firebase';
 import User, { CreateUser } from '../../interfaces/entities/user';
 import { createUser, getUser } from '../../utils/api';
-import AuthenticationContext, { Auth } from './Authentication.Context';
+import AuthenticationContext from './Authentication.Context';
 
 interface AuthenticationProviderProps {
   children: React.ReactNode;
@@ -35,7 +35,6 @@ const signInToBackend = async (name: string) => {
 };
 
 const AuthenticationProvider = ({ children }: AuthenticationProviderProps) => {
-  const [firebaseData, setFirebaseData] = React.useState<Auth | null>(null);
   const [user, setUser] = React.useState<User | null>(null);
   const [registeredName, setRegisteredName] = React.useState<string>('');
   const [refresh, setRefresh] = React.useState<boolean>(false);
@@ -50,19 +49,17 @@ const AuthenticationProvider = ({ children }: AuthenticationProviderProps) => {
     const unsubscribe = firebaseAuth.onAuthStateChanged((user) => {
       const firebaseUser = user;
       if (!firebaseUser) {
-        setFirebaseData(null);
         setUser(null);
         setFetched(true);
         return;
       }
       firebaseUser
         .getIdToken()
-        .then(async (token) => {
-          const { providerId, email, displayName } = firebaseUser;
+        .then(async () => {
+          const { email, displayName } = firebaseUser;
           const name = registeredName || displayName || email || 'No name';
           const user = await signInToBackend(name);
           setUser(user);
-          setFirebaseData({ token, providerId });
         })
         .catch((error) => {
           console.error(error);
@@ -77,7 +74,7 @@ const AuthenticationProvider = ({ children }: AuthenticationProviderProps) => {
 
   return (
     <AuthenticationContext.Provider
-      value={{ auth: firebaseData, user, registeredName, setRegisteredName, refreshUser }}
+      value={{ user, registeredName, setRegisteredName, refreshUser }}
     >
       {fetched && children}
     </AuthenticationContext.Provider>
