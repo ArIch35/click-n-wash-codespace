@@ -111,47 +111,50 @@ const LaundromatsManagePage = () => {
           <Table.Tbody>{rows}</Table.Tbody>
         </Table>
 
-        <Stack>
-          <Text size="xl">Analytics</Text>
+        {analytics.length > 0 && (
+          <Stack>
+            <Text size="xl">Analytics</Text>
 
-          <Group justify="space-around" align="flex-start">
-            <Stack>
-              <Text size="xl">Span</Text>
-              <Select data={['day', 'week', 'month', 'year']} value={span} onChange={setSpan} />
-            </Stack>
-            <Stack>
-              <Text size="xl">Pick date range</Text>
-              <DatePicker type="range" value={fromDateToDate} onChange={handleDateChange} />
-            </Stack>
-          </Group>
-        </Stack>
+            <Group justify="space-around" align="flex-start">
+              <Stack>
+                <Text size="xl">Span</Text>
+                <Select data={['day', 'week', 'month', 'year']} value={span} onChange={setSpan} />
+              </Stack>
+              <Stack>
+                <Text size="xl">Pick date range</Text>
+                <DatePicker type="range" value={fromDateToDate} onChange={handleDateChange} />
+              </Stack>
+            </Group>
+          </Stack>
+        )}
       </Container>
 
       <Stack px="xl">
-        {analytics.map((laundromatAnalytics) => (
-          <Stack key={laundromatAnalytics.laundromat.id}>
-            <Group>
-              <Title order={3}>{laundromatAnalytics.laundromat.name}, </Title>
-              <Text fw={700} size="xl">
-                Total revenue:{' '}
-                <NumberFormatter
-                  value={laundromatAnalytics.analytics
-                    .map((el) => el.revenue)
-                    .reduce((a, b) => a + b, 0)}
-                  thousandSeparator
-                  suffix="€"
-                />
-              </Text>
-            </Group>
-            <BarChart
-              h="20rem"
-              data={laundromatAnalytics.analytics}
-              dataKey="date"
-              withLegend
-              series={laundromatAnalytics.series}
-            />
-          </Stack>
-        ))}
+        {analytics.length > 0 &&
+          analytics.map((laundromatAnalytics) => (
+            <Stack key={laundromatAnalytics.laundromat.id}>
+              <Group>
+                <Title order={3}>{laundromatAnalytics.laundromat.name}, </Title>
+                <Text fw={700} size="xl">
+                  Total revenue:{' '}
+                  <NumberFormatter
+                    value={laundromatAnalytics.analytics
+                      .map((el) => el.revenue)
+                      .reduce((a, b) => a + b, 0)}
+                    thousandSeparator
+                    suffix="€"
+                  />
+                </Text>
+              </Group>
+              <BarChart
+                h="20rem"
+                data={laundromatAnalytics.analytics}
+                dataKey="date"
+                withLegend
+                series={laundromatAnalytics.series}
+              />
+            </Stack>
+          ))}
       </Stack>
     </Stack>
   );
