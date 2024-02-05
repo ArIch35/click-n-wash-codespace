@@ -1,12 +1,13 @@
-import { Button, Card, RangeSlider, Select, Stack, TextInput } from '@mantine/core';
+import { Button, Card, Stack } from '@mantine/core';
+import { useForm } from '@mantine/form';
 import React, { useEffect } from 'react';
 import { getLaundromatFilters } from '../../utils/api';
+import FormInputFields from '../ui/form-input-fields';
 
 export interface SearchFilter {
   name?: string;
   city?: string;
-  priceFrom?: number;
-  priceTo?: number;
+  price?: [number, number];
 }
 
 export interface RequestFilter {
@@ -20,98 +21,68 @@ type FilterProps = {
   onFilterReset: () => void;
 };
 
+const initialValues: SearchFilter = {
+  name: '',
+  city: '',
+  price: [0, 0],
+};
+
 const Filter: React.FC<FilterProps> = ({ onFilterSelected, onFilterReset }) => {
   const [requestFilter, setRequestFilter] = React.useState<RequestFilter | null>();
-  const [searchFilter, setSearchFilter] = React.useState<SearchFilter>({
-    name: '',
-    city: '',
-    priceFrom: -1,
-    priceTo: -1,
+
+  const form = useForm<SearchFilter>({
+    initialValues,
   });
+
+  const onSubmit = (values: SearchFilter, event?: React.FormEvent<HTMLFormElement>) => {
+    event?.preventDefault();
+    onFilterSelected(values);
+  };
 
   useEffect(() => {
     getLaundromatFilters()
       .then((filters) => {
         setRequestFilter(filters);
+        form.setInitialValues({
+          ...form.values,
+          price: [filters.minPrice, filters.maxPrice],
+        });
+        form.reset();
       })
       .catch((error) => {
         console.error(error);
       });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  const returnValidFilter = (filter: SearchFilter) => {
-    const oneOfThePriceChanged =
-      filter.priceFrom !== requestFilter!.minPrice || filter.priceTo !== requestFilter!.maxPrice;
-    onFilterSelected({
-      name: !filter.name || filter.name === '' ? undefined : filter.name,
-      city: !filter.city || filter.city === '' ? undefined : filter.city,
-      priceFrom: !oneOfThePriceChanged || filter.priceFrom === -1 ? undefined : filter.priceFrom,
-      priceTo: !oneOfThePriceChanged || filter.priceTo === -1 ? undefined : filter.priceTo,
-    });
-  };
-
   return (
-    <Card withBorder>
-      <Stack>
-        <TextInput
-          label="Laundromat name"
-          placeholder="Pick Name"
-          value={searchFilter.name}
-          onChange={(event) =>
-            setSearchFilter({ ...searchFilter, name: event.currentTarget.value })
-          }
-        />
-        {requestFilter && (
-          <Select
-            key={searchFilter.city}
-            label="Laundromat City"
-            placeholder="Pick City"
-            data={requestFilter.cities}
-            searchable
-            value={searchFilter.city}
-            onChange={(value) => {
-              setSearchFilter({ ...searchFilter, city: value! });
+    <form onSubmit={form.onSubmit(onSubmit)}>
+      <Card withBorder>
+        <Stack>
+          {requestFilter && (
+            <FormInputFields
+              form={form}
+              values={form.values}
+              customComponent={{ price: 'RangeSlider', city: 'Autocomplete' }}
+              props={{
+                name: { placeholder: 'Mary Jane laundromat' },
+                city: { placeholder: 'Darmstadt', data: requestFilter.cities },
+                price: { minRange: 1, min: requestFilter.minPrice, max: requestFilter.maxPrice },
+              }}
+            />
+          )}
+          <Button type="submit">Filter</Button>
+          <Button
+            onClick={() => {
+              form.reset();
+              onFilterReset();
             }}
-          />
-        )}
-        {requestFilter && (
-          <RangeSlider
-            min={requestFilter.minPrice}
-            max={requestFilter.maxPrice}
-            step={1}
-            minRange={5}
-            defaultValue={[requestFilter.minPrice, requestFilter.maxPrice]}
-            value={[
-              searchFilter.priceFrom! === -1 ? requestFilter.minPrice : searchFilter.priceFrom!,
-              searchFilter.priceTo! === -1 ? requestFilter.maxPrice : searchFilter.priceTo!,
-            ]}
-            onChange={(value) => {
-              setSearchFilter({ ...searchFilter, priceFrom: value[0], priceTo: value[1] });
-            }}
-          />
-        )}
-        <Button
-          onClick={() => {
-            returnValidFilter(searchFilter);
-          }}
-        >
-          Filter
-        </Button>
-        <Button
-          onClick={() => {
-            setSearchFilter({
-              name: '',
-              city: '',
-              priceFrom: requestFilter!.minPrice,
-              priceTo: requestFilter!.maxPrice,
-            });
-            onFilterReset();
-          }}
-        >
-          Reset
-        </Button>
-      </Stack>
-    </Card>
+          >
+            Reset
+          </Button>
+        </Stack>
+      </Card>
+    </form>
   );
 };
 

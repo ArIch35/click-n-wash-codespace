@@ -125,13 +125,12 @@ export function AuthenticationForm({ ...props }: ModalProps) {
             confirmPassword: type !== 'register',
             terms: type !== 'register',
           }}
-          required={{
-            email: true,
-            password: true,
-            confirmPassword: type === 'register',
-            terms: type === 'register',
+          props={{
+            email: { required: true },
+            password: { required: true },
+            confirmPassword: { required: type === 'register' },
+            terms: { required: type === 'register', label: 'I accept terms and conditions' },
           }}
-          label={{ terms: 'I accept terms and conditions' }}
         />
 
         <Group justify="space-between" mt="xl">

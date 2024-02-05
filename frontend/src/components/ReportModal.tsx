@@ -61,14 +61,19 @@ const ReportModal = ({ contractId }: ReportModalProps) => {
         size="lg"
         centered
       >
-        <Stack gap="xl">
-          <form onSubmit={form.onSubmit(onSubmit)}>
-            <FormInputFields form={form} values={form.values} textArea={{ description: true }} />
+        <form onSubmit={form.onSubmit(onSubmit)}>
+          <Stack gap="xl">
+            <FormInputFields
+              form={form}
+              values={form.values}
+              customComponent={{ description: 'Textarea' }}
+              props={{ description: { autosize: true, minRows: 5, maxRows: 10 } }}
+            />
             <Button type="submit" radius="md" size="md" color="red">
               Submit report
             </Button>
-          </form>
-        </Stack>
+          </Stack>
+        </form>
       </Modal>
       <Button color="red" mt="md" radius="md" onClick={open}>
         Report problem

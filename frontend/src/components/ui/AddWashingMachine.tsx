@@ -82,10 +82,10 @@ function AddWashingMachine({
             form={form}
             values={form.values}
             hide={{ laundromat: true }}
-            placeholder={{
-              name: 'Name e.g. Washing Machine 1',
-              brand: 'Brand e.g Miele',
-              description: 'Description e.g Max 8.Kg',
+            props={{
+              name: { placeholder: 'Name e.g. Washing Machine 1' },
+              brand: { placeholder: 'Brand e.g Miele' },
+              description: { placeholder: 'Description e.g Max 8.Kg' },
             }}
           />
           <Group justify="flex-end" mt="md">

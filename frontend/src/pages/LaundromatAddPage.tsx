@@ -76,10 +76,12 @@ const LaundromatAddPage = () => {
     },
   });
 
-  const onSubmit = () => {
-    createLaundromat(form.values.laundromat)
+  const onSubmit = (values: FormValues, event: React.FormEvent<HTMLFormElement> | undefined) => {
+    event?.preventDefault();
+
+    createLaundromat(values.laundromat)
       .then(async (laundromat) => {
-        const washingMachines = form.values.washingMachines.map((washingMachine) => ({
+        const washingMachines = values.washingMachines.map((washingMachine) => ({
           ...washingMachine,
           laundromat: laundromat.id,
         }));
@@ -110,28 +112,20 @@ const LaundromatAddPage = () => {
     form.setFieldValue('washingMachines', form.values.washingMachines.slice(0, -1));
   };
 
-  const findLocation = () => {
-    getPositionFromAddress(form.values.laundromat)
-      .then((location) => {
-        form.setFieldValue('laundromat.lat', location.lat);
-        form.setFieldValue('laundromat.lon', location.lon);
-      })
-      .catch((error) => {
-        showErrorNotification('Laundromat', 'find location of the', String(error));
-      });
-  };
-
   const nextStep = () => {
     if (form.validate().hasErrors) {
       return;
     }
 
-    if (form.values.laundromat.lat === '' || form.values.laundromat.lon === '') {
-      findLocation();
-      return;
-    }
-
-    setActive((current) => (current < 2 ? current + 1 : 2));
+    getPositionFromAddress(form.values.laundromat)
+      .then((location) => {
+        form.setFieldValue('laundromat.lat', location.lat);
+        form.setFieldValue('laundromat.lon', location.lon);
+        setActive((current) => (current < 2 ? current + 1 : 2));
+      })
+      .catch((error) => {
+        showErrorNotification('Laundromat', 'find location of the', String(error));
+      });
   };
   const prevStep = () => setActive((current) => (current > 0 ? current - 1 : 0));
 
@@ -147,7 +141,7 @@ const LaundromatAddPage = () => {
             values={form.values.laundromat}
             baseKey="laundromat"
             hide={{ 'laundromat.lat': true, 'laundromat.lon': true }}
-            suffix={{ 'laundromat.price': '€' }}
+            props={{ 'laundromat.price': { min: 1, suffix: '€' } }}
           />
         </Stepper.Step>
         <Stepper.Step label="Second step" description="Washing Mashine">
@@ -195,7 +189,9 @@ const LaundromatAddPage = () => {
           <Flex gap="1rem">
             {active > 0 && <Button onClick={prevStep}>Back</Button>}
             {active === 2 ? (
-              <Button onClick={onSubmit}>Submit</Button>
+              <form onSubmit={form.onSubmit(onSubmit)}>
+                <Button type="submit">Submit</Button>
+              </form>
             ) : (
               <Button onClick={nextStep}>
                 {form.values.laundromat.lat ? 'Next' : 'Find Location'}

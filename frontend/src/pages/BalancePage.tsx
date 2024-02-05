@@ -1,4 +1,4 @@
-import { Container, Flex, NumberFormatter, Space, Table, Text } from '@mantine/core';
+import { Container, Flex, NumberFormatter, Space, Table, Text, rem } from '@mantine/core';
 import { upperFirst } from '@mantine/hooks';
 import React from 'react';
 import AddFundsModal from '../components/ui/AddFundsModal';
@@ -24,7 +24,6 @@ const BalancePage = () => {
       <Table.Th>Transaction Date</Table.Th>
       <Table.Th>Contract Id</Table.Th>
       <Table.Th>Transaction Status</Table.Th>
-      <Table.Th>Transaction Type</Table.Th>
       <Table.Th>Transaction Amount</Table.Th>
     </Table.Tr>
   );
@@ -38,13 +37,13 @@ const BalancePage = () => {
           <Flex gap={'md'}>
             <Text size="xl">
               Current Balance:{' '}
-              {NumberFormatter({ value: user?.balance, thousandSeparator: true, suffix: ' € EUR' })}
+              <NumberFormatter value={user?.balance} thousandSeparator suffix="€ EUR" />
             </Text>
             <AddFundsModal />
           </Flex>
         </Flex>
         <Flex mt="m" px="md">
-          <Table fz="md" highlightOnHover>
+          <Table fz="md" highlightOnHover stickyHeader stickyHeaderOffset={rem(45)}>
             <Table.Thead>{ths}</Table.Thead>
             <Table.Tbody>
               {transactions
@@ -54,15 +53,12 @@ const BalancePage = () => {
                     <Table.Td>{transaction.name}</Table.Td>
                     <Table.Td>{formatDate(transaction.createdAt)}</Table.Td>
                     <Table.Td>{transaction.id}</Table.Td>
-                    <Table.Td>
-                      {transaction.type.charAt(0).toUpperCase() + transaction.type.slice(1)}
-                    </Table.Td>
                     <Table.Td>{upperFirst(transaction.type)}</Table.Td>
                     <Table.Td style={{ textAlign: 'end' }}>
                       <NumberFormatter
                         value={transaction.amount}
                         thousandSeparator
-                        suffix=" € EUR"
+                        suffix="€ EUR"
                       />
                     </Table.Td>
                   </Table.Tr>

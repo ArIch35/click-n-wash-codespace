@@ -1,5 +1,6 @@
 import React from 'react';
 import { Navigate, Route, Routes } from 'react-router-dom';
+import firebaseAuth from './firebase';
 import { useAuth } from './providers/authentication/Authentication.Context';
 import { routes } from './routeConstants';
 import { showAuthRequiredOnce, showVendorRequiredOnce } from './utils/mantine-notifications';
@@ -11,17 +12,18 @@ interface CheckRoute {
 }
 
 const CheckRoute = ({ children, requireAuth, requireVendor }: CheckRoute) => {
-  const { auth, user } = useAuth();
+  const { user } = useAuth();
+  const firebaseUser = firebaseAuth.currentUser;
 
   React.useEffect(() => {
-    if (requireAuth && !auth) {
+    if (requireAuth && !firebaseUser) {
       showAuthRequiredOnce();
     } else if (requireVendor && !user?.isAlsoVendor) {
       showVendorRequiredOnce();
     }
-  }, [auth, requireAuth, requireVendor, user?.isAlsoVendor]);
+  }, [firebaseUser, requireAuth, requireVendor, user?.isAlsoVendor]);
 
-  if (requireAuth && !auth) {
+  if (requireAuth && !firebaseUser) {
     return <Navigate to={'/'} replace />;
   }
 

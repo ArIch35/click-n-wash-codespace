@@ -47,12 +47,12 @@ function AddFundsModal() {
                 color={amount === value ? undefined : theme.colors.gray[6]}
                 onClick={() => setAmount(value)}
               >
-                {NumberFormatter({
-                  value,
-                  decimalSeparator: '.',
-                  thousandSeparator: ',',
-                  prefix: '€ ',
-                })}
+                <NumberFormatter
+                  value={value}
+                  decimalSeparator="."
+                  thousandSeparator=","
+                  prefix="€"
+                />
               </Button>
             ))}
           </Group>
