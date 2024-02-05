@@ -1,4 +1,5 @@
 import {
+  Badge,
   Box,
   Button,
   Container,
@@ -9,7 +10,10 @@ import {
   Table,
   Text,
 } from '@mantine/core';
+import BulkCancelContractsModal from '../../components/BulkCancelContractsModal';
 import FormInputFields from '../../components/ui/form-input-fields';
+import formatDate from '../../utils/format-date';
+import { getColor } from '../../utils/utils';
 import useWashingMachineDetails from './useWashingMachineDetails';
 
 const WashingMachineDetailsPage = () => {
@@ -21,7 +25,6 @@ const WashingMachineDetailsPage = () => {
     form,
     close,
     handleCancelContract,
-    cancelAllContracts,
     handleUpdateWashingMachine,
     handleDeleteWashingMachineModal,
     handleDeleteWashingmachine,
@@ -31,6 +34,7 @@ const WashingMachineDetailsPage = () => {
     <Table.Tr>
       <Table.Th>Id</Table.Th>
       <Table.Th>Name</Table.Th>
+      <Table.Th>Time</Table.Th>
       <Table.Th>Status</Table.Th>
       <Table.Th>Actions</Table.Th>
     </Table.Tr>
@@ -40,7 +44,14 @@ const WashingMachineDetailsPage = () => {
     <Table.Tr key={contract.id}>
       <Table.Td>{contract.id}</Table.Td>
       <Table.Td>{contract.name}</Table.Td>
-      <Table.Td>{contract.status}</Table.Td>
+      <Table.Td>
+        {formatDate(contract.startDate)} - {formatDate(contract.endDate)}
+      </Table.Td>
+      <Table.Td>
+        <Badge bg={getColor(contract.status)} radius="sm">
+          {contract.status}
+        </Badge>
+      </Table.Td>
       <Table.Td>
         <Button
           variant="filled"
@@ -125,18 +136,7 @@ const WashingMachineDetailsPage = () => {
           <Divider my={40} />
           <Flex justify={'space-between'} py={10}>
             <Text size="xl">My Contracts</Text>
-            <form>
-              <Button
-                radius={'100'}
-                type="submit"
-                color="red"
-                onClick={(event) => {
-                  cancelAllContracts(event);
-                }}
-              >
-                Cancel All Contracts
-              </Button>
-            </form>
+            <BulkCancelContractsModal />
           </Flex>
           <Table>
             <Table.Thead>{ths}</Table.Thead>

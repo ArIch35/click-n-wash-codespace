@@ -14,7 +14,7 @@ interface Contract extends BaseEntity {
 }
 
 export type BulkCancelContracts = Pick<Contract, 'startDate' | 'endDate'> & {
-  laundromat: string;
+  washingMachine: string;
 };
 
 export type ReportContract = {

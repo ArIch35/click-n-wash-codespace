@@ -2,7 +2,7 @@ import { AfterLoad, BeforeInsert, Column, Entity, ManyToOne } from 'typeorm';
 import { date, object, string } from 'yup';
 import getDb from '../db';
 import StatusError from '../utils/error-with-status';
-import { finalizeBalanceTransaction } from './balance-transaction';
+import BalanceTransaction, { finalizeBalanceTransaction } from './balance-transaction';
 import BaseEntity from './base-entity';
 import User from './user';
 import WashingMachine from './washing-machine';
@@ -99,37 +99,44 @@ const autoGenerateName = (contract: Contract): void => {
 };
 
 /**
- * Finalizes a contract by creating balance transactions and updating the contract status.
- * If the 'cancel' parameter is set to true, the contract will be cancelled and a refund transaction will be created.
+ * Finalizes a contract or an array of contracts.
+ * If the `cancel` parameter is set to `true`, the contract(s) will be cancelled and a refund will be created.
  *
- * @param contract - The contract to be finalized.
- * @param cancel - Optional. If true, the contract will be cancelled.
+ * @param contract - The contract or array of contracts to be finalized.
+ * @param cancel - Optional. Set to `true` to cancel the contract(s) and create a refund. Defaults to `false`.
+ * @returns A promise that resolves when the contract(s) have been finalized.
  */
-export const finalizeContract = async (contract: Contract, cancel?: boolean) => {
+export const finalizeContract = async (contract: Contract | Contract[], cancel?: boolean) => {
   await getDb().entityManager.transaction(async (transactionalEntityManager) => {
-    let name = `Contract #${contract.id}`;
+    const contracts = contract instanceof Array ? contract : [contract];
+    const balanceTransactions: BalanceTransaction[] = [];
 
-    // Check whether the contract is gonna be cancelled
-    if (cancel) {
-      contract.status = 'cancelled';
-      name = `Refund for ${name}`;
+    for (const contract of contracts) {
+      let name = `Contract #${contract.id}`;
+
+      // Check whether the contract is gonna be cancelled
+      if (cancel) {
+        contract.status = 'cancelled';
+        name = `Refund for ${name}`;
+      }
+
+      // Create balance transactions
+      const senderBalance = getDb().balanceTransactionRepository.create({
+        name,
+        amount: contract.price * -1,
+        user: cancel ? contract.washingMachine.laundromat.owner : contract.user,
+      });
+      const receiverBalance = getDb().balanceTransactionRepository.create({
+        name,
+        amount: contract.price,
+        user: cancel ? contract.user : contract.washingMachine.laundromat.owner,
+      });
+
+      balanceTransactions.push(senderBalance, receiverBalance);
     }
 
-    // Create balance transactions
-    const senderBalance = getDb().balanceTransactionRepository.create({
-      name,
-      amount: contract.price * -1,
-      user: cancel ? contract.washingMachine.laundromat.owner : contract.user,
-    });
-    const receiverBalance = getDb().balanceTransactionRepository.create({
-      name,
-      amount: contract.price,
-      user: cancel ? contract.user : contract.washingMachine.laundromat.owner,
-    });
-
-    await finalizeBalanceTransaction(senderBalance, transactionalEntityManager);
-    await finalizeBalanceTransaction(receiverBalance, transactionalEntityManager);
-    await transactionalEntityManager.save(contract);
+    await finalizeBalanceTransaction(balanceTransactions, transactionalEntityManager);
+    await transactionalEntityManager.save(contracts);
   });
 };
 
@@ -152,7 +159,7 @@ export const updateContractSchema = object({
 export const bulkCancelContractSchema = object({
   startDate: date().required(),
   endDate: date().required(),
-  laundromat: string().required(),
+  washingMachine: string().required(),
 }).test('is-valid-date', 'Start date must be before end date', (value) => {
   return value.startDate < value.endDate;
 });

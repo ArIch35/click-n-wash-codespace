@@ -5,7 +5,7 @@ import {
   signInWithEmailAndPassword,
 } from 'firebase/auth';
 import getDb, { connectToDb } from './db';
-import Contract from './entities/contract';
+import Contract, { finalizeContract } from './entities/contract';
 import Laundromat from './entities/laundromat';
 import User from './entities/user';
 import WashingMachine from './entities/washing-machine';
@@ -43,7 +43,7 @@ const seed = async () => {
     const user = getDb().userRepository.create({
       email: fakerDE.internet.email(),
       name: fakerDE.person.fullName(),
-      balance: 200,
+      balance: 500,
     });
     userMap.set(user.email, user);
 
@@ -69,7 +69,7 @@ const seed = async () => {
         id: firebaseUser.user.uid,
         email: firebaseUser.user.email!,
         name: 'Seed User',
-        balance: 200,
+        balance: 500,
       });
       userMap.set(user.email, user);
     }
@@ -141,6 +141,7 @@ const seed = async () => {
   const threeMonthsAhead = new Date();
   threeMonthsAgo.setMonth(threeMonthsAgo.getMonth() - 3);
   threeMonthsAhead.setMonth(threeMonthsAhead.getMonth() + 3);
+  const TWO_HOURS = 2 * 60 * 60 * 1000;
   const contracts: Contract[] = [];
   const totalContracts =
     randomNumber(contractMinPerPseudoUser, contractMaxPerPseudoUser) * users.length;
@@ -148,8 +149,7 @@ const seed = async () => {
     const user = users[randomNumber(0, users.length - 1)];
     const washingMachine = washingMachines[randomNumber(0, washingMachines.length - 1)];
     const startDate = randomDate(threeMonthsAgo, threeMonthsAhead);
-    const endDate = new Date(startDate);
-    endDate.setHours(endDate.getHours() + 2);
+    const endDate = new Date(startDate.getTime() + TWO_HOURS - 1);
     const contract = getDb().contractRepository.create({
       startDate,
       endDate,
@@ -177,49 +177,11 @@ const seed = async () => {
 
   for (let i = 0; i < contracts.length; i += batchSize) {
     const batch = contracts.slice(i, i + batchSize);
-    await getDb().contractRepository.save(batch);
+    await finalizeContract(batch);
     console.log(`Seeding batch ${i / 1000 + 1} contracts completed`);
   }
 
   console.log(`Seeding ${contracts.length} contracts completed`);
-
-  const balanceTransactions = contracts.flatMap((contract) => {
-    const senderBalance = getDb().balanceTransactionRepository.create({
-      name: `Contract #${contract.id}`,
-      amount: contract.price * -1,
-      user: contract.user,
-    });
-    const receiverBalance = getDb().balanceTransactionRepository.create({
-      name: `Contract #${contract.id}`,
-      amount: contract.price,
-      user: contract.washingMachine.laundromat.owner,
-    });
-    userMap.get(contract.user.email)!.balance -= contract.price;
-    userMap.get(contract.washingMachine.laundromat.owner.email)!.balance += contract.price;
-    return [senderBalance, receiverBalance];
-  });
-
-  console.log(`Seeding ${balanceTransactions.length} balance transactions...`);
-
-  for (let i = 0; i < balanceTransactions.length; i += batchSize) {
-    const batch = balanceTransactions.slice(i, i + batchSize);
-    await getDb().balanceTransactionRepository.save(batch);
-    console.log(`Seeding batch ${i / 1000 + 1} balance transactions completed`);
-  }
-
-  console.log(`Seeding ${balanceTransactions.length} balance transactions completed`);
-
-  const users2 = Array.from(userMap.values());
-
-  console.log('Updating users balance...');
-
-  for (let i = 0; i < users2.length; i += batchSize) {
-    const batch = users2.slice(i, i + batchSize);
-    await getDb().userRepository.save(batch);
-    console.log(`Updating balance batch ${i / 1000 + 1} completed`);
-  }
-
-  console.log('Updating users balance completed');
 
   const endTime = Date.now();
 

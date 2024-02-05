@@ -83,6 +83,8 @@ export const bulkCancelContracts = async (bulkCancelContracts: BulkCancelContrac
   if (!response.ok) {
     throw new Error((data as Message).message);
   }
+
+  return entityParser<Message>(data as Message);
 };
 
 /**

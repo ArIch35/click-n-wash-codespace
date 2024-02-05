@@ -111,7 +111,7 @@ const LaundromatsManagePage = () => {
           <Table.Tbody>{rows}</Table.Tbody>
         </Table>
 
-        {laundromats.length != 0 && (
+        {laundromats.length > 0 && (
           <Stack>
             <Text size="xl">Analytics</Text>
 

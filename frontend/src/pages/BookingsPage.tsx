@@ -18,24 +18,7 @@ import Contract from '../interfaces/entities/contract';
 import { cancelContract, getContracts } from '../utils/api';
 import formatDate from '../utils/format-date';
 import { showCustomNotification } from '../utils/mantine-notifications';
-
-/**
- * Returns the color associated with the given status.
- * @param status - The status of the booking.
- * @returns The color string.
- */
-const getColor = (status: string) => {
-  switch (status) {
-    case 'ongoing':
-      return 'green';
-    case 'finished':
-      return 'blue';
-    case 'cancelled':
-      return 'red';
-    default:
-      return 'gray';
-  }
-};
+import { getColor } from '../utils/utils';
 
 const BookingsPage = () => {
   const [contracts, setContracts] = React.useState<Contract[]>([]);

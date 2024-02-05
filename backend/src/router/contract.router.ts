@@ -1,5 +1,5 @@
 import { RequestHandler, Router } from 'express';
-import { LessThanOrEqual, MoreThanOrEqual } from 'typeorm';
+import { Between } from 'typeorm';
 import { ValidationError } from 'yup';
 import getDb from '../db';
 import Contract, {
@@ -132,18 +132,11 @@ router.post('/bulkcancel', (async (req, res) => {
     const id = res.locals.uid as string;
 
     const contracts = await getDb().contractRepository.find({
-      where: [
-        {
-          washingMachine: { laundromat: { id: validated.laundromat, owner: { id } } },
-          status: 'ongoing',
-          endDate: MoreThanOrEqual(validated.startDate),
-        },
-        {
-          washingMachine: { laundromat: { id: validated.laundromat, owner: { id } } },
-          status: 'ongoing',
-          startDate: LessThanOrEqual(validated.endDate),
-        },
-      ],
+      where: {
+        washingMachine: { id: validated.washingMachine, laundromat: { owner: { id } } },
+        status: 'ongoing',
+        endDate: Between(validated.startDate, validated.endDate),
+      },
       relations: { user: true, washingMachine: { laundromat: { owner: true } } },
     });
 
