@@ -12,10 +12,11 @@ import {
   Textarea,
   Title,
 } from '@mantine/core';
+import { DatePicker } from '@mantine/dates';
 import { UseFormReturnType } from '@mantine/form';
 import { upperFirst } from '@mantine/hooks';
 
-type Components = 'RangeSlider' | 'Textarea' | 'Select' | 'Autocomplete';
+type Components = 'RangeSlider' | 'Textarea' | 'Select' | 'Autocomplete' | 'DatePicker';
 
 interface FormInputFieldsProps<T> {
   form: UseFormReturnType<T>;
@@ -130,12 +131,18 @@ const renderInputs = <T extends object>(props: FormInputFieldsProps<T>) => {
         switch (component) {
           case 'RangeSlider':
             return (
-              <RangeSlider
-                key={parentKey}
-                name={key}
-                {...props.form.getInputProps(parentKey)}
-                {...props.props?.[parentKey]}
-              />
+              <Stack key={parentKey} gap={0}>
+                <Text>
+                  {(props.props?.[parentKey]?.label as string) ||
+                    (props.props?.label?.[key] as string) ||
+                    upperFirst(formatName(key))}
+                </Text>
+                <RangeSlider
+                  name={key}
+                  {...props.form.getInputProps(parentKey)}
+                  {...props.props?.[parentKey]}
+                />
+              </Stack>
             );
           case 'Textarea':
             return (
@@ -166,6 +173,20 @@ const renderInputs = <T extends object>(props: FormInputFieldsProps<T>) => {
                 {...props.form.getInputProps(parentKey)}
                 {...props.props?.[parentKey]}
               />
+            );
+          case 'DatePicker':
+            return (
+              <Stack key={parentKey} gap={0}>
+                <Text>
+                  {(props.props?.[parentKey]?.label as string) ||
+                    (props.props?.label?.[key] as string) ||
+                    upperFirst(formatName(key))}
+                </Text>
+                <DatePicker
+                  {...props.form.getInputProps(parentKey)}
+                  {...props.props?.[parentKey]}
+                />
+              </Stack>
             );
         }
       }
