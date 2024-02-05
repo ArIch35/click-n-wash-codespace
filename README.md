@@ -8,6 +8,7 @@ Feel free to check our website at <a href="https://clicknwash.pro/"> clicknwash.
 
 - [About](#about)
 - [Features](#features)
+- [Getting Started](#started)
 - [Tech Stakes](#tech-stakes)
 - [Database Structures](#database-structure)
 - [API Functions](#api-functions)
@@ -31,6 +32,78 @@ Click n' Wash is a student-led initiative aimed at simplifying the laundry exper
 - **Transaction History**: user can see their own transaction history.
 - **Become a Vendor**: user can become a vendor to open their own laundromat.
 - **Refund System** : a vendor can refunds the transaction to the user, when there is an error with the machine.
+
+## Getting Started <a name="started"></a>
+
+### Prerequisites
+
+To get Started with the application, make sure you have the following prerequisites installed:
+
+- [Node.js](https://nodejs.org/en/)
+- [npm](https://www.npmjs.com/)
+- [Docker](https://www.docker.com/)
+- [Docker Compose](https://docs.docker.com/compose/)
+- [PostgreSQL](https://www.postgresql.org/)
+
+### Installation
+
+1. Clone the repository
+
+```bash
+git clone https://code.fbi.h-da.de/click-n-wash/click-n-wash.git
+```
+
+2. Configure the enviroment variables( .env)
+   Create and fill the enviroment variables in the `.env` and make sure the file located in the root of the back-end folder. You can use the [`env.example`](./.env.example) file as template.
+
+3. Installation Methods:
+
+#### Docker Compose
+
+1. To provide a one-command solution for starting the Database/Backend. Simply run the following command in the terminal:
+
+```
+cd back-end/
+docker compose up -d
+```
+
+#### Backend
+
+1. Install Depedencies:
+
+```bash
+cd back-end/
+npm i
+```
+
+2. Start the Database with no data:
+
+```
+npm run dev
+```
+
+#### Frontend
+
+1. Install Depedencies:
+
+```bash
+cd front-end/
+npm i
+```
+
+2. Start the front end
+
+```bash
+cd ..
+cd front-end/
+npm run dev
+```
+
+3. Open the website
+
+```
+http://localhost:5173/
+```
 
 ## Database Structures <a name="database-structure"></a>
 
