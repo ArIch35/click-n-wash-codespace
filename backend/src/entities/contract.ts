@@ -152,7 +152,7 @@ export const updateContractSchema = object({
 export const bulkCancelContractSchema = object({
   startDate: date().required(),
   endDate: date().required(),
-  laundromat: string().required(),
+  washingMachine: string().required(),
 }).test('is-valid-date', 'Start date must be before end date', (value) => {
   return value.startDate < value.endDate;
 });
