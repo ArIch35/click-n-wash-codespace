@@ -158,7 +158,7 @@ In this page the user will see a map that shows the location of the laundromats 
 
 In this page the user and the vendor can see the list of messages that they got about their booking or about their laundromats.
 
-### Manange Bookings Page
+### Manage Bookings Page
 
 Here the user can see the list of their booking and the detail of the booking. the user can also cancel their booking or report a problem with the washing machine in this page.
 
@@ -208,7 +208,7 @@ With this component the user can pick which machine they want to book.
 
 This component is used in the balance page to help the user top up their balance.
 
-### Add Washing Machine
+### Add Washing Machine Modal
 
 This component will show a form for the detail of the washing machine,that will be added to the laundromat.
 
