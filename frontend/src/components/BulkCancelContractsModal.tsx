@@ -72,7 +72,13 @@ const BulkCancelContractsModal = () => {
               form={form}
               values={form.values}
               customComponent={{ fromDateToDate: 'DatePicker' }}
-              props={{ fromDateToDate: { type: 'range', style: { alignSelf: 'center' } } }}
+              props={{
+                fromDateToDate: {
+                  label: 'Choose date range for the cancellation',
+                  type: 'range',
+                  style: { alignSelf: 'center' },
+                },
+              }}
             />
             <Button type="submit" radius="md" size="md" color="red">
               Cancel contracts
