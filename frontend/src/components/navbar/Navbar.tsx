@@ -38,6 +38,20 @@ const Navbar = ({ toggle, setVisible }: NavbarControllerProps) => {
     color: 'red',
     autoClose: false,
   };
+
+  const sucessNotification: Notification = {
+    title: 'Success',
+    message: 'Activated vendor mode successfully!',
+    color: 'green',
+    autoClose: true,
+  };
+
+  const nonVendorNotification: Notification = {
+    title: 'Success',
+    message: 'Deactivated vendor mode successfully!',
+    color: 'green',
+    autoClose: true,
+  };
   const toggleVendorMode = () => {
     if (!user) {
       throw new Error('User is not logged in');
@@ -48,7 +62,13 @@ const Navbar = ({ toggle, setVisible }: NavbarControllerProps) => {
       isAlsoVendor: !user.isAlsoVendor,
     };
     updateUser(body)
-      .then(() => refreshUser())
+      .then(() => {
+        refreshUser(),
+          // If user change to vendor mode, show success notification
+          !user.isAlsoVendor && showCustomNotification(sucessNotification);
+        // If user change to non vendor mode, show error notification
+        user.isAlsoVendor && showCustomNotification(nonVendorNotification);
+      })
       .catch((error) => {
         console.error(error), showCustomNotification(customNotification);
       });

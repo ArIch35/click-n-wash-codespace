@@ -24,7 +24,6 @@ const BalancePage = () => {
       <Table.Th>Transaction Date</Table.Th>
       <Table.Th>Contract Id</Table.Th>
       <Table.Th>Transaction Status</Table.Th>
-      <Table.Th>Transaction Type</Table.Th>
       <Table.Th>Transaction Amount</Table.Th>
     </Table.Tr>
   );
@@ -54,9 +53,6 @@ const BalancePage = () => {
                     <Table.Td>{transaction.name}</Table.Td>
                     <Table.Td>{formatDate(transaction.createdAt)}</Table.Td>
                     <Table.Td>{transaction.id}</Table.Td>
-                    <Table.Td>
-                      {transaction.type.charAt(0).toUpperCase() + transaction.type.slice(1)}
-                    </Table.Td>
                     <Table.Td>{upperFirst(transaction.type)}</Table.Td>
                     <Table.Td style={{ textAlign: 'end' }}>
                       <NumberFormatter
