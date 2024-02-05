@@ -243,6 +243,10 @@ In this page the user can see their transaction list, their current balance and 
 
 This page is only available to vendor. In this page the vendor can manage their laundromats informations and also add or delete a washing machine.
 
+### Edit Laundromats
+
+In this page the vendor can edit their laundromat information.
+
 ### Washing Machine Detail Page
 
 In this page the vendor can see the detail of the washing machine and also change the information of the washing machine. Here the vendor can also see the list of contract and refund or cancel a contracts, when something's wrong happened to the washing machine.
