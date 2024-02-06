@@ -58,12 +58,12 @@ function AddWashingMachine({
         // Append to the washing machines state
         const newWashingMachines = [...(washingMachines ?? []), response];
         setWashingMachines(newWashingMachines);
-        showSuccessNotification('New Washing Machine', 'create');
+        showSuccessNotification('New Machine', 'create');
         close();
       })
       .catch((error) => {
         console.error(error);
-        showErrorNotification('Washing Machine', 'create', String(error));
+        showErrorNotification('Machine', 'create', String(error));
       });
   };
 
@@ -76,7 +76,7 @@ function AddWashingMachine({
 
   return (
     <>
-      <Modal opened={opened} onClose={close} title="Add New Washing Machine" centered>
+      <Modal opened={opened} onClose={close} title="Add New Machine" centered>
         <form onSubmit={form.onSubmit(onSubmit)}>
           <FormInputFields
             form={form}
@@ -97,7 +97,7 @@ function AddWashingMachine({
       </Modal>
 
       <Button onClick={open} radius={100}>
-        Add Washing machine
+        Add New Machine
       </Button>
     </>
   );
