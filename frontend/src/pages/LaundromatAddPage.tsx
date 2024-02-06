@@ -144,7 +144,7 @@ const LaundromatAddPage = () => {
             props={{ 'laundromat.price': { min: 1, suffix: '€' } }}
           />
         </Stepper.Step>
-        <Stepper.Step label="Second step" description="Washing Mashine">
+        <Stepper.Step label="Second step" description="Washing Machines">
           <FormInputFields
             form={form}
             values={form.values.washingMachines}
