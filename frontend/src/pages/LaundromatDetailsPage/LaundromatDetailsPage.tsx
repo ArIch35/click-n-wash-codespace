@@ -140,7 +140,7 @@ const LaundromatDetailPage = () => {
           </Box>
           <Divider my={40} />
           <Flex justify={'space-between'} py={10}>
-            <Text size="xl">My Washing Machines</Text>
+            <Text size="xl">My Machines</Text>
             <AddWashingMachine
               laundromatId={laundromat.id}
               washingMachines={washingMachines}
