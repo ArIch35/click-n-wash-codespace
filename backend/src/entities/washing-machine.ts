@@ -56,14 +56,14 @@ const checkDuplicateNameWithinLaundromat = async (
   }
 };
 
-export const createWashingMaschineSchema = object({
+export const createWashingMachineSchema = object({
   name: string().required(),
   brand: string().required(),
   description: string(),
   laundromat: string().required(),
 }).noUnknown();
 
-export const updateWashingMaschineSchema = object({
+export const updateWashingMachineSchema = object({
   name: string(),
   brand: string(),
   description: string(),

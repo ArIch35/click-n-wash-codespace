@@ -2,8 +2,8 @@ import { RequestHandler, Router } from 'express';
 import { ValidationError } from 'yup';
 import getDb from '../db';
 import {
-  createWashingMaschineSchema,
-  updateWashingMaschineSchema,
+  createWashingMachineSchema,
+  updateWashingMachineSchema,
 } from '../entities/washing-machine';
 import StatusError from '../utils/error-with-status';
 import {
@@ -52,7 +52,7 @@ router.get('/:id', (async (req, res) => {
 
 router.post('/', (async (req, res) => {
   try {
-    const validated = await createWashingMaschineSchema.validate(req.body, {
+    const validated = await createWashingMachineSchema.validate(req.body, {
       abortEarly: false,
       strict: true,
     });
@@ -87,7 +87,7 @@ router.post('/', (async (req, res) => {
 
 router.put('/:id', (async (req, res) => {
   try {
-    const validated = await updateWashingMaschineSchema.validate(req.body, {
+    const validated = await updateWashingMachineSchema.validate(req.body, {
       abortEarly: false,
       strict: true,
     });

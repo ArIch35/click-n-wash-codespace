@@ -119,7 +119,7 @@ const useWashingMachineDetails = () => {
     }
 
     if (!id) {
-      showErrorNotification('Washing Machine', 'update', 'Washing Machine not found');
+      showErrorNotification('Machine', 'update', 'Machine not found');
       return;
     }
 
@@ -133,12 +133,12 @@ const useWashingMachineDetails = () => {
         });
 
         setWashingMachine(response);
-        showSuccessNotification('Washing Machine', 'update');
+        showSuccessNotification('Machine', 'update');
         setLoading(false);
       })
       .catch((error) => {
         console.error(error);
-        showErrorNotification('Washing Machine', 'update', String(error));
+        showErrorNotification('Machine', 'update', String(error));
         setLoading(false);
       });
   };
@@ -150,19 +150,19 @@ const useWashingMachineDetails = () => {
     event?.preventDefault();
 
     if (!id) {
-      showErrorNotification('Washing Machine', 'delete', 'Washing Machine not found');
+      showErrorNotification('Machine', 'delete', 'Machine not found');
       return;
     }
 
     deleteWashingMachine(id)
       .then(() => {
-        showSuccessNotification('Washing Machine', 'delete');
+        showSuccessNotification('Machine', 'delete');
         setLoading(false);
         navigate(-1);
       })
       .catch((error) => {
         console.error(error);
-        showErrorNotification('Washing Machine', 'delete', 'failed to delete washing machine');
+        showErrorNotification('Machine', 'delete', 'failed to delete machine');
         setLoading(false);
       });
   };
@@ -171,11 +171,7 @@ const useWashingMachineDetails = () => {
     event.preventDefault();
 
     if (numberOfActiveContracts !== 0) {
-      showErrorNotification(
-        'Washing Machine',
-        'delete',
-        'Washing Machine still has active contracts',
-      );
+      showErrorNotification('Machine', 'delete', 'Machine still has active contracts');
       return;
     }
 
