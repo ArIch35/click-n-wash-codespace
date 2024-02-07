@@ -97,8 +97,7 @@ const LaundromatsManagePage = () => {
   );
 
   return (
-    <Stack py="lg">
-      <Container>
+      <Container py={30} size={'xl'}>
         <Group justify="space-between">
           <Text size="xl">My Laundromats</Text>
           <Button variant="outline" radius={'100'} onClick={() => navigate('/add-laundromat')}>
@@ -127,7 +126,6 @@ const LaundromatsManagePage = () => {
             </Group>
           </Stack>
         )}
-      </Container>
 
       <Stack px="xl">
         {analytics.map((laundromatAnalytics) => (
@@ -140,9 +138,9 @@ const LaundromatsManagePage = () => {
                   value={laundromatAnalytics.analytics
                     .map((el) => el.revenue)
                     .reduce((a, b) => a + b, 0)}
-                  thousandSeparator
-                  suffix="€"
-                />
+                    thousandSeparator
+                    suffix="€"
+                    />
               </Text>
             </Group>
             <BarChart
@@ -151,11 +149,11 @@ const LaundromatsManagePage = () => {
               dataKey="date"
               withLegend
               series={laundromatAnalytics.series}
-            />
+              />
           </Stack>
         ))}
       </Stack>
-    </Stack>
+    </Container>
   );
 };
 
