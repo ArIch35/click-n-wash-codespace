@@ -97,35 +97,35 @@ const LaundromatsManagePage = () => {
   );
 
   return (
-      <Container py={30} size={'xl'}>
-        <Group justify="space-between">
-          <Text size="xl">My Laundromats</Text>
-          <Button variant="outline" radius={'100'} onClick={() => navigate('/add-laundromat')}>
-            + Add
-          </Button>
-        </Group>
+    <Container py={30} size={'xl'}>
+      <Group justify="space-between">
+        <Text size="xl">My Laundromats</Text>
+        <Button variant="outline" radius={'100'} onClick={() => navigate('/add-laundromat')}>
+          + Add
+        </Button>
+      </Group>
 
-        <Table>
-          <Table.Thead>{ths}</Table.Thead>
-          <Table.Tbody>{rows}</Table.Tbody>
-        </Table>
+      <Table>
+        <Table.Thead>{ths}</Table.Thead>
+        <Table.Tbody>{rows}</Table.Tbody>
+      </Table>
 
-        {laundromats.length > 0 && (
-          <Stack>
-            <Text size="xl">Analytics</Text>
+      {laundromats.length > 0 && (
+        <Stack>
+          <Text size="xl">Analytics</Text>
 
-            <Group justify="space-around" align="flex-start">
-              <Stack>
-                <Text size="xl">Span</Text>
-                <Select data={['day', 'week', 'month', 'year']} value={span} onChange={setSpan} />
-              </Stack>
-              <Stack>
-                <Text size="xl">Pick date range</Text>
-                <DatePicker type="range" value={fromDateToDate} onChange={handleDateChange} />
-              </Stack>
-            </Group>
-          </Stack>
-        )}
+          <Group justify="space-around" align="flex-start">
+            <Stack>
+              <Text size="xl">Span</Text>
+              <Select data={['day', 'week', 'month', 'year']} value={span} onChange={setSpan} />
+            </Stack>
+            <Stack>
+              <Text size="xl">Pick date range</Text>
+              <DatePicker type="range" value={fromDateToDate} onChange={handleDateChange} />
+            </Stack>
+          </Group>
+        </Stack>
+      )}
 
       <Stack px="xl">
         {analytics.map((laundromatAnalytics) => (
@@ -138,9 +138,9 @@ const LaundromatsManagePage = () => {
                   value={laundromatAnalytics.analytics
                     .map((el) => el.revenue)
                     .reduce((a, b) => a + b, 0)}
-                    thousandSeparator
-                    suffix="€"
-                    />
+                  thousandSeparator
+                  suffix="€"
+                />
               </Text>
             </Group>
             <BarChart
@@ -149,7 +149,7 @@ const LaundromatsManagePage = () => {
               dataKey="date"
               withLegend
               series={laundromatAnalytics.series}
-              />
+            />
           </Stack>
         ))}
       </Stack>
