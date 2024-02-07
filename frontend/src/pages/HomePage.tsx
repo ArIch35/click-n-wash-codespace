@@ -1,16 +1,21 @@
 import { Box, Button, Group, NumberFormatter, Paper, Stack, Text, Title } from '@mantine/core';
+import { useDisclosure } from '@mantine/hooks';
 import { Map } from 'leaflet';
 import React, { useEffect, useState } from 'react';
 import AutoSizer from 'react-virtualized-auto-sizer';
 import { FixedSizeList } from 'react-window';
+import { AuthenticationForm } from '../components/auth/AuthentificationForm';
 import Filter, { SearchFilter } from '../components/home/Filter';
 import CustomMap from '../components/home/Map';
 import WashingMachinePicker from '../components/home/WashingMachinePicker';
 import Laundromat from '../interfaces/entities/laundromat';
+import { useAuth } from '../providers/authentication/Authentication.Context';
 import { getFilteredLaundromats, getLaundromats } from '../utils/api';
 import { showCustomNotification, showErrorNotification } from '../utils/mantine-notifications';
 
 const HomePage = () => {
+  const { user } = useAuth();
+  const [modalOpened, modalHandlers] = useDisclosure(false);
   const [laundromats, setAllLaundromats] = useState<Laundromat[]>([]);
   const [chosenLaundromat, setChosenLaundromat] = useState<Laundromat | null>(null);
   const [isOpen, setIsOpen] = useState<boolean>(false);
@@ -57,6 +62,10 @@ const HomePage = () => {
   };
 
   const onLaundromatChosen = (laundromat: Laundromat) => {
+    if (!user) {
+      modalHandlers.open();
+      return;
+    }
     setChosenLaundromat(laundromat);
     setIsOpen(true);
   };
@@ -161,6 +170,7 @@ const HomePage = () => {
           />
         )}
       </Stack>
+      {!user && <AuthenticationForm opened={modalOpened} onClose={modalHandlers.close} />}
     </Group>
   );
 };
