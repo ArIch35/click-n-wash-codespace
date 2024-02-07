@@ -10,12 +10,14 @@ import { routes } from '../../routeConstants';
 import { updateUser } from '../../utils/api';
 import { showCustomNotification } from '../../utils/mantine-notifications';
 import classes from './Navbar.module.css';
+import { useMediaQuery } from '@mantine/hooks';
 
 const settings = routes.find((route) => route.label === 'Settings');
 
 const Navbar = ({ toggle, setVisible }: NavbarControllerProps) => {
   const { user, refreshUser } = useAuth();
   const location = useLocation();
+  const isMobile = useMediaQuery('(max-width: 50em)');
   const data = routes.filter(
     (route) =>
       route.onNavbar &&
@@ -133,7 +135,7 @@ const Navbar = ({ toggle, setVisible }: NavbarControllerProps) => {
   );
 
   return (
-    <nav className={classes.navbar}>
+    <nav className={isMobile ? classes.navbar : classes.navbarFlex}>
       <div className={classes.navbarMain}>
         <Group className={classes.title} justify="space-between">
           <Text fw={700} style={{ fontSize: 24 }}>
@@ -143,7 +145,7 @@ const Navbar = ({ toggle, setVisible }: NavbarControllerProps) => {
         {links}
       </div>
 
-      <div className={classes.footer}>
+      <div className={isMobile ? '' : classes.footer}>
         {settingsLink}
         {vendorLink}
       </div>
