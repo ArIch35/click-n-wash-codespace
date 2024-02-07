@@ -86,6 +86,7 @@ export function AuthenticationForm({ ...props }: ModalProps) {
 
   return (
     <Modal
+      data-testid="auth-modal"
       withCloseButton={isMobile}
       fullScreen={isMobile}
       transitionProps={{ transition: 'fade', duration: 200 }}
