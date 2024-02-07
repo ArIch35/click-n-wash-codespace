@@ -4,6 +4,16 @@
   width: rem(250px);
   padding-top: var(--mantine-spacing-sm);
   padding-bottom: var(--mantine-spacing-sm);
+  flex-direction: column;
+  color: white;
+}
+
+.navbarFlex {
+  background-color: light-dark(#3060be, var(--mantine-color-dark-9));
+  height: 100vh;
+  width: rem(250px);
+  padding-top: var(--mantine-spacing-sm);
+  padding-bottom: var(--mantine-spacing-sm);
   display: flex;
   flex-direction: column;
   color: white;
