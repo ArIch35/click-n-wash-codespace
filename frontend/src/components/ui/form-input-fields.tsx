@@ -284,7 +284,7 @@ const renderInputs = <T extends object>(props: FormInputFieldsProps<T>) => {
  * />
  */
 const FormInputFields = <T extends object>(props: FormInputFieldsProps<T>) => {
-  return <Stack gap="md">{renderInputs(props)}</Stack>;
+  return <Stack gap="xs">{renderInputs(props)}</Stack>;
 };
 
 export default FormInputFields;

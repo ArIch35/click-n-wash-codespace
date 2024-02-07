@@ -72,13 +72,13 @@ const HomePage = () => {
 
   const LaundromatCard = ({ laundromat }: { laundromat: Laundromat }) => {
     return (
-      <Paper shadow="sm" radius="md" withBorder p="md">
-        <Stack justify="space-between">
+      <Paper shadow="sm" radius="md" withBorder p="sm">
+        <Stack justify="space-between" gap={'xs'}>
           <Title order={6}>
             {laundromat.name} ({laundromat.city})
           </Title>
 
-          <Stack>
+          <Stack gap={0}>
             <Text truncate="end">
               Address: {laundromat.street}, {laundromat.postalCode}, {laundromat.city},{' '}
               {laundromat.country}
@@ -128,7 +128,7 @@ const HomePage = () => {
 
   return (
     <Group h="inherit" gap={0}>
-      <Stack h="inherit" w="80%">
+      <Stack h="inherit" w="75%">
         {laundromats && (
           <CustomMap
             laundromats={laundromats.filter((laundromat) => laundromat.position)}
@@ -137,7 +137,7 @@ const HomePage = () => {
           />
         )}
       </Stack>
-      <Stack h="inherit" w="20%" gap={0}>
+      <Stack h="inherit" w="25%" gap={0}>
         <Box>
           <Filter onFilterSelected={onFilterSelected} onFilterReset={getAllLaundromats} />
         </Box>
