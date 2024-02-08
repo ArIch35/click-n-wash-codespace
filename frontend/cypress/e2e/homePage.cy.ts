@@ -36,7 +36,7 @@ describe('register new user', () => {
   it('passes', () => {
     cy.visit(Cypress.env('VITE_FRONTEND_ADDRESS') as string);
     cy.wait(1000);
-    cy.get('[data-testid="login-button"]').should('exist').click();
+    cy.contains('button', 'Login').should('exist').click();
     cy.contains('button', 'Not a member yet? Register').should('exist').click();
     cy.get('input[name="name"]').eq(1).should('exist').type('newUser');
     cy.get('input[name="email"]').should('exist').type('newUser@mantine.de');
