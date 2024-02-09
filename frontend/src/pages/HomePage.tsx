@@ -170,13 +170,7 @@ const HomePage = () => {
           />
         )}
       </Stack>
-      {!user && (
-        <AuthenticationForm
-          data-testid="login"
-          opened={modalOpened}
-          onClose={modalHandlers.close}
-        />
-      )}
+      {!user && <AuthenticationForm opened={modalOpened} onClose={modalHandlers.close} />}
     </Group>
   );
 };
