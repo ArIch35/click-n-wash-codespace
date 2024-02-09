@@ -1,5 +1,6 @@
+// Login function
 // Make a login function so that we can use it in the test
-function login() {
+function loginHome() {
   cy.visit(Cypress.env('VITE_FRONTEND_ADDRESS') as string);
   cy.wait(1000);
   cy.get('body').then((body) => {
@@ -48,13 +49,13 @@ describe('register new user', () => {
 
 describe('login', () => {
   it('passes', () => {
-    login();
+    loginHome();
   });
 });
 
 describe('click the hamburger button', () => {
   it('passes', () => {
-    login();
+    loginHome();
     cy.get('button').eq(0).should('exist').click();
     cy.wait(1000);
   });
@@ -91,7 +92,7 @@ describe('try to book', () => {
     cy.contains('button', 'Book Time').should('exist').click();
     cy.wait(1000);
     cy.get('ul div button').eq(0).should('exist').click({ force: true });
-    cy.wait(5000);
+    cy.wait(1000);
   });
 });
 
