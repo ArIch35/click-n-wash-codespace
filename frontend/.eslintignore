@@ -1,3 +1,4 @@
 node_modules
 dist
 src/vite-env.d.ts
+cypress/support/commands.ts
