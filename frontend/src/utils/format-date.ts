@@ -4,6 +4,8 @@
  * @returns Formatted date
  */
 const formatDate = (date: Date): string => {
+  // Convert Date to local timezone first
+  date = new Date(date.getTime() - date.getTimezoneOffset() * 60000);
   const day = date.getDate().toString().padStart(2, '0');
   const month = (date.getMonth() + 1).toString().padStart(2, '0');
   const year = date.getFullYear();

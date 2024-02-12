@@ -12,7 +12,7 @@ interface Db {
   dataSource: DataSource;
   entityManager: EntityManager;
   dropDatabase: () => Promise<void>;
-  syncAuth: () => Promise<void>;
+  syncAuth: (id?: string) => Promise<void>;
   userRepository: Repository<User>;
   laundromatRepository: Repository<Laundromat>;
   washingMachineRepository: Repository<WashingMachine>;
@@ -50,7 +50,16 @@ export const connectToDb = async (test?: boolean): Promise<void> => {
       await getDb().laundromatRepository.delete({});
       await getDb().userRepository.delete({});
     },
-    syncAuth: async () => {
+    syncAuth: async (id?: string) => {
+      if (id) {
+        const user = await getDb().userRepository.findOne({ where: { id } });
+        if (!user) {
+          await admin.auth().deleteUser(id);
+          console.log(`Deleted user ${id} from Firebase`);
+        }
+        return;
+      }
+
       const firebaseUserIds: string[] = [];
       const dbUserIds = (await getDb().userRepository.find()).map((user) => user.id);
       let exists = true;

@@ -48,9 +48,7 @@ const ONE_HOUR = 3600000;
  * @throws Error if the API request fails.
  */
 export const bookWashingMachine = async (id: string, startDate: Date) => {
-  const dateWithTimezoneOffset = new Date(
-    startDate.getTime() + startDate.getTimezoneOffset() * 60 * 1000,
-  );
+  const dateWithTimezoneOffset = new Date(startDate.getTime());
   const response = await fetch(`${route}`, {
     method: 'POST',
     headers: { ...(await headers()) },
