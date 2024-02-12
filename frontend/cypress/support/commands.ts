@@ -1,3 +1,4 @@
+// eslint-disable-next-line spaced-comment
 ///<reference types="cypress" />
 // ***********************************************
 // This example commands.ts shows you how to
