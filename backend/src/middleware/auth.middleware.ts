@@ -7,14 +7,17 @@ import { STATUS_UNAUTHORIZED } from '../utils/http-status-codes';
 
 // Middleware
 const checkToken: RequestHandler = (async (req, res, next) => {
-  const skipAuth = routesWithoutAuth.some((route) => {
-    const path1 = route.path.toLocaleLowerCase();
-    const path2 = path1.slice(-1) !== '/' ? `${path1}/` : path1;
-    return (
-      route.method === req.method &&
-      (path1 === req.path.toLocaleLowerCase() || path2 === req.path.toLocaleLowerCase())
-    );
-  });
+  // Skip auth if it is a GET request and not API endpoints
+  const skipAuth =
+    (req.method === 'GET' && !req.path.startsWith('/api')) ||
+    routesWithoutAuth.some((route) => {
+      const path1 = route.path.toLocaleLowerCase();
+      const path2 = path1.slice(-1) !== '/' ? `${path1}/` : path1;
+      return (
+        route.method === req.method &&
+        (path1 === req.path.toLocaleLowerCase() || path2 === req.path.toLocaleLowerCase())
+      );
+    });
 
   try {
     if (!req.headers.authorization) {

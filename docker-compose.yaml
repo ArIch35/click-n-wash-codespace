@@ -15,6 +15,18 @@ services:
       - click-n-wash-db-data:/var/lib/postgresql/data
       - ./init.sql:/docker-entrypoint-initdb.d/init.sql
 
+  app:
+    container_name: click-n-wash-app
+    build: .
+    ports:
+      - ${PORT:-8080}:${PORT:-8080}
+    env_file:
+      - .env
+    environment:
+      DB_HOST: click-n-wash-db
+    depends_on:
+      - click-n-wash-db
+
 volumes:
   click-n-wash-db-data:
     driver: local

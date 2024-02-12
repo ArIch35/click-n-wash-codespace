@@ -1,5 +1,5 @@
 import 'reflect-metadata';
-import server from './server';
+import server, { getSocket } from './server';
 import loadEnv from './utils/load-env';
 
 const PORT = loadEnv().PORT;
@@ -10,10 +10,22 @@ const PORT = loadEnv().PORT;
  */
 server()
   .then((app) => {
-    app.listen(PORT, () => {
-      console.log(`Server is running on port ${PORT}`);
+    const appInstance = app.listen(PORT, () => console.log(`Server is running on port ${PORT}`));
+    const socket = getSocket();
+
+    const signals: NodeJS.Signals[] = ['SIGINT', 'SIGTERM', 'SIGQUIT'];
+    signals.forEach((signal) => {
+      process.on(signal, () => {
+        console.log(`Received ${signal}, shutting down`);
+        socket?.close();
+        appInstance.close(() => {
+          console.log('Server closed');
+          process.exit(0);
+        });
+      });
     });
   })
-  .catch((err) => {
-    console.log(err);
+  .catch((error) => {
+    console.error(error);
+    process.exit(1);
   });

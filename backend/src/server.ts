@@ -15,7 +15,7 @@ import laundromatRouter from './router/laundromat.router';
 import userRouter from './router/user.router';
 import washingMachineRouter from './router/washing-machine.router';
 import { customMessage } from './utils/http-return-messages';
-import { STATUS_NOT_FOUND, STATUS_OK } from './utils/http-status-codes';
+import { STATUS_NOT_FOUND } from './utils/http-status-codes';
 import loadEnv from './utils/load-env';
 
 /**
@@ -45,8 +45,17 @@ const server = async (test?: boolean) => {
   app.use('/api/generateToken', generateTokenRouter);
   // Add routes here
 
-  app.use('/', (_req, res) => {
-    res.status(STATUS_OK).send(customMessage(true, 'Server is running'));
+  // app.use('/', (_req, res) => {
+  //   res.status(STATUS_OK).send(customMessage(true, 'Server is running'));
+  // });
+
+  app.use(express.static('public'));
+  app.get('*', (_req, res) => {
+    res.sendFile('index.html', { root: 'public' }, (err) => {
+      if (err) {
+        res.status(404).send({ message: 'Frontend not found' });
+      }
+    });
   });
 
   app.use('*', (_req, res) => {
