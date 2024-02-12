@@ -258,7 +258,7 @@ router.delete('/', (async (_req, res) => {
 
     await getDb().userRepository.softDelete({ id: uid });
     getDb()
-      .syncAuth()
+      .syncAuth(uid)
       .catch((error) => console.error(error));
     return res.status(STATUS_OK).json(MESSAGE_OK);
   } catch (error: unknown) {
