@@ -2,7 +2,7 @@
 // Make a login function so that we can use it in the test
 function login() {
   cy.visit(Cypress.env('VITE_FRONTEND_ADDRESS') as string);
-  cy.wait(1000);
+  cy.wait(3000);
   cy.get('body').then((body) => {
     if (body.find('button:contains("Login")').length > 0) {
       cy.contains('button', 'Login').eq(0).should('exist').click();
@@ -20,7 +20,7 @@ describe('visit the website', () => {
   it('passes', () => {
     // Use the .env with the help of load-env.ts
     cy.visit(Cypress.env('VITE_FRONTEND_ADDRESS') as string);
-    cy.wait(1000);
+    cy.wait(3000);
   });
 });
 
@@ -34,7 +34,7 @@ describe('Add Funds 20', () => {
   it('passes', () => {
     login();
     cy.get('button').eq(0).should('exist').click();
-    cy.wait(1000);
+    cy.wait(3000);
     cy.contains('a', 'Balance').should('exist').click();
     cy.contains('button', 'Add Funds').should('exist').click();
     cy.contains('button', '20').should('exist').click();
@@ -42,10 +42,22 @@ describe('Add Funds 20', () => {
   });
 });
 
+describe('check the balance', () => {
+  it('passes', () => {
+    login();
+    cy.get('button').eq(0).should('exist').click();
+    cy.wait(3000);
+    cy.contains('a', 'Balance').should('exist').click();
+    cy.wait(3000);
+    cy.contains('div', '20').should('exist');
+    cy.wait(3000);
+  });
+});
+
 describe('log out from the website', () => {
   it('passes', () => {
     cy.visit(Cypress.env('VITE_FRONTEND_ADDRESS') as string);
-    cy.wait(1000);
+    cy.wait(3000);
     cy.get('button').eq(2).should('exist').trigger('mouseover');
     cy.contains('div', 'Logout').should('exist').click();
   });
