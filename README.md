@@ -333,7 +333,7 @@ npm test
 
 ### Frontend Test
 
-1. Make sure that the docker,the backend,and also the frontend are already running. before we do the frontend test. [recommended with seeded Database](#seeding).
+1. Make sure that the docker,the backend,and also the frontend are already running. before we do the frontend test. [with seeded Database](#seeding).
 
 ```bash
 cd back-end/
@@ -359,7 +359,7 @@ npm run dev
 
 3.Run the frontend with the help of cypress. There are 2 choices of commands to run the test.
 
-- First Option
+- First Option(with UI)
 
 ```bash
 cd front-end/
@@ -368,11 +368,11 @@ npx cypress open
 
 After that, a pop-up screen from Cypress will appear. Select 'E2E Testing' and choose your preferred browser for testing. Finally, run the test based on the sequence of the filename.
 
-- Second Option
+- Second Option(with npx cypress run --headless)(without UI)
 
 ```bash
 cd front-end/
-npx cypress run --headless
+npm run test
 ```
 
 With the second Option the test will run in the terminal.If there are an Errors, it will be save in the file ./frontend/cypress/screenshots.
