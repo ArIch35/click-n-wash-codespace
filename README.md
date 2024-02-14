@@ -1,4 +1,4 @@
-a# Click n' Wash
+# Click n' Wash
 
 ## Our Website
 
