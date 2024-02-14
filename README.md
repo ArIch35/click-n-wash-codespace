@@ -333,7 +333,7 @@ npm test
 
 ### Frontend Test
 
-1. Make sure that the docker,the backend,and also the frontend are already running. before we do the frontend test.[recommended with seeded Database](#seeding)
+1. Make sure that the docker,the backend,and also the frontend are already running. before we do the frontend test. [recommended with seeded Database](#seeding).
 
 ```bash
 cd back-end/
