@@ -97,19 +97,19 @@ const useLaundromatDetail = () => {
     close();
 
     if (!id) {
-      showErrorNotification('Laudromat', 'delete', 'Laundromat Id not found');
+      showErrorNotification('Laundromat', 'delete', 'Laundromat Id not found');
       return;
     }
 
     deleteLaundromat(id)
       .then(() => {
-        showSuccessNotification('Laudromat', 'delete');
+        showSuccessNotification('Laundromat', 'delete');
         setLoading(false);
         navigate('/manage-laundromats');
       })
       .catch((error) => {
         console.error(error);
-        showErrorNotification('Laudromat', 'delete', String(error));
+        showErrorNotification('Laundromat', 'delete', String(error));
       });
   };
 
@@ -139,11 +139,11 @@ const useLaundromatDetail = () => {
             });
 
             setLaundromat(response);
-            showSuccessNotification('Laudromat', 'update');
+            showSuccessNotification('Laundromat', 'update');
             setLoading(false);
           })
           .catch((error) => {
-            showErrorNotification('Laudromat', 'update', String(error));
+            showErrorNotification('Laundromat', 'update', String(error));
             setLoading(false);
           });
       })

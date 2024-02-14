@@ -64,7 +64,23 @@ describe('go to manage laundromat and create laundromat and also add washing mac
     cy.get('input[name="description"]').should('exist').type('Max. 8 Kg');
     cy.contains('button', 'Next').should('exist').click();
     cy.wait(1000);
+    cy.contains('button', 'Submit').should('exist').click();
+    cy.wait(1000);
     cy.contains('div', 'Success').should('exist');
-    cy.contains('div', 'Laundromat created successfully!').should('exist');
+    cy.contains('div', 'Laundromat successfully created').should('exist');
+    cy.wait(1000);
+    cy.contains('td', 'Cypress Laundromat').should('exist');
+    cy.contains('td', 'Berliner Allee 6C').should('exist');
+    cy.contains('td', '64295 - Darmstadt').should('exist');
+    cy.contains('td', '1').should('exist');
+  });
+});
+
+describe('log out from the website', () => {
+  it('passes', () => {
+    cy.visit(Cypress.env('VITE_FRONTEND_ADDRESS') as string);
+    cy.wait(1000);
+    cy.get('button').eq(2).should('exist').trigger('mouseover');
+    cy.contains('div', 'Logout').should('exist').click();
   });
 });
