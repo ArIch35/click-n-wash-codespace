@@ -9,11 +9,12 @@ Feel free to check our website at <a href="https://clicknwash.pro/"> clicknwash.
 - [About](#about)
 - [Features](#features)
 - [Getting Started](#started)
-- [Tech Stakes](#tech-stakes)
+- [Tech Stacks](#tech-stacks)
 - [Database Structures](#database-structure)
 - [API Functions](#api-functions)
 - [Pages](#pages)
 - [Components](#components)
+- [Tests](#tests)
 - [Authors](#authors)
 
 ## About Click n' Wash <a name="about"></a>
@@ -289,9 +290,80 @@ This component is used in the balance page to help the user top up their balance
 
 This component will show a form for the detail of the washing machine,that will be added to the laundromat.
 
-##
+## Tests <a name="tests"></a>
 
-## Tech Stakes <a name="tech-stakes"></a>
+We have 2 diffferent tests in our project. the first one is to test our backend. and the second one is an end to end test for our frontend with the help of CyPress.
+
+### Backend Test
+
+1. Make sure that the docker is already running, before we do the test. If the docker is not running yet. we can run the docker with this command.
+
+```bash
+cd back-end/
+docker compose up -d
+```
+
+2. Install all the depedencies that are needed for the backend.
+
+```bash
+cd back-end/
+npm i
+```
+
+3. start the test by running the following command.
+
+```bash
+cd back-end/
+npm test
+```
+
+### Frontend Test
+
+1. Make sure that the docker,the backend,and also the frontend are already running. before we do the frontend test.
+
+```bash
+cd back-end/
+docker compose up -d
+```
+
+```bash
+cd back-end/
+npm run dev
+```
+
+2.Install all the depedencies that are needed for the frontend and run it.
+
+```bash
+cd front-end/
+npm i
+```
+
+```bash
+cd front-end/
+npm run dev
+```
+
+3.Run the frontend with the help of cypress. There are 2 choices of commands to run the test.
+
+- First Option
+
+```bash
+cd front-end/
+npx cypress open
+```
+
+After that, a pop-up screen from Cypress will appear. Select 'E2E Testing' and choose your preferred browser for testing. Finally, run the test based on the sequence of the filename.
+
+- Second Option
+
+```bash
+cd front-end/
+npx cypress run --headless
+```
+
+With the second Option the test will run in the terminal.If there are an Errors, it will be save in the file ./frontend/cypress/screenshots.
+
+## Tech Stacks <a name="tech-stacks"></a>
 
 ### Frontend
 
@@ -301,6 +373,7 @@ This component will show a form for the detail of the washing machine,that will 
 - [Mantine](https://mantine.dev/) - React CSS Framework
 - [Firebase](https://firebase.google.com/) - Google base login service
 - [Openstreetmap](https://www.openstreetmap.org/#map=6/51.330/10.453) - World map API
+- [Cypress](https://www.cypress.io/) - End To End Testing
 
 ### Backend
 
