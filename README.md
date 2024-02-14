@@ -282,11 +282,11 @@ This component will help the user to login to our website with their own google 
 
 ### Filter
 
-This component will the the user to find the nearest or cheapest laundromat. In this coomponent the user can set a filter for the laundromats.
+This component will help the user to find the nearest or cheapest laundromat. In this coomponent the user can set a filter for the laundromats.
 
 ### Map
 
-This component will show a openstreetmap API in the homepage to show the location of the laundromats.
+This component will show an openstreetmap API in the homepage to show the location of the laundromats.
 
 ### TimePicker
 
