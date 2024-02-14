@@ -83,6 +83,20 @@ npm i
 npm run dev
 ```
 
+### Or we can run the databasw with seeded Data
+
+1. Seed Data to the database:
+
+```bash
+npm run seed
+```
+
+2. Start the Database with no data:
+
+```bash
+npm run dev
+```
+
 #### Frontend
 
 1. Install Depedencies:
