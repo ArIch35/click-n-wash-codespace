@@ -1,4 +1,4 @@
-# Click n' Wash
+a# Click n' Wash
 
 ## Our Website
 
@@ -83,7 +83,7 @@ npm i
 npm run dev
 ```
 
-### Or we can run the databasw with seeded Data
+### Or we can run the database with seeded Data <a name="seeding"></a>
 
 1. Seed Data to the database:
 
@@ -333,7 +333,7 @@ npm test
 
 ### Frontend Test
 
-1. Make sure that the docker,the backend,and also the frontend are already running. before we do the frontend test.
+1. Make sure that the docker,the backend,and also the frontend are already running. before we do the frontend test.[recommended with seeded Database](#seeding)
 
 ```bash
 cd back-end/
