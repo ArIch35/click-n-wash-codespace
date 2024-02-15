@@ -99,7 +99,6 @@ const BookingsPage = () => {
         </Button>
         {isAbleToSimulate(contract) && (
           <Button
-            color="red"
             mt="md"
             radius="md"
             disabled={contract.status !== 'ongoing'}
