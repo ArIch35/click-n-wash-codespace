@@ -17,6 +17,15 @@ import { randomDate, randomNumber } from './utils/utils';
  * Seed the database with random data
  */
 const seed = async () => {
+  // Check if DOCKER_SEED is set to true and DB is already seeded
+  if (
+    process.env.DOCKER_SEED === 'true' &&
+    (await getDb().userRepository.findOne({ where: { email: 'seed@gmail.com' } }))
+  ) {
+    console.log('Database already seeded');
+    return;
+  }
+
   // Delete all data from the database
   console.log('Deleting all data from the database...');
   await getDb().dropDatabase();
