@@ -11,6 +11,7 @@ import Contract, {
 } from '../entities/contract';
 import Notification from '../interfaces/notification';
 import StatusError from '../utils/error-with-status';
+import formatDate from '../utils/format-date';
 import {
   MESSAGE_FORBIDDEN_NOT_OWNER,
   MESSAGE_NOT_FOUND,
@@ -97,7 +98,7 @@ router.post('/', (async (req, res) => {
     const title = 'Incoming Booking!';
     const message = `Washing machine ${washingMachine.name} in laundromat ${
       washingMachine.laundromat.name
-    } has been booked from ${contract.startDate.toLocaleString()} to ${contract.endDate.toLocaleString()}`;
+    } has been booked from ${formatDate(contract.startDate)} to ${formatDate(contract.endDate)}`;
     const notification: Notification = {
       title,
       message,
@@ -145,9 +146,9 @@ router.post('/bulkcancel', (async (req, res) => {
       const title = 'Your booking has been cancelled!';
       const message = `A booking for washing machine ${
         contract.washingMachine.name
-      } in laundromat ${
-        contract.washingMachine.laundromat.name
-      } from ${contract.startDate.toLocaleString()} to ${contract.endDate.toLocaleString()} has been cancelled`;
+      } in laundromat ${contract.washingMachine.laundromat.name} from ${formatDate(
+        contract.startDate,
+      )} to ${formatDate(contract.endDate)} has been cancelled`;
       const notification: Notification = {
         title,
         message,
@@ -199,9 +200,9 @@ router.post('/:id/report', (async (req, res) => {
     const title = `Contract #${contract.id} - Problem Reported!`;
     const message = `A problem has been reported for washing machine ${
       contract.washingMachine.name
-    } in laundromat ${
-      contract.washingMachine.laundromat.name
-    } from ${contract.startDate.toLocaleString()} to ${contract.endDate.toLocaleString()}`;
+    } in laundromat ${contract.washingMachine.laundromat.name} from ${formatDate(
+      contract.startDate,
+    )} to ${formatDate(contract.endDate)}`;
     const notification: Notification = {
       title,
       message,
@@ -261,7 +262,7 @@ router.put('/:id', (async (req, res) => {
       : 'Someone has cancelled a booking for your washing machine!';
     const message = `A booking for washing machine ${contract.washingMachine.name} in laundromat ${
       contract.washingMachine.laundromat.name
-    } from ${contract.startDate.toLocaleString()} to ${contract.endDate.toLocaleString()} has been cancelled`;
+    } from ${formatDate(contract.startDate)} to ${formatDate(contract.endDate)} has been cancelled`;
     const notification: Notification = {
       title,
       message,
