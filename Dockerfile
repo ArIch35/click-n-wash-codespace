@@ -26,4 +26,4 @@ COPY --from=backend /app .
 COPY --from=frontend /app/dist ./public
 
 # Run the app
-CMD if [ "$DOCKER_SEED" = "true" ]; then npm run seed; fi && npm run start
+CMD if [ "$DOCKER_SEED" = "true" ]; then npm run seed & node dist/index.js; else node dist/index.js; fi
