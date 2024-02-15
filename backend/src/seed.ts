@@ -52,7 +52,7 @@ const seed = async () => {
     const user = getDb().userRepository.create({
       email: fakerDE.internet.email(),
       name: fakerDE.person.fullName(),
-      balance: 500,
+      balance: 1500,
     });
     userMap.set(user.email, user);
 
@@ -78,7 +78,7 @@ const seed = async () => {
         id: firebaseUser.user.uid,
         email: firebaseUser.user.email!,
         name: 'Seed User',
-        balance: 500,
+        balance: 1500,
       });
       userMap.set(user.email, user);
     }
