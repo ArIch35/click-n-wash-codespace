@@ -11,7 +11,7 @@ Feel free to check our [website](https://clicknwash.pro/).
 - [Getting Started](#started)
 - [Tech Stacks](#tech-stacks)
 - [Database Structures](#database-structure)
-- [API Functions](#api-functions)
+- [API Routes](#api-routes)
 - [Pages](#pages)
 - [Components](#components)
 - [Tests](#tests)
@@ -184,50 +184,54 @@ The `washingMachine` table stores a washing machine entity. Each washing machine
 - `contracts`: a column to store the contracts of the washing machine.
 - `laundromat`: a column to store the laundromat of the washing machine.
 
-## API Functions <a name="api-functions"/>
+## API Routes <a name="api-routes"/>
 
-In our Project, we have a folder called API, to help us work with the data from the backend. The API will be divided into some categories based on the Entity.
-
-### Balance Transactions API
-
-- `getBalanceTransactions`: This API will be used to retrieve balance transactions.
-
-### Contracts API
-
-- `getContracts`: This API will retrieve the contracts from the server.
-- `getContractsById`: This API will retrieve a contract by its ID from the server.
-- `bookWashingMachine`: This API is used to book a washing machine for a specified start date.
-- `bulkCancelContracts`: This API will cancel multiple contracts in bulk.
-- `reportContract`: This API will send a report for a contract with the specified ID.
-- cancelContract`: This API is for the contract cancellation.
-
-### Laundromats API
-
-- `getLaundromats`: This will retrieve a list of laundromats from the server.
-- `getLaundromatsById`: This will retrieve a laundromat with a specified ID.
-- `getLaundromatTimeSlots`: It will retrieve the time slots for a specific laundromat.
-- `createLaundromat`: API to create a new laundromat.
-- `updateLaundromat`: API to update laundromat with the specified ID.
-- `deleteLaundromat`: API to delete a laundromat by its ID.
-- `getLaundromatFilters`: It will retrieve the filter parameters for the laundromats.
-- `getFilteredLaundromats`: Retrieves a list of filtered laundromats from the server.
+The API routes are divided into 5 categories: `Users`, `Laundromats`, `Washing Machines`, `Contracts`, and `Balance Transactions`.
 
 ### Users API
 
-- `getUser`: Retrieves a user based on the ID.
-- `createUser`: Creates a new user.
-- `updateUser`: Updates a user's information.
-- `markAsRead`: Marks the specified messages as read.
-- `topUpBalance`: Top up the balance of a user.
+- `GET /api/users/:idOrEmail`: This API will retrieve a user based on the ID or email.
+- `POST /api/users`: This API will create a new user.
+- `POST /api/users/restore`: This API will restore a user by its ID (automatically read from the token) when the user is deleted.
+- `POST /api/users/topup`: This API will top up the balance of a user.
+- `PUT /api/users/`: This API will update a user's information by its ID (automatically read from the token).
+- `PUT /api/users/read`: This API will mark the specified messages as read.
+- `DELETE /api/users/`: This API will delete a user by its ID (automatically read from the token).
+
+### Laundromats API
+
+- `GET /api/laundromats`: This API will retrieve a list of laundromats from the server.
+- `GET /api/laundromats/filter-params`: This API will retrieve the filter parameters for the laundromats.
+- `GET /api/laundromats/:id`: This API will retrieve a laundromat with a specified ID.
+- `GET /api/laundromats/:id/time-slots`: This API will retrieve all booked time slots for a specific laundromat.
+- `GET /api/laundromats/:id/analytics`: This API will retrieve the analytics for a specific laundromat.
+- `POST /api/laundromats`: This API will create a new laundromat.
+- `PUT /api/laundromats/:id`: This API will update the laundromat with the specified ID.
+- `DELETE /api/laundromats/:id`: This API will delete a laundromat by its ID.
 
 ### Washing Machines API
 
-- `createWashingMachine`: Creates a washing machine.
-- `getWashingMachineById`: Retreives a washing machine by its ID.
-- `updateWashingMachines`: Updates a washing machine's information.
-- `deleteWashingMachines`: Deletes a washing machine by its ID.
+- `GET /api/washingmachines/`: This API will retrieve a list of washing machines from the server.
+- `GET /api/washingmachines/:id`: This API will retrieve a washing machine by its ID from the server.
+- `POST /api/washingmachines`: This API will create a new washing machine.
+- `PUT /api/washingmachines/:id`: This API will update the washing machine with the specified ID.
+- `DELETE /api/washingmachines/:id`: This API will delete a washing machine by its ID.
 
-## Pages <a name="pages/>
+### Contracts API
+
+- `GET /api/contracts`: This API will retrieve the contracts that are owned by the user.
+- `GET /api/contracts/:id`: This API will retrieve a contract that is owned by the user by its ID.
+- `POST /api/contracts`: This API will book a washing machine for a specified start date and time.
+- `POST /api/contracts/bulk-cancel`: This API will cancel multiple contracts in bulk (only for the owner).
+- `POST /api/contracts/:id/report`: This API will send a report for a contract with the specified ID to its owner.
+- `PUT /api/contracts/:id`: This API will cancel a contract by its ID by updating the status through body.
+
+### Balance Transactions API
+
+- `GET /api/balancetransactions`: This API will retrieve the balance transactions from the server.
+- `GET /api/balancetransactions/:id`: This API will retrieve a balance transaction by its ID from the server.
+
+## Pages <a name="pages"/>
 
 ### Home Page
 
@@ -397,7 +401,7 @@ With the second Option, the test will run in the terminal. If there are Errors, 
 - [ESLint](https://eslint.org/) - Linter
 - [Prettier](https://prettier.io/) - Code formatter
 
-## Authors <a name="authors"></a>
+## Authors <a name="authors"/>
 
 - [Vinston Salim, 772744]
 - [Bernhard Ricardo Putranto, 772543]
