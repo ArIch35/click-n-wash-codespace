@@ -1,10 +1,11 @@
-import { Modal, Stack } from '@mantine/core';
+import { Modal, Stack, Text, Title } from '@mantine/core';
 import { notifications } from '@mantine/notifications';
 import React, { useEffect, useState } from 'react';
 import Laundromat from '../../interfaces/entities/laundromat';
 import WashingMachine from '../../interfaces/entities/washing-machine';
 import { useAuth } from '../../providers/authentication/Authentication.Context';
 import { bookWashingMachine, getLaundromatTimeSlots } from '../../utils/api';
+import formatDate from '../../utils/format-date';
 import BaseList from '../ui/BaseList.component';
 import IndividualWashingMachine from '../ui/IndividualWashingMachineComponent';
 import TimePicker from './TimePicker';
@@ -115,20 +116,35 @@ const WashingMachinePicker: React.FC<WashingMachinePickerProps> = ({
       {bookedDatesMap && (
         <Modal opened={isOpen} onClose={onPickerClose} size="md">
           <Stack>
+            <Title style={{ textAlign: 'center' }} order={4}>
+              Select a date and time
+            </Title>
             <TimePicker
               bookedDates={bookedDatesMap}
               washingMachines={allWashingMachines}
               onDateAndTimeSelected={onDateAndTimeSelected}
               onDateAndTimeUnselected={() => {
+                setSelectedDate(null);
                 setValidWashingMachines(new Array<WashingMachine>());
               }}
             />
             {selectedDate && validWashingMachines && (
-              <BaseList
-                items={validWashingMachines}
-                IndividualComponent={IndividualWashingMachine}
-                onItemClick={onWashingMachineClick}
-              />
+              <>
+                <Text style={{ textAlign: 'center' }}>
+                  From <strong>{formatDate(selectedDate)}</strong>
+                </Text>
+                <Text style={{ textAlign: 'center' }}>
+                  Until{' '}
+                  <strong>
+                    {formatDate(new Date(selectedDate.getTime() + 60 * 60 * 1000 * 2 - 1))}
+                  </strong>
+                </Text>
+                <BaseList
+                  items={validWashingMachines}
+                  IndividualComponent={IndividualWashingMachine}
+                  onItemClick={onWashingMachineClick}
+                />
+              </>
             )}
           </Stack>
         </Modal>
