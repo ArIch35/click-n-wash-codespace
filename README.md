@@ -6,16 +6,16 @@ Feel free to check our [website](https://clicknwash.pro/).
 
 ## Table of Contents
 
-- [About](#about)
-- [Features](#features)
-- [Getting Started](#started)
-- [Tech Stacks](#tech-stacks)
-- [Database Structures](#database-structure)
-- [API Routes](#api-routes)
-- [Pages](#pages)
-- [Components](#components)
-- [Tests](#tests)
-- [Authors](#authors)
+1. [About Click n' Wash](#about)
+2. [Features](#features)
+3. [Getting Started](#started)
+4. [Database Structures](#database-structure)
+5. [API Routes](#api-routes)
+6. [Pages](#pages)
+7. [Components](#components)
+8. [Tests](#tests)
+9. [Tech Stacks](#tech-stacks)
+10. [Authors](#authors)
 
 ## About Click n' Wash <a name="about"/>
 
