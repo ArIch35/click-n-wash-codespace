@@ -1,5 +1,5 @@
 import { Button, Flex, Indicator, Select } from '@mantine/core';
-import { DatesProvider, DatePicker } from '@mantine/dates';
+import { DatePicker, DatesProvider } from '@mantine/dates';
 import '@mantine/dates/styles.css';
 import { useState } from 'react';
 import WashingMachine from '../../interfaces/entities/washing-machine';
@@ -175,7 +175,7 @@ const TimePicker = ({
       settings={{ locale: 'de', firstDayOfWeek: 0, weekendDays: [0], timezone: 'Europe/Berlin' }}
     >
       <DatePicker
-        mt="md"
+        style={{ alignSelf: 'center' }}
         placeholder="Pick date"
         value={selectedDate}
         onChange={(date) => {

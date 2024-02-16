@@ -1,4 +1,4 @@
-import { Container, Flex, NumberFormatter, Space, Table, Text, rem } from '@mantine/core';
+import { Container, Flex, NumberFormatter, Space, Table, Text } from '@mantine/core';
 import { upperFirst } from '@mantine/hooks';
 import React from 'react';
 import AddFundsModal from '../components/ui/AddFundsModal';
@@ -22,7 +22,7 @@ const BalancePage = () => {
     <Table.Tr>
       <Table.Th>Transaction Name</Table.Th>
       <Table.Th>Transaction Date</Table.Th>
-      <Table.Th>Contract Id</Table.Th>
+      <Table.Th>Transaction Id</Table.Th>
       <Table.Th>Transaction Status</Table.Th>
       <Table.Th>Transaction Amount</Table.Th>
     </Table.Tr>
@@ -43,7 +43,7 @@ const BalancePage = () => {
           </Flex>
         </Flex>
         <Flex mt="m" px="md">
-          <Table fz="md" highlightOnHover stickyHeader stickyHeaderOffset={rem(45)}>
+          <Table fz="md" highlightOnHover>
             <Table.Thead>{ths}</Table.Thead>
             <Table.Tbody>
               {transactions

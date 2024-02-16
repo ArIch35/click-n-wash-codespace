@@ -29,7 +29,7 @@ const entityParser = <T>(entity: T): T => {
 
     if (typeof value === 'string' && isISO8601DateString(value)) {
       // If the value is a string that represents a date, then convert it to a Date object with local timezone
-      parsedEntity[key as keyof T] = new Date(new Date(value).getTime());
+      parsedEntity[key as keyof T] = new Date(value);
     } else if (typeof value === 'object' && value !== null) {
       // If the value is an object, then parse it recursively
       parsedEntity[key as keyof T] = entityParser(value);

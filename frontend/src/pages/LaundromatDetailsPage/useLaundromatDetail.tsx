@@ -20,6 +20,8 @@ const initialValues: CreateLaundromat = {
   city: '',
   price: 0,
   country: '',
+  lat: '',
+  lon: '',
 };
 
 const useLaundromatDetail = () => {
@@ -49,6 +51,8 @@ const useLaundromatDetail = () => {
           postalCode: response.postalCode,
           country: response.country,
           price: response.price,
+          lat: response.lat,
+          lon: response.lon,
         });
 
         form.reset();
@@ -127,7 +131,7 @@ const useLaundromatDetail = () => {
     getPositionFromAddress(values)
       .then((location) => {
         setLoading(true);
-        updateLaundromat(id, { ...values, ...location })
+        updateLaundromat(id, { ...values, lat: location.lat, lon: location.lon })
           .then((response) => {
             form.setInitialValues({
               name: response.name,
@@ -136,7 +140,10 @@ const useLaundromatDetail = () => {
               postalCode: response.postalCode,
               country: response.country,
               price: response.price,
+              lat: response.lat,
+              lon: response.lon,
             });
+            form.reset();
 
             setLaundromat(response);
             showSuccessNotification('Laundromat', 'update');

@@ -1,4 +1,4 @@
-import { Card, Text } from '@mantine/core';
+import { Stack, Text } from '@mantine/core';
 import React, { useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import Timer from '../components/simulation/Timer';
@@ -41,7 +41,7 @@ const LaundromatSimulationPage: React.FC = () => {
   return (
     <>
       {contract && (
-        <Card>
+        <Stack align="center">
           <Timer
             label="Max Timer"
             startTime={contract.startDate}
@@ -70,7 +70,7 @@ const LaundromatSimulationPage: React.FC = () => {
               })
             }
           />
-        </Card>
+        </Stack>
       )}
     </>
   );

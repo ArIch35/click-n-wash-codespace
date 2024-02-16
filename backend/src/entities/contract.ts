@@ -11,10 +11,10 @@ type Status = 'ongoing' | 'finished' | 'cancelled';
 
 @Entity()
 class Contract extends BaseEntity {
-  @Column()
+  @Column({ type: 'timestamptz' })
   startDate!: Date;
 
-  @Column()
+  @Column({ type: 'timestamptz' })
   endDate!: Date;
 
   @Column()

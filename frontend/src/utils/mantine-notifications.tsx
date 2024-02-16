@@ -1,8 +1,8 @@
+import { Badge, ThemeIcon } from '@mantine/core';
 import { notifications } from '@mantine/notifications';
+import { IconBuildingStore, IconCheck, IconX } from '@tabler/icons-react';
 import Notification from '../interfaces/notification';
 import { autoCloseDuration } from './constants';
-import { Badge, ThemeIcon } from '@mantine/core';
-import { IconBuildingStore, IconCheck, IconX } from '@tabler/icons-react';
 
 /**
  * Show notification
@@ -38,7 +38,7 @@ export const showCustomNotification = (
     icon: iconForServerNotification(color),
     title: (
       <Badge color={color} variant="light">
-        Vendor Notification - {notification.title}
+        Server - {notification.title}
       </Badge>
     ),
     message: notification.message,
