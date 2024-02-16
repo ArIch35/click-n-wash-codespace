@@ -20,6 +20,7 @@ import {
 import {
   STATUS_BAD_REQUEST,
   STATUS_CONFLICT,
+  STATUS_CREATED,
   STATUS_FORBIDDEN,
   STATUS_NOT_FOUND,
   STATUS_OK,
@@ -298,7 +299,7 @@ router.post('/', (async (req, res) => {
     });
 
     const result = await getDb().laundromatRepository.save(laundromat);
-    return res.status(STATUS_OK).json(result);
+    return res.status(STATUS_CREATED).json(result);
   } catch (error: unknown) {
     if (error instanceof ValidationError) {
       return res.status(STATUS_BAD_REQUEST).json(customMessage(false, error.errors.join(', ')));
