@@ -1,6 +1,8 @@
 import 'reflect-metadata';
 import server, { getSocket } from './server';
+import { users } from './utils/constants';
 import loadEnv from './utils/load-env';
+import sendNotification from './utils/send-notification';
 
 const PORT = loadEnv().PORT;
 
@@ -18,6 +20,14 @@ server()
       process.on(signal, () => {
         console.log(`Received ${signal}, shutting down`);
         socket?.close();
+        Object.keys(users).forEach((userId) => {
+          sendNotification(userId, {
+            title: 'Server',
+            message: 'Server is shutting down',
+            autoClose: false,
+            color: 'red',
+          });
+        });
         appInstance.close(() => {
           console.log('Server closed');
           process.exit(0);
