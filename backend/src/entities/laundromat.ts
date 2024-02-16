@@ -106,6 +106,8 @@ export const updateLaundromatSchema = object({
   country: string(),
   postalCode: string(),
   price: number(),
+  lat: string(),
+  lon: string(),
 })
   .noUnknown()
   .test('at-least-one-field', 'You must provide at least one field', (value) =>

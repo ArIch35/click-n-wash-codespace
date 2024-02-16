@@ -1,7 +1,7 @@
 import { Button, Container, Flex, Group, Stack, Stepper, rem } from '@mantine/core';
 import { hasLength, isInRange, useForm } from '@mantine/form';
 import { IconCircleCheck } from '@tabler/icons-react';
-import { useState } from 'react';
+import React, { useState } from 'react';
 import { MapContainer, Marker, TileLayer, useMap } from 'react-leaflet';
 import { useNavigate } from 'react-router-dom';
 import FormInputFields from '../components/ui/form-input-fields';
@@ -12,7 +12,7 @@ import { wmIcon } from '../utils/icon/CustomIcons';
 import { showErrorNotification, showSuccessNotification } from '../utils/mantine-notifications';
 
 type FormValues = {
-  laundromat: CreateLaundromat & { lat: string; lon: string };
+  laundromat: CreateLaundromat;
   washingMachines: Omit<CreateWashingMachine, 'laundromat'>[];
 };
 
@@ -39,6 +39,9 @@ const initialValues: FormValues = {
 const LaundromatAddPage = () => {
   const [active, setActive] = useState(0);
   const navigate = useNavigate();
+  const [lastLocation, setLastLocation] = useState<Omit<CreateLaundromat, 'name' | 'price'> | null>(
+    null,
+  );
 
   function MapContext() {
     const map = useMap();
@@ -75,6 +78,19 @@ const LaundromatAddPage = () => {
           : undefined,
     },
   });
+
+  const isLocationUpToDate = React.useMemo(() => {
+    // If current location is not set, then the location is not up to date
+    if (!lastLocation) {
+      return false;
+    }
+
+    return Object.keys(lastLocation).every(
+      (key) =>
+        form.values.laundromat[key as keyof Omit<CreateLaundromat, 'name' | 'price'>] ===
+        lastLocation[key as keyof Omit<CreateLaundromat, 'name' | 'price'>],
+    );
+  }, [lastLocation, form.values.laundromat]);
 
   const onSubmit = (values: FormValues, event: React.FormEvent<HTMLFormElement> | undefined) => {
     event?.preventDefault();
@@ -117,11 +133,24 @@ const LaundromatAddPage = () => {
       return;
     }
 
+    // Check if current location is the same as the form values, then go to the next step
+    if (isLocationUpToDate) {
+      setActive((current) => (current < 2 ? current + 1 : 2));
+      return;
+    }
+
     getPositionFromAddress(form.values.laundromat)
       .then((location) => {
         form.setFieldValue('laundromat.lat', location.lat);
         form.setFieldValue('laundromat.lon', location.lon);
-        setActive((current) => (current < 2 ? current + 1 : 2));
+        setLastLocation({
+          city: form.values.laundromat.city,
+          country: form.values.laundromat.country,
+          postalCode: form.values.laundromat.postalCode,
+          street: form.values.laundromat.street,
+          lat: location.lat,
+          lon: location.lon,
+        });
       })
       .catch((error) => {
         showErrorNotification('Laundromat', 'find location of the', String(error));
@@ -157,9 +186,9 @@ const LaundromatAddPage = () => {
         </Stepper.Step>
       </Stepper>
       <Stack mt="xl">
-        {active === 0 && form.values.laundromat.lat && form.values.laundromat.lon && (
+        {active === 0 && isLocationUpToDate && (
           <MapContainer
-            center={[Number(form.values.laundromat.lat), Number(form.values.laundromat.lon)]}
+            center={[Number(lastLocation?.lat), Number(lastLocation?.lon)]}
             zoom={13}
             scrollWheelZoom="center"
             dragging={false}
@@ -172,7 +201,7 @@ const LaundromatAddPage = () => {
             />
             <MapContext />
             <Marker
-              position={[Number(form.values.laundromat.lat), Number(form.values.laundromat.lon)]}
+              position={[Number(lastLocation?.lat), Number(lastLocation?.lon)]}
               icon={wmIcon}
             />
           </MapContainer>
@@ -193,9 +222,7 @@ const LaundromatAddPage = () => {
                 <Button type="submit">Submit</Button>
               </form>
             ) : (
-              <Button onClick={nextStep}>
-                {form.values.laundromat.lat ? 'Next' : 'Find Location'}
-              </Button>
+              <Button onClick={nextStep}>{isLocationUpToDate ? 'Next' : 'Find Location'}</Button>
             )}
           </Flex>
         </Group>

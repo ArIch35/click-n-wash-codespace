@@ -36,7 +36,7 @@ export interface LaundromatAnalytics {
 
 export type CreateLaundromat = Pick<
   Laundromat,
-  'name' | 'street' | 'city' | 'country' | 'postalCode' | 'price'
+  'name' | 'street' | 'city' | 'country' | 'postalCode' | 'price' | 'lat' | 'lon'
 >;
 
 export type GetLocationLaundromat = Pick<Laundromat, 'street' | 'city' | 'country' | 'postalCode'>;
