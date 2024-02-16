@@ -56,7 +56,7 @@ deploy:
     - NODE_VERSION=$(./node-install-latest.sh | grep -oP 'Now using node \Kv[0-9\.]+')
     - export PATH=$PATH:/home/ubuntu/.nvm/versions/node/$NODE_VERSION/bin
     - npm install -g pm2
-    - sudo docker compose down && sudo docker compose up -d --build
+    - sudo docker compose down && sudo docker compose up -d click-n-wash-db --build
     - cd backend
     - npm install
     - npm run build
