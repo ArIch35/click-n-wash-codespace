@@ -22,7 +22,7 @@ server()
         socket?.close();
         Object.keys(users).forEach((userId) => {
           sendNotification(userId, {
-            title: 'Server',
+            title: 'Shutdown',
             message: 'Server is shutting down',
             autoClose: false,
             color: 'red',
