@@ -55,7 +55,7 @@ git clone https://code.fbi.h-da.de/click-n-wash/click-n-wash.git
 ```
 
 2. Configure the environment variables( .env)
-   Create and fill the environment variables in the `.env` and make sure the file is located in the root of the back-end folder. You can use the [`env.example`](./.env.example) file as a template. Firebase environment variables are required for the program to work. You can get the environment variables at the end of this readme.
+   Create and fill the environment variables in the `.env` and make sure the file is located in the root of the back-end folder. You can use the [`env.example`](./.env.example) file as a template. Firebase environment variables are required for the program to work.
 
 3. Installation Methods:
 
