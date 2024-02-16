@@ -13,7 +13,7 @@ mocha.describe('UserController', () => {
   /**
    * Test the GET /users endpoint.
    */
-  mocha.it('should return a 401 unauthorized', async () => {
+  mocha.it('GET /users should return a 401 unauthorized', async () => {
     const res = await api.get('/users').expect(401);
     expect(res.body).to.be.an('object').contains({
       success: false,
@@ -24,7 +24,7 @@ mocha.describe('UserController', () => {
   /**
    * Test the POST /users endpoint.
    */
-  mocha.it('should create a new user', async () => {
+  mocha.it('POST /users should create a new user', async () => {
     const user = await getFirebaseUser(1);
     const token = await user.getIdToken();
     const res = await api
@@ -45,7 +45,7 @@ mocha.describe('UserController', () => {
   /**
    * Test the GET /users endpoint with a token.
    */
-  mocha.it('should return a 403 forbidden', async () => {
+  mocha.it('GET /users should return a 403 forbidden', async () => {
     const user = await getFirebaseUser(1);
     const token = await user.getIdToken();
     const res = await api.get('/users').auth(token, { type: 'bearer' }).expect(403);
@@ -58,7 +58,7 @@ mocha.describe('UserController', () => {
   /**
    * Test to POST /users endpoint with an already existing user.
    */
-  mocha.it('should return a conflict error', async () => {
+  mocha.it('POST /users should return a conflict error', async () => {
     const user = await getFirebaseUser(1);
     const token = await user.getIdToken();
     const res = await api
@@ -78,7 +78,7 @@ mocha.describe('UserController', () => {
   /**
    * Test the GET /users/:idOrEmail endpoint.
    */
-  mocha.it('should return the user created in the previous test', async () => {
+  mocha.it('GET /users/:idOrEmail should return a user', async () => {
     const user = await getFirebaseUser(1);
     const token = await user.getIdToken();
     const res = await api.get(`/users/${user.uid}`).auth(token, { type: 'bearer' }).expect(200);
@@ -93,7 +93,7 @@ mocha.describe('UserController', () => {
   /**
    * Test the GET /users/:idOrEmail endpoint with an invalid id.
    */
-  mocha.it('should return a not found error', async () => {
+  mocha.it('GET /users/:idOrEmail should return a not found error', async () => {
     const user = await getFirebaseUser(1);
     const token = await user.getIdToken();
     const res = await api.get('/users/123456').auth(token, { type: 'bearer' }).expect(404);
@@ -107,7 +107,7 @@ mocha.describe('UserController', () => {
   /**
    * Test the PUT /users endpoint.
    */
-  mocha.it('should update the user created in the previous test', async () => {
+  mocha.it('PUT /users should update the user created in the previous test', async () => {
     const user = await getFirebaseUser(1);
     const token = await user.getIdToken();
     const res = await api
@@ -128,7 +128,7 @@ mocha.describe('UserController', () => {
   /**
    * Test the PUT /users endpoint with an invalid id.
    */
-  mocha.it('should return a not found error', async () => {
+  mocha.it('PUT /users should return a not found error', async () => {
     const userToken = '123456';
     await api
       .put('/users')
@@ -142,7 +142,7 @@ mocha.describe('UserController', () => {
   /**
    * Test the DELETE /users endpoint.
    */
-  mocha.it('should delete the user created in the previous test', async () => {
+  mocha.it('DELETE /users should delete the user created in the previous test', async () => {
     const user = await getFirebaseUser(1);
     const token = await user.getIdToken();
     const res = await api.delete('/users').auth(token, { type: 'bearer' }).expect(200);
@@ -156,7 +156,7 @@ mocha.describe('UserController', () => {
   /**
    * Test the DELETE /users endpoint with an invalid id.
    */
-  mocha.it('should return a not found error', async () => {
+  mocha.it('DELETE /users should return a not found error', async () => {
     const user = await getFirebaseUser(1);
     const token = await user.getIdToken();
     const res = await api.delete('/users').auth(token, { type: 'bearer' }).expect(404);
@@ -170,7 +170,7 @@ mocha.describe('UserController', () => {
   /**
    * Test the POST /users/restore endpoint.
    */
-  mocha.it('should restore the user created in the previous test', async () => {
+  mocha.it('POST /users/restore should restore the user deleted in the previous test', async () => {
     const user = await getFirebaseUser(1);
     const token = await user.getIdToken();
     const res = await api.post('/users/restore').auth(token, { type: 'bearer' }).expect(200);
@@ -185,7 +185,7 @@ mocha.describe('UserController', () => {
   /**
    * Test the POST /users/restore endpoint with a restored user.
    */
-  mocha.it('should return a conflict error', async () => {
+  mocha.it('POST /users/restore should return a conflict error', async () => {
     const user = await getFirebaseUser(1);
     const token = await user.getIdToken();
     const res = await api.post('/users/restore').auth(token, { type: 'bearer' }).expect(409);

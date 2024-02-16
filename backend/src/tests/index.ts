@@ -12,6 +12,12 @@ import firebaseAuth from '../utils/firebase';
 
 const firebaseUsers = new Map<number, User>();
 
+/**
+ * Retrieves a Firebase user by index. If the user does not exist, it creates a new user and returns it.
+ *
+ * @param index - The index of the user to retrieve or create.
+ * @returns The Firebase user.
+ */
 export const getFirebaseUser = async (index: number) => {
   let firebaseUser = firebaseUsers.get(index);
   if (!firebaseUser) {
@@ -35,6 +41,37 @@ export const getFirebaseUser = async (index: number) => {
   return firebaseUser;
 };
 
+/**
+ * Retrieves the backend user based on the provided index.
+ *
+ * @param index - The index of the user to retrieve.
+ * @returns An object containing the user and the token.
+ * @throws An error if the Firebase user does not have an email.
+ */
+export const getBackendUser = async (index: number) => {
+  const firebaseUser = await getFirebaseUser(index);
+  if (!firebaseUser.email) {
+    throw new Error('Firebase user does not have an email');
+  }
+  let user = await getDb().userRepository.findOne({ where: { email: firebaseUser.email } });
+  if (!user) {
+    user = getDb().userRepository.create({
+      id: firebaseUser.uid,
+      email: firebaseUser.email,
+      name: `TestUser${index}`,
+      balance: 200,
+    });
+    await getDb().userRepository.save(user);
+  }
+  return {
+    user,
+    token: await firebaseUser.getIdToken(),
+  };
+};
+
+/**
+ * Initializes the Mocha test suite.
+ */
 export const mochaInit = () => {
   let testServer: Server<typeof IncomingMessage, typeof ServerResponse> | null = null;
   const TEST_PORT = 5050;
