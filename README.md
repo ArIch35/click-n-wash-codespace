@@ -112,77 +112,7 @@ npm run seed
 
 This website uses PostgreSQL as the database, with typeORM as the ORM. The database consists of 6 tables: `BalanceTransaction`, `Contract`, `Laundromat`, `Message`, `User`, and `WashingMachine`.
 
-### Base Entity
-
-The `BaseEntity` is the entity, which all the other entities will inherit from. It has the following fields:
-
-- `id`: a column to store the ID of an entity.
-- `createdAt`: a column to store when the entity is created.
-- `updatedAt`: a column to store when the entity is updated.
-- `deletedAt`: a column to store when the entity is deleted.
-- `name`: a column to store the name of an entity.
-
-### Balance Transaction
-
-The `balanceTransaction` table stores a balance transaction entity. Each balance transaction has the fields from the base entity and the following fields:
-
-- `amount`: a column to store the amount of the transaction.
-- `type`: a column to store the type of the transaction.
-- `user`: a column to store the user information.
-
-### Contract
-
-The `contract` table stores a contract entity. Each contract has the fields from the base entity and the following fields:
-
-- `startDate`: a column to store the start date of the contract.
-- `endDate`: a column to store the end date of the contract.
-- `status`: a column to store the status of the contract.
-- `price`: a column to store the price of the contract.
-- `user`: a column to store the user information.
-- `washingMachine`: a column to store the washing machine information.
-
-### Laundromat
-
-The `laundromat` table stores a laundromat entity. Each laundromat has the fields from the base entity and the following fields:
-
-- `street`: a column to store the street of the laundromat.
-- `city`: a column to store the city of the laundromat.
-- `country`: a column to store the country of the laundromat.
-- `postalCode`: a column to store the postal code of the laundromat.
-- `price`: a column to store the price of each washing machine in the laundromat.
-- `lat`: a column to store the latitude of the laundromat.
-- `lon`: a column to store the longitude of the laundromat.
-- `owner`: a column to store the owner of the laundromat.
-- `washingMachines`: a column to store the washing machines in the laundromat.
-
-### Message
-
-The `message` table stores a message entity. Each message has the fields from the base entity and the following fields:
-
-- `content`: a column to store the content of the message.
-- `read`: a column to store whether the message is read.
-- `forVendor`: a column to store whether the message is for the vendor.
-- `to`: a column to store the user information.
-
-### User
-
-The `user` table stores a user entity. Each user has the fields from the base entity and the following fields:
-
-- `email`: a column to store the email of the user.
-- `balance`: a column to store the balance of the user.
-- `isAlsoVendor`: a column to store whether the user is also a vendor.
-- `laundromats`: a column to store the laundromats owned by the user.
-- `contracts`: a column to store the contracts of the user.
-- `inbox`: a column to store the messages of the user.
-
-### Washing Machine
-
-The `washingMachine` table stores a washing machine entity. Each washing machine has the fields from the base entity and the following fields:
-
-- `brand`: a column to store the brand of the washing machine.
-- `description`: a column to store the description of the washing machine.
-- `contracts`: a column to store the contracts of the washing machine.
-- `laundromat`: a column to store the laundromat of the washing machine.
+![Database Structure](./assets/db.svg)
 
 ## API Routes <a name="api-routes"/>
 
