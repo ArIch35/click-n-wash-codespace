@@ -13,6 +13,7 @@ const createSocket = (server: HttpServer): RequestHandler => {
     },
   });
   console.log('Socket.io server created');
+  setSocket(socket);
 
   socket.on('connection', (client) => {
     console.log(client.id, 'connected');
@@ -34,7 +35,6 @@ const createSocket = (server: HttpServer): RequestHandler => {
   });
 
   return (_, _res, next) => {
-    setSocket(socket);
     next();
   };
 };

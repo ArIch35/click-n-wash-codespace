@@ -18,7 +18,7 @@ import washingMachineRouter from './router/washing-machine.router';
 import { customMessage } from './utils/http-return-messages';
 import { STATUS_NOT_FOUND } from './utils/http-status-codes';
 import loadEnv from './utils/load-env';
-import { openApiRoute } from './utils/utils';
+import { openApiRoute, openApiSpecPath } from './utils/utils';
 
 /**
  * Starts the server.
@@ -38,7 +38,7 @@ const server = async (test?: boolean) => {
         version: '1.0.0',
       },
     },
-    specOutputPath: '../api-docs/swagger.json',
+    specOutputPath: openApiSpecPath,
   });
   const server = http.createServer(app);
 

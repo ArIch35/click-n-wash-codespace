@@ -80,3 +80,4 @@ export const randomDate = (start: Date, end: Date) => {
 };
 
 export const openApiRoute = '/api-docs';
+export const openApiSpecPath = `..${openApiRoute}/swagger.json`;
