@@ -10,6 +10,10 @@ import { openApiSpecPath } from './utils/utils';
 
 const PORT = loadEnv().PORT;
 
+if (!process.env.NODE_ENV) {
+  process.env.NODE_ENV = 'development';
+}
+
 const closeServer = (server: Server<typeof IncomingMessage, typeof ServerResponse>) => {
   const closePromise = new Promise<void>((resolve) => {
     const socket = getSocket();
