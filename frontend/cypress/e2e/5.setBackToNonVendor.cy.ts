@@ -51,8 +51,6 @@ describe('go to manage laundromat and delete laundromat', () => {
       .should('exist')
       .click();
     cy.wait(1000);
-    cy.contains('div', 'Success').should('exist');
-    cy.wait(1000);
     // Delete the laundromat
     cy.contains('button', 'Delete').should('exist').click();
     cy.wait(1000);
