@@ -104,6 +104,7 @@ const LaundromatDetailPage = () => {
               <FormInputFields
                 form={form}
                 values={form.values}
+                hide={{ lat: true, lon: true }}
                 props={{ price: { suffix: '€' } }}
               />
               <Flex justify="flex-end" mt="md">

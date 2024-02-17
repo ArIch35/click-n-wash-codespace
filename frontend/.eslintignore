@@ -3,3 +3,4 @@ dist
 src/vite-env.d.ts
 cypress/support/commands.ts
 cypress.config.ts
+cypress/e2e/*

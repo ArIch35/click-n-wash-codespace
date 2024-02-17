@@ -24,3 +24,5 @@ dist-ssr
 *.sw?
 
 .env
+cypress/screenshots
+cypress/fixtures/userData.json

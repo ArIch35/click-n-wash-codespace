@@ -3,6 +3,7 @@ import express from 'express';
 import 'reflect-metadata';
 import { connectToDb } from './db';
 
+import expressOasGenerator from 'express-oas-generator';
 import http from 'http';
 import { Server } from 'socket.io';
 import { DefaultEventsMap } from 'socket.io/dist/typed-events';
@@ -17,6 +18,7 @@ import washingMachineRouter from './router/washing-machine.router';
 import { customMessage } from './utils/http-return-messages';
 import { STATUS_NOT_FOUND } from './utils/http-status-codes';
 import loadEnv from './utils/load-env';
+import { openApiRoute, openApiSpecPath } from './utils/utils';
 
 /**
  * Starts the server.
@@ -28,6 +30,16 @@ const server = async (test?: boolean) => {
   console.log(`Connected to DB ${loadEnv().DB_NAME}`);
 
   const app = express();
+  expressOasGenerator.handleResponses(app, {
+    specOutputFileBehavior: 'PRESERVE',
+    swaggerDocumentOptions: {
+      info: {
+        title: 'ClickNWash API',
+        version: '1.0.0',
+      },
+    },
+    specOutputPath: openApiSpecPath,
+  });
   const server = http.createServer(app);
 
   app.use(cors());
@@ -45,12 +57,21 @@ const server = async (test?: boolean) => {
   app.use('/api/generateToken', generateTokenRouter);
   // Add routes here
 
-  // app.use('/', (_req, res) => {
-  //   res.status(STATUS_OK).send(customMessage(true, 'Server is running'));
-  // });
+  // Backend status
+  app.get('/api', (_req, res) => {
+    res.status(200).send(customMessage(true, 'Backend is running'));
+  });
+
+  // Redirect to openapi
+  app.use('/docs', (_req, res) => {
+    res.redirect(openApiRoute);
+  });
 
   app.use(express.static('public'));
-  app.get('*', (_req, res) => {
+  app.get('*', (req, res, next) => {
+    if (req.path.startsWith(openApiRoute)) {
+      return next();
+    }
     res.sendFile('index.html', { root: 'public' }, (err) => {
       if (err) {
         res.status(404).send({ message: 'Frontend not found' });
@@ -58,10 +79,14 @@ const server = async (test?: boolean) => {
     });
   });
 
-  app.use('*', (_req, res) => {
+  app.use('*', (req, res, next) => {
+    if (req.originalUrl.startsWith(openApiRoute)) {
+      return next();
+    }
     res.status(STATUS_NOT_FOUND).send(customMessage(false, 'Route not found'));
   });
 
+  expressOasGenerator.handleRequests();
   return server;
 };
 

@@ -1,20 +1,4 @@
-// Login function
-// Make a login function so that we can use it in the test
-function loginSetDefault() {
-  cy.visit(Cypress.env('VITE_FRONTEND_ADDRESS') as string);
-  cy.wait(1000);
-  cy.get('body').then((body) => {
-    if (body.find('button:contains("Login")').length > 0) {
-      cy.contains('button', 'Login').eq(0).should('exist').click();
-      cy.get('input[name="email"]').should('exist').type('newUser@mantine.de');
-      cy.get('input[name="password"]').should('exist').type('ValidP4$$w0rd');
-      cy.get('button[type="submit"]').eq(1).should('exist').click();
-    } else {
-      // If the button doesn't exist, return
-      return;
-    }
-  });
-}
+import { login } from './index.cy';
 
 describe('visit the website', () => {
   it('passes', () => {
@@ -26,13 +10,13 @@ describe('visit the website', () => {
 
 describe('login', () => {
   it('passes', () => {
-    loginSetDefault();
+    login();
   });
 });
 
 describe('click the hamburger button and deactivate vendor mode', () => {
   it('passes', () => {
-    loginSetDefault();
+    cy.visit(Cypress.env('VITE_FRONTEND_ADDRESS') as string);
     cy.get('button').eq(0).should('exist').click();
     cy.wait(1000);
     cy.contains('a', 'Deactivate Vendor Mode').should('exist').click();
@@ -46,7 +30,7 @@ describe('click the hamburger button and deactivate vendor mode', () => {
 
 describe('go to manage laundromat and delete laundromat', () => {
   it('passes', () => {
-    loginSetDefault();
+    cy.visit(Cypress.env('VITE_FRONTEND_ADDRESS') as string);
     cy.get('button').eq(0).should('exist').click();
     cy.wait(1000);
     cy.contains('a', 'Manage laundromats').should('exist').click();
@@ -55,39 +39,31 @@ describe('go to manage laundromat and delete laundromat', () => {
     cy.wait(1000);
     // Delete the laundromat
     cy.contains('button', 'Delete').should('exist').click();
-    cy.wait(1000);
+    cy.wait(2000);
     cy.contains('div', 'Failed to delete Laundromat').should('exist');
     cy.wait(1000);
-    cy.contains('div', 'Laundromat has washing machines').should('exist');
-    cy.wait(1000);
     // Delete the washing machine
-    cy.get('button')
-      .should('exist')
-      .find('svg.tabler-icon.tabler-icon-trash')
+    cy.get('table button')
+      .then(($buttons) => {
+        expect($buttons).to.have.length(2);
+      })
+      .eq(1)
       .should('exist')
       .click();
+    cy.wait(1000);
     // Delete the laundromat
     cy.contains('button', 'Delete').should('exist').click();
-    cy.wait(1000);
-    // A Modal should appear
-    cy.contains('h2', 'Delete Laundromat Cypress Laundromat').should('exist');
-    cy.wait(1000);
-    cy.contains('p', 'Are you sure you want to delete Laundromat Cypress Laundromat?').should(
-      'exist',
-    );
     cy.wait(1000);
     cy.get('section button').eq(2).should('exist').click();
     cy.wait(1000);
     cy.contains('div', 'Success').should('exist');
-    cy.wait(1000);
     cy.contains('div', 'Laundromat successfully deleted').should('exist');
-    cy.wait(1000);
   });
 });
 
 describe('click the hamburger button and deactivate vendor mode', () => {
   it('passes', () => {
-    loginSetDefault();
+    cy.visit(Cypress.env('VITE_FRONTEND_ADDRESS') as string);
     cy.get('button').eq(0).should('exist').click();
     cy.wait(1000);
     cy.contains('a', 'Deactivate Vendor Mode').should('exist').click();

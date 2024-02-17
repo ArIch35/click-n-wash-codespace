@@ -55,7 +55,7 @@ git clone https://code.fbi.h-da.de/click-n-wash/click-n-wash.git
 ```
 
 2. Configure the environment variables( .env)
-   Create and fill the environment variables in the `.env` and make sure the file is located in the root of the back-end folder. You can use the [`env.example`](./.env.example) file as a template. Firebase environment variables are required for the program to work. You can get the environment variables at the end of this readme.
+   Create and fill the environment variables in the `.env` and make sure the file is located in the root of the back-end folder. You can use the [`env.example`](./.env.example) file as a template. Firebase environment variables are required for the program to work.
 
 3. Installation Methods:
 
@@ -112,124 +112,11 @@ npm run seed
 
 This website uses PostgreSQL as the database, with typeORM as the ORM. The database consists of 6 tables: `BalanceTransaction`, `Contract`, `Laundromat`, `Message`, `User`, and `WashingMachine`.
 
-### Base Entity
-
-The `BaseEntity` is the entity, which all the other entities will inherit from. It has the following fields:
-
-- `id`: a column to store the ID of an entity.
-- `createdAt`: a column to store when the entity is created.
-- `updatedAt`: a column to store when the entity is updated.
-- `deletedAt`: a column to store when the entity is deleted.
-- `name`: a column to store the name of an entity.
-
-### Balance Transaction
-
-The `balanceTransaction` table stores a balance transaction entity. Each balance transaction has the fields from the base entity and the following fields:
-
-- `amount`: a column to store the amount of the transaction.
-- `type`: a column to store the type of the transaction.
-- `user`: a column to store the user information.
-
-### Contract
-
-The `contract` table stores a contract entity. Each contract has the fields from the base entity and the following fields:
-
-- `startDate`: a column to store the start date of the contract.
-- `endDate`: a column to store the end date of the contract.
-- `status`: a column to store the status of the contract.
-- `price`: a column to store the price of the contract.
-- `user`: a column to store the user information.
-- `washingMachine`: a column to store the washing machine information.
-
-### Laundromat
-
-The `laundromat` table stores a laundromat entity. Each laundromat has the fields from the base entity and the following fields:
-
-- `street`: a column to store the street of the laundromat.
-- `city`: a column to store the city of the laundromat.
-- `country`: a column to store the country of the laundromat.
-- `postalCode`: a column to store the postal code of the laundromat.
-- `price`: a column to store the price of each washing machine in the laundromat.
-- `lat`: a column to store the latitude of the laundromat.
-- `lon`: a column to store the longitude of the laundromat.
-- `owner`: a column to store the owner of the laundromat.
-- `washingMachines`: a column to store the washing machines in the laundromat.
-
-### Message
-
-The `message` table stores a message entity. Each message has the fields from the base entity and the following fields:
-
-- `content`: a column to store the content of the message.
-- `read`: a column to store whether the message is read.
-- `forVendor`: a column to store whether the message is for the vendor.
-- `to`: a column to store the user information.
-
-### User
-
-The `user` table stores a user entity. Each user has the fields from the base entity and the following fields:
-
-- `email`: a column to store the email of the user.
-- `balance`: a column to store the balance of the user.
-- `isAlsoVendor`: a column to store whether the user is also a vendor.
-- `laundromats`: a column to store the laundromats owned by the user.
-- `contracts`: a column to store the contracts of the user.
-- `inbox`: a column to store the messages of the user.
-
-### Washing Machine
-
-The `washingMachine` table stores a washing machine entity. Each washing machine has the fields from the base entity and the following fields:
-
-- `brand`: a column to store the brand of the washing machine.
-- `description`: a column to store the description of the washing machine.
-- `contracts`: a column to store the contracts of the washing machine.
-- `laundromat`: a column to store the laundromat of the washing machine.
+![Database Structure](./assets/db.svg)
 
 ## API Routes <a name="api-routes"/>
 
-The API routes are divided into 5 categories: `Users`, `Laundromats`, `Washing Machines`, `Contracts`, and `Balance Transactions`.
-
-### Users API
-
-- `GET /api/users/:idOrEmail`: This API will retrieve a user based on the ID or email.
-- `POST /api/users`: This API will create a new user.
-- `POST /api/users/restore`: This API will restore a user by its ID (automatically read from the token) when the user is deleted.
-- `POST /api/users/topup`: This API will top up the balance of a user.
-- `PUT /api/users/`: This API will update a user's information by its ID (automatically read from the token).
-- `PUT /api/users/read`: This API will mark the specified messages as read.
-- `DELETE /api/users/`: This API will delete a user by its ID (automatically read from the token).
-
-### Laundromats API
-
-- `GET /api/laundromats`: This API will retrieve a list of laundromats from the server.
-- `GET /api/laundromats/filter-params`: This API will retrieve the filter parameters for the laundromats.
-- `GET /api/laundromats/:id`: This API will retrieve a laundromat with a specified ID.
-- `GET /api/laundromats/:id/time-slots`: This API will retrieve all booked time slots for a specific laundromat.
-- `GET /api/laundromats/:id/analytics`: This API will retrieve the analytics for a specific laundromat.
-- `POST /api/laundromats`: This API will create a new laundromat.
-- `PUT /api/laundromats/:id`: This API will update the laundromat with the specified ID.
-- `DELETE /api/laundromats/:id`: This API will delete a laundromat by its ID.
-
-### Washing Machines API
-
-- `GET /api/washingmachines/`: This API will retrieve a list of washing machines from the server.
-- `GET /api/washingmachines/:id`: This API will retrieve a washing machine by its ID from the server.
-- `POST /api/washingmachines`: This API will create a new washing machine.
-- `PUT /api/washingmachines/:id`: This API will update the washing machine with the specified ID.
-- `DELETE /api/washingmachines/:id`: This API will delete a washing machine by its ID.
-
-### Contracts API
-
-- `GET /api/contracts`: This API will retrieve the contracts that are owned by the user.
-- `GET /api/contracts/:id`: This API will retrieve a contract that is owned by the user by its ID.
-- `POST /api/contracts`: This API will book a washing machine for a specified start date and time.
-- `POST /api/contracts/bulk-cancel`: This API will cancel multiple contracts in bulk (only for the owner).
-- `POST /api/contracts/:id/report`: This API will send a report for a contract with the specified ID to its owner.
-- `PUT /api/contracts/:id`: This API will cancel a contract by its ID by updating the status through body.
-
-### Balance Transactions API
-
-- `GET /api/balancetransactions`: This API will retrieve the balance transactions from the server.
-- `GET /api/balancetransactions/:id`: This API will retrieve a balance transaction by its ID from the server.
+The API routes are divided into 5 categories: `Users`, `Laundromats`, `Washing Machines`, `Contracts`, and `Balance Transactions`. We use SWAGGER to document our API. You can check the API documentation [here](https://clicknwash.pro/docs/). You can also check the API documentation locally by going to http://localhost:8080/docs/.
 
 ## Pages <a name="pages"/>
 
@@ -393,6 +280,8 @@ With the second Option, the test will run in the terminal. If there are Errors, 
 - [tsc-watch](https://www.npmjs.com/package/tsc-watch) -TypeScript compiler
 - [Express](https://expressjs.com/) - Web framework
 - [Faker](https://www.npmjs.com/package/@faker-js/faker) - Dummy Data Generator
+- [Swagger](https://swagger.io/) - API Documentation
+- [Express-oas-generator](https://www.npmjs.com/package/express-oas-generator) - OpenAPI Specification Generator
 
 ### Other tools
 

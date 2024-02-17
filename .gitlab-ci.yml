@@ -1,16 +1,34 @@
 image: node:lts-alpine
 
+variables:
+  npm_config_cache: "$CI_PROJECT_DIR/.npm"
+  CYPRESS_CACHE_FOLDER: "$CI_PROJECT_DIR/cache/Cypress"
+
+default:
+  interruptible: true
+  cache:
+    policy: pull-push
+    unprotect: false
+    untracked: false
+    when: on_success
+    key: ${CI_COMMIT_REF_SLUG}
+    paths:
+      - .npm
+      - cache/Cypress
+      - backend/node_modules
+      - frontend/node_modules
+
 test-format:
   stage: test
   before_script:
     - cp ${ENV_TEST} .env
   script:
     - cd backend
-    - npm install
+    - npm ci
     - npm run prettier:check
     - npm run lint
     - cd ../frontend
-    - npm install
+    - npm ci
     - npm run prettier:check
     - npm run lint
   after_script:
@@ -23,19 +41,32 @@ test-integration:
     POSTGRES_USER: cnw-user
     POSTGRES_PASSWORD: cnw-password
     POSTGRES_HOST_AUTH_METHOD: trust
+    VITE_FRONTEND_ADDRESS: http://localhost:4173/
+  image: cypress/base
   services:
     - postgres:latest
   before_script:
     - cp ${ENV_TEST} .env
-    - apk update && apk add postgresql-client
+    - apt-get update -qy && apt-get upgrade -qy
+    - apt-get install -y postgresql-client
     - psql -h "postgres" -U "$POSTGRES_USER" -d "$POSTGRES_DB" -f init.sql
   script:
     - cd backend
-    - npm install
+    - npm ci
     - npm run test
-    # TODO: Add frontend tests
+    - npm run build
+    - node ./dist/ &
+    - cd ../frontend
+    - npm ci
+    - npm run build
+    - npm run preview & sleep 5 && npm run test
   after_script:
     - rm .env
+  artifacts:
+    when: always
+    paths:
+      - frontend/cypress/screenshots/**/*.png
+    expire_in: 1 day
 
 deploy:
   stage: deploy
@@ -56,13 +87,13 @@ deploy:
     - NODE_VERSION=$(./node-install-latest.sh | grep -oP 'Now using node \Kv[0-9\.]+')
     - export PATH=$PATH:/home/ubuntu/.nvm/versions/node/$NODE_VERSION/bin
     - npm install -g pm2
-    - sudo docker compose down && sudo docker compose up -d --build
+    - sudo docker compose down && sudo docker compose up -d click-n-wash-db --build
     - cd backend
-    - npm install
+    - npm ci
     - npm run build
     - npm run production
     - cd ../frontend
-    - npm install
+    - npm ci
     - npm run build
     - cd ..
     - if [[ ! -x "./deploy.sh" ]]; then chmod +x ./deploy.sh; fi

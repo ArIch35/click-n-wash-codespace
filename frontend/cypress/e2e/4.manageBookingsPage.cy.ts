@@ -1,20 +1,4 @@
-// Login function
-// Make a login function so that we can use it in the test
-function loginManage() {
-  cy.visit(Cypress.env('VITE_FRONTEND_ADDRESS') as string);
-  cy.wait(1000);
-  cy.get('body').then((body) => {
-    if (body.find('button:contains("Login")').length > 0) {
-      cy.contains('button', 'Login').eq(0).should('exist').click();
-      cy.get('input[name="email"]').should('exist').type('newUser@mantine.de');
-      cy.get('input[name="password"]').should('exist').type('ValidP4$$w0rd');
-      cy.get('button[type="submit"]').eq(1).should('exist').click();
-    } else {
-      // If the button doesn't exist, return
-      return;
-    }
-  });
-}
+import { login } from './index.cy';
 
 describe('visit the website', () => {
   it('passes', () => {
@@ -26,13 +10,13 @@ describe('visit the website', () => {
 
 describe('login', () => {
   it('passes', () => {
-    loginManage();
+    login();
   });
 });
 
 describe('move to manage bookings page and report problem', () => {
   it('passes', () => {
-    loginManage();
+    cy.visit(Cypress.env('VITE_FRONTEND_ADDRESS') as string);
     cy.get('button').eq(0).should('exist').click();
     cy.wait(1000);
     cy.contains('a', 'Manage bookings').should('exist').click();
@@ -52,7 +36,7 @@ describe('move to manage bookings page and report problem', () => {
 
 describe('cancel booking', () => {
   it('passes', () => {
-    loginManage();
+    cy.visit(Cypress.env('VITE_FRONTEND_ADDRESS') as string);
     cy.get('button').eq(0).should('exist').click();
     cy.wait(1000);
     cy.contains('a', 'Manage bookings').should('exist').click();
