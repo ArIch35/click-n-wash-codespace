@@ -43,9 +43,11 @@ describe('go to manage laundromat and delete laundromat', () => {
     cy.contains('div', 'Failed to delete Laundromat').should('exist');
     cy.wait(1000);
     // Delete the washing machine
-    cy.get('button')
-      .should('exist')
-      .find('svg.tabler-icon.tabler-icon-trash')
+    cy.get('table button')
+      .then(($buttons) => {
+        expect($buttons).to.have.length(2);
+      })
+      .eq(1)
       .should('exist')
       .click();
     cy.wait(1000);
