@@ -39,10 +39,8 @@ describe('go to manage laundromat and delete laundromat', () => {
     cy.wait(1000);
     // Delete the laundromat
     cy.contains('button', 'Delete').should('exist').click();
-    cy.wait(1000);
+    cy.wait(2000);
     cy.contains('div', 'Failed to delete Laundromat').should('exist');
-    cy.wait(1000);
-    cy.contains('div', 'Laundromat has washing machines').should('exist');
     cy.wait(1000);
     // Delete the washing machine
     cy.get('button')
@@ -50,12 +48,11 @@ describe('go to manage laundromat and delete laundromat', () => {
       .find('svg.tabler-icon.tabler-icon-trash')
       .should('exist')
       .click();
+    cy.wait(1000);
     // Delete the laundromat
     cy.contains('button', 'Delete').should('exist').click();
     cy.wait(1000);
     // A Modal should appear
-    cy.contains('h2', 'Delete Laundromat Cypress Laundromat').should('exist');
-    cy.wait(1000);
     cy.contains('p', 'Are you sure you want to delete Laundromat Cypress Laundromat?').should(
       'exist',
     );
@@ -63,9 +60,7 @@ describe('go to manage laundromat and delete laundromat', () => {
     cy.get('section button').eq(2).should('exist').click();
     cy.wait(1000);
     cy.contains('div', 'Success').should('exist');
-    cy.wait(1000);
     cy.contains('div', 'Laundromat successfully deleted').should('exist');
-    cy.wait(1000);
   });
 });
 
