@@ -2,10 +2,10 @@ import {
   Badge,
   Box,
   Button,
+  Center,
   Container,
   Divider,
   Flex,
-  Grid,
   LoadingOverlay,
   Modal,
   Table,
@@ -152,18 +152,14 @@ const WashingMachineDetailsPage = () => {
           </Flex>
           <Table>
             <Table.Thead>{ths}</Table.Thead>
-            {contracts.length === 0 ? (
-              <Table.Tr h={100}>
-                <Table.Td colSpan={5} p={3}>
-                  <Grid>
-                    <EmptyData message="Contract" />
-                  </Grid>
-                </Table.Td>
-              </Table.Tr>
-            ) : (
-              <Table.Tbody>{rows}</Table.Tbody>
-            )}{' '}
+            <Table.Tbody>{rows}</Table.Tbody>
           </Table>
+
+          {contracts.length === 0 && (
+            <Center>
+              <EmptyData message="Contract" />
+            </Center>
+          )}
         </>
       )}
     </Container>
