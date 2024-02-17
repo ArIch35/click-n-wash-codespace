@@ -97,9 +97,17 @@ const WashingMachineDetailsPage = () => {
       )}
       {!loading && washingMachine && contracts && (
         <>
-          <Text ta="center" size="xl">
-            Washing Machine {washingMachine.name}
-          </Text>
+          {/* Back To Laundromat */}
+          <Flex justify="flex-start" align="center" mb={20}>
+            <Box w={'40%'}>
+              <Button variant="link" onClick={() => window.history.back()}>
+                {'< Back'}
+              </Button>
+            </Box>
+            <Text ta="center" size="xl">
+              Washing Machine {washingMachine.name}
+            </Text>
+          </Flex>
           <Box mx="auto">
             <form onSubmit={form.onSubmit(handleUpdateWashingMachine)}>
               <FormInputFields form={form} values={form.values} />
