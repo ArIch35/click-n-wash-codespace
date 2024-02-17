@@ -170,13 +170,6 @@ const useLaundromatDetail = () => {
       return;
     }
 
-    // Check if washing machine has contracts
-    const toBeDeletedWashingMachine = washingMachines?.find((element) => element.id === id);
-    if (toBeDeletedWashingMachine?.contracts && toBeDeletedWashingMachine.contracts.length > 0) {
-      showErrorNotification('Washing Machine', 'delete', 'Washing Machine has contracts');
-      return;
-    }
-
     deleteWashingMachine(id)
       .then(() => {
         // Update washing machines state
