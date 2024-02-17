@@ -5,16 +5,23 @@ import { useParams } from 'react-router-dom';
 import { Message, bulkCancelContracts } from '../utils/api';
 import { showCustomNotification, showErrorNotification } from '../utils/mantine-notifications';
 import FormInputFields from './ui/form-input-fields';
+import React from 'react';
 
 interface FormValues {
   fromDateToDate: [Date | null, Date | null];
+}
+
+interface BulkCancelContractsModalProps {
+  numberOfContracts: number;
 }
 
 const initialValues: FormValues = {
   fromDateToDate: [null, null],
 };
 
-const BulkCancelContractsModal = () => {
+const BulkCancelContractsModal: React.FC<BulkCancelContractsModalProps> = ({
+  numberOfContracts,
+}) => {
   const { id } = useParams();
   const [opened, { open, close }] = useDisclosure(false);
 
@@ -86,7 +93,7 @@ const BulkCancelContractsModal = () => {
           </Stack>
         </form>
       </Modal>
-      <Button color="red" mt="md" radius="md" onClick={open}>
+      <Button color="red" mt="md" radius="md" onClick={open} disabled={numberOfContracts < 1}>
         Bulk cancel contracts
       </Button>
     </Box>
