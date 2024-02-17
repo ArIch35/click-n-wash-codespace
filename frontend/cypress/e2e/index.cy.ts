@@ -1,5 +1,8 @@
 export const register = () => {
-  const email = Math.random().toString(36).substring(7) + '@mantine.de';
+  // Create random 24 character email
+  const email = `${Math.random().toString(36).substring(2, 15)}@${Math.random()
+    .toString(36)
+    .substring(2, 15)}.com`;
   const password = 'ValidP4$$w0rd';
 
   cy.visit(Cypress.env('VITE_FRONTEND_ADDRESS') as string);

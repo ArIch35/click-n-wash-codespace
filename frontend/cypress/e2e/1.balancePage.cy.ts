@@ -10,11 +10,11 @@ describe('visit the website', () => {
 
 describe('register new user', () => {
   it('passes', () => {
-    try {
-      cy.readFile('cypress/fixtures/userData.json');
-    } catch (error) {
-      register();
-    }
+    cy.task('readFileMaybe', 'cypress/fixtures/userData.json').then((data) => {
+      if (!data) {
+        register();
+      }
+    });
   });
 });
 
