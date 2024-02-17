@@ -65,7 +65,7 @@ test-integration:
   artifacts:
     when: always
     paths:
-      - cypress/screenshots/**/*.png
+      - frontend/cypress/screenshots/**/*.png
     expire_in: 1 day
 
 deploy:

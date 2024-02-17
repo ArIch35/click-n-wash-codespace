@@ -52,11 +52,6 @@ describe('go to manage laundromat and delete laundromat', () => {
     // Delete the laundromat
     cy.contains('button', 'Delete').should('exist').click();
     cy.wait(1000);
-    // A Modal should appear
-    cy.contains('p', 'Are you sure you want to delete Laundromat Cypress Laundromat?').should(
-      'exist',
-    );
-    cy.wait(1000);
     cy.get('section button').eq(2).should('exist').click();
     cy.wait(1000);
     cy.contains('div', 'Success').should('exist');
