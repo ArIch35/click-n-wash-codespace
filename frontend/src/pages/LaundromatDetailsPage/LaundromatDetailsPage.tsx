@@ -96,9 +96,16 @@ const LaundromatDetailPage = () => {
       )}
       {!loading && laundromat && (
         <>
-          <Text ta="center" size="xl">
-            Laundromat {laundromat.name}
-          </Text>
+          <Flex justify="flex-start" align="center" mb={20}>
+            <Box w={'40%'}>
+              <Button variant="link" onClick={() => window.history.back()}>
+                {'< Back'}
+              </Button>
+            </Box>
+            <Text ta="center" size="xl">
+              Laundromat {laundromat.name}
+            </Text>
+          </Flex>
           <Box mx="auto">
             <form onSubmit={form.onSubmit(handleUpdateLaundromat)}>
               <FormInputFields
