@@ -1,6 +1,5 @@
 import { Center, Image, Title, Text, Button, Container, Grid } from '@mantine/core';
 import { useNavigate } from 'react-router-dom';
-import missingImage from '../assets/404Image.svg';
 
 const MissingPage = () => {
   const navigate = useNavigate();
@@ -12,7 +11,7 @@ const MissingPage = () => {
           <Grid.Col>
             {' '}
             <Image
-              src={missingImage}
+              src="404image.svg"
               alt="404 Image"
               fallbackSrc="https://ui.mantine.dev/_next/static/media/image.11cd6c19.svg"
             />
