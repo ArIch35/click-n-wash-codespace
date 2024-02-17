@@ -138,7 +138,9 @@ const WashingMachineDetailsPage = () => {
           <Divider my={40} />
           <Flex justify={'space-between'} py={10}>
             <Text size="xl">My Contracts</Text>
-            <BulkCancelContractsModal numberOfContracts={contracts.length} />
+            <BulkCancelContractsModal
+              numberOfContracts={contracts.filter((c) => c.status === 'ongoing').length}
+            />
           </Flex>
           <Table>
             <Table.Thead>{ths}</Table.Thead>
