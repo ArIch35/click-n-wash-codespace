@@ -5,6 +5,7 @@ import { createUserWithEmailAndPassword, signInWithEmailAndPassword } from 'fire
 import React from 'react';
 import firebaseAuth from '../../firebase';
 import { useAuth } from '../../providers/authentication/Authentication.Context';
+import { checkBackendStatus } from '../../utils/api';
 import { showCustomNotification, showErrorNotification } from '../../utils/mantine-notifications';
 import FormInputFields from '../ui/form-input-fields';
 import { GoogleButton } from './GoogleButton';
@@ -49,32 +50,40 @@ export function AuthenticationForm({ ...props }: ModalProps) {
     if (form.validate().hasErrors) {
       return;
     }
-    if (type === 'login') {
-      signInWithEmailAndPassword(firebaseAuth, values.email, values.password)
-        .then((userCredential) => {
-          props.onClose();
-          showCustomNotification({
-            title: `Welcome ${userCredential.user?.displayName || userCredential.user.email}!`,
-            message: 'You have been successfully logged in',
-            color: 'green',
-            autoClose: true,
-          });
-        })
-        .catch((error) => showErrorNotification('User', 'login', String(error)));
-      return;
-    }
-    setRegisteredName(values.name);
-    createUserWithEmailAndPassword(firebaseAuth, values.email, values.password)
+
+    // Check whether backend is running
+    checkBackendStatus()
       .then(() => {
-        props.onClose();
-        showCustomNotification({
-          title: 'Welcome',
-          message: 'Your account has been created',
-          color: 'green',
-          autoClose: true,
-        });
+        if (type === 'login') {
+          signInWithEmailAndPassword(firebaseAuth, values.email, values.password)
+            .then((userCredential) => {
+              props.onClose();
+              showCustomNotification({
+                title: `Welcome ${userCredential.user?.displayName || userCredential.user.email}!`,
+                message: 'You have been successfully logged in',
+                color: 'green',
+                autoClose: true,
+              });
+            })
+            .catch((error) => showErrorNotification('User', 'login', String(error)));
+          return;
+        }
+        setRegisteredName(values.name);
+        createUserWithEmailAndPassword(firebaseAuth, values.email, values.password)
+          .then(() => {
+            props.onClose();
+            showCustomNotification({
+              title: 'Welcome',
+              message: 'Your account has been created',
+              color: 'green',
+              autoClose: true,
+            });
+          })
+          .catch((error) => showErrorNotification('User', 'register', String(error)));
       })
-      .catch((error) => showErrorNotification('User', 'register', String(error)));
+      .catch((error) => {
+        showErrorNotification('Backend', 'check status on', String(error));
+      });
   };
 
   React.useEffect(() => {

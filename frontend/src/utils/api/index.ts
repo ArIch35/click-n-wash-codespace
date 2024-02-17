@@ -1,5 +1,6 @@
 import firebaseAuth from '../../firebase';
 import { GetLocationLaundromat } from '../../interfaces/entities/laundromat';
+import loadEnv from '../load-env';
 
 export interface Message {
   success: boolean;
@@ -15,6 +16,16 @@ export const headers = async () => {
     'Content-Type': 'application/json',
     Authorization: `Bearer ${token}`,
   };
+};
+
+export const checkBackendStatus = async () => {
+  const response = await fetch(`${loadEnv().VITE_SERVER_ADDRESS}`, {
+    headers: { ...(await headers()) },
+  });
+
+  if (!response.ok) {
+    throw new Error('Backend is not running');
+  }
 };
 
 /**

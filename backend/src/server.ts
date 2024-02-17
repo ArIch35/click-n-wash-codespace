@@ -57,6 +57,11 @@ const server = async (test?: boolean) => {
   app.use('/api/generateToken', generateTokenRouter);
   // Add routes here
 
+  // Backend status
+  app.get('/api', (_req, res) => {
+    res.status(200).send(customMessage(true, 'Backend is running'));
+  });
+
   // Redirect to openapi
   app.use('/docs', (_req, res) => {
     res.redirect(openApiRoute);
