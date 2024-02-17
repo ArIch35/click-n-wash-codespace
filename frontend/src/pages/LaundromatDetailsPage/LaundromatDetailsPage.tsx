@@ -2,10 +2,10 @@ import {
   ActionIcon,
   Box,
   Button,
+  Center,
   Container,
   Divider,
   Flex,
-  Grid,
   Group,
   LoadingOverlay,
   Modal,
@@ -159,18 +159,14 @@ const LaundromatDetailPage = () => {
           </Flex>
           <Table>
             <Table.Thead>{ths}</Table.Thead>
-            {laundromat.washingMachines?.length === 0 ? (
-              <Table.Tr h={100}>
-                <Table.Td colSpan={5} p={3}>
-                  <Grid>
-                    <EmptyData message="Machine" />
-                  </Grid>
-                </Table.Td>
-              </Table.Tr>
-            ) : (
-              <Table.Tbody>{rows}</Table.Tbody>
-            )}{' '}
+            <Table.Tbody>{rows}</Table.Tbody>
           </Table>
+
+          {laundromat.washingMachines?.length === 0 && (
+            <Center>
+              <EmptyData message="Laundromat" />
+            </Center>
+          )}
         </>
       )}
     </Container>
