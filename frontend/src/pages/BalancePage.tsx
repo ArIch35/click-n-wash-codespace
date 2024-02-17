@@ -1,4 +1,4 @@
-import { Container, Flex, Grid, NumberFormatter, Space, Table, Text } from '@mantine/core';
+import { Center, Container, Flex, NumberFormatter, Space, Table, Text } from '@mantine/core';
 import { upperFirst } from '@mantine/hooks';
 import React from 'react';
 import AddFundsModal from '../components/ui/AddFundsModal';
@@ -60,18 +60,14 @@ const BalancePage = () => {
         <Flex mt="m" px="md">
           <Table fz="md" highlightOnHover>
             <Table.Thead>{ths}</Table.Thead>
-            {transactions.length === 0 ? (
-              <Table.Tr h={100}>
-                <Table.Td colSpan={5} p={3}>
-                  <Grid>
-                    <EmptyData message="Transaction" />
-                  </Grid>
-                </Table.Td>
-              </Table.Tr>
-            ) : (
-              <Table.Tbody>{rows}</Table.Tbody>
-            )}{' '}
+            <Table.Tbody>{rows}</Table.Tbody>
           </Table>
+
+          {transactions.length === 0 && (
+            <Center>
+              <EmptyData message="Transaction" />
+            </Center>
+          )}
         </Flex>
       </Flex>
     </Container>
