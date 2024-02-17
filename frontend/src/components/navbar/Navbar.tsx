@@ -64,12 +64,16 @@ const Navbar = ({ toggle, setVisible }: NavbarControllerProps) => {
       isAlsoVendor: !user.isAlsoVendor,
     };
     updateUser(body)
-      .then(() => {
-        refreshUser(),
-          // If user change to vendor mode, show success notification
-          !user.isAlsoVendor && showCustomNotification(sucessNotification);
+      .then((user) => {
+        refreshUser();
         // If user change to non vendor mode, show error notification
-        user.isAlsoVendor && showCustomNotification(nonVendorNotification);
+        if (!user.isAlsoVendor) {
+          showCustomNotification(nonVendorNotification);
+          navigate('/');
+          return;
+        }
+        // If user change to vendor mode, show success notification
+        showCustomNotification(sucessNotification);
       })
       .catch((error) => {
         console.error(error), showCustomNotification(customNotification);
