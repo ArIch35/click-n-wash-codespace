@@ -5,6 +5,7 @@ import {
   Container,
   Divider,
   Flex,
+  Grid,
   LoadingOverlay,
   Modal,
   Table,
@@ -15,6 +16,7 @@ import FormInputFields from '../../components/ui/form-input-fields';
 import formatDate from '../../utils/format-date';
 import { getColor } from '../../utils/utils';
 import useWashingMachineDetails from './useWashingMachineDetails';
+import EmptyData from '../../components/EmptyData';
 
 const WashingMachineDetailsPage = () => {
   const {
@@ -136,11 +138,21 @@ const WashingMachineDetailsPage = () => {
           <Divider my={40} />
           <Flex justify={'space-between'} py={10}>
             <Text size="xl">My Contracts</Text>
-            <BulkCancelContractsModal />
+            <BulkCancelContractsModal numberOfContracts={contracts.length} />
           </Flex>
           <Table>
             <Table.Thead>{ths}</Table.Thead>
-            <Table.Tbody>{rows}</Table.Tbody>
+            {contracts.length === 0 ? (
+              <Table.Tr h={100}>
+                <Table.Td colSpan={5} p={3}>
+                  <Grid>
+                    <EmptyData message="Contract" />
+                  </Grid>
+                </Table.Td>
+              </Table.Tr>
+            ) : (
+              <Table.Tbody>{rows}</Table.Tbody>
+            )}{' '}
           </Table>
         </>
       )}
