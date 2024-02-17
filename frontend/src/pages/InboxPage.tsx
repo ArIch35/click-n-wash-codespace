@@ -1,9 +1,10 @@
-import { Container, Table, Tabs } from '@mantine/core';
+import { Container, Grid, Table, Tabs } from '@mantine/core';
 import { useLocalStorage } from '@mantine/hooks';
 import React from 'react';
 import { useAuth } from '../providers/authentication/Authentication.Context';
 import { markAsRead } from '../utils/api';
 import formatDate from '../utils/format-date';
+import EmptyData from '../components/EmptyData';
 
 const InboxPage = () => {
   const { user, refreshUser } = useAuth();
@@ -80,7 +81,17 @@ const InboxPage = () => {
         <Tabs.Panel value="user" pt="xs">
           <Table>
             <Table.Thead>{ths}</Table.Thead>
-            <Table.Tbody>{userRows}</Table.Tbody>
+            {user.inbox?.filter((message) => !message.forVendor).length === 0 ? (
+              <Table.Tr h={100}>
+                <Table.Td colSpan={5} p={3}>
+                  <Grid>
+                    <EmptyData message="Message" />
+                  </Grid>
+                </Table.Td>
+              </Table.Tr>
+            ) : (
+              <Table.Tbody>{userRows}</Table.Tbody>
+            )}{' '}
           </Table>
         </Tabs.Panel>
 
@@ -88,7 +99,17 @@ const InboxPage = () => {
           <Tabs.Panel value="vendor" pt="xs">
             <Table>
               <Table.Thead>{ths}</Table.Thead>
-              <Table.Tbody>{vendorRows}</Table.Tbody>
+              {user.inbox?.filter((message) => message.forVendor).length === 0 ? (
+                <Table.Tr h={100}>
+                  <Table.Td colSpan={5} p={3}>
+                    <Grid>
+                      <EmptyData message="Message" />
+                    </Grid>
+                  </Table.Td>
+                </Table.Tr>
+              ) : (
+                <Table.Tbody>{vendorRows}</Table.Tbody>
+              )}{' '}
             </Table>
           </Tabs.Panel>
         )}
