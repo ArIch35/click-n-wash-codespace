@@ -55,7 +55,7 @@ test-integration:
     - npm ci
     - npm run test
     - npm run build
-    - npm run start &
+    - node ./dist/ &
     - cd ../frontend
     - npm ci
     - npm run build
