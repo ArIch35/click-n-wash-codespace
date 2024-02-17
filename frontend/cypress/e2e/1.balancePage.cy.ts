@@ -1,20 +1,4 @@
-// Login function
-// Make a login function so that we can use it in the test
-function login() {
-  cy.visit(Cypress.env('VITE_FRONTEND_ADDRESS') as string);
-  cy.wait(1000);
-  cy.get('body').then((body) => {
-    if (body.find('button:contains("Login")').length > 0) {
-      cy.contains('button', 'Login').eq(0).should('exist').click();
-      cy.get('input[name="email"]').should('exist').type('newUser@mantine.de');
-      cy.get('input[name="password"]').should('exist').type('ValidP4$$w0rd');
-      cy.get('button[type="submit"]').eq(1).should('exist').click();
-    } else {
-      // If the button doesn't exist, return
-      return;
-    }
-  });
-}
+import { login, register } from './index.cy';
 
 describe('visit the website', () => {
   it('passes', () => {
@@ -26,16 +10,11 @@ describe('visit the website', () => {
 
 describe('register new user', () => {
   it('passes', () => {
-    cy.visit(Cypress.env('VITE_FRONTEND_ADDRESS') as string);
-    cy.wait(1000);
-    cy.contains('button', 'Login').should('exist').click();
-    cy.contains('button', 'Not a member yet? Register').should('exist').click();
-    cy.get('input[name="name"]').eq(1).should('exist').type('newUser');
-    cy.get('input[name="email"]').should('exist').type('newUser@mantine.de');
-    cy.get('input[name="password"]').should('exist').type('ValidP4$$w0rd');
-    cy.get('input[name="confirmPassword"]').should('exist').type('ValidP4$$w0rd');
-    cy.get('input[name="terms"]').should('exist').check();
-    cy.contains('button', 'Register').should('exist').click();
+    try {
+      cy.readFile('cypress/fixtures/userData.json');
+    } catch (error) {
+      register();
+    }
   });
 });
 
