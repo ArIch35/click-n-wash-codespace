@@ -4,12 +4,14 @@ import admin from '../firebase-admin';
 import { routesWithoutAuth } from '../utils/constants';
 import { customMessage } from '../utils/http-return-messages';
 import { STATUS_UNAUTHORIZED } from '../utils/http-status-codes';
+import { openApiRoute } from '../utils/utils';
 
 // Middleware
 const checkToken: RequestHandler = (async (req, res, next) => {
   // Skip auth if it is a GET request and not API endpoints
   const skipAuth =
     (req.method === 'GET' && !req.path.startsWith('/api')) ||
+    req.path.startsWith(openApiRoute) ||
     routesWithoutAuth.some((route) => {
       const path1 = route.path.toLocaleLowerCase();
       const path2 = path1.slice(-1) !== '/' ? `${path1}/` : path1;

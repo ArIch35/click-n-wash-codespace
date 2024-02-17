@@ -78,3 +78,5 @@ export const randomDate = (start: Date, end: Date) => {
 
   return randomDate;
 };
+
+export const openApiRoute = '/api-docs';
