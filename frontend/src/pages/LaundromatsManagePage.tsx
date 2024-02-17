@@ -2,6 +2,7 @@ import { BarChart } from '@mantine/charts';
 import {
   Button,
   Container,
+  Grid,
   Group,
   NumberFormatter,
   Select,
@@ -19,6 +20,7 @@ import Laundromat, {
 } from '../interfaces/entities/laundromat';
 import { getLaundromatAnalytics, getLaundromats } from '../utils/api';
 import { showErrorNotification } from '../utils/mantine-notifications';
+import EmptyData from '../components/EmptyData';
 
 const LaundromatsManagePage = () => {
   const navigate = useNavigate();
@@ -107,7 +109,17 @@ const LaundromatsManagePage = () => {
 
       <Table>
         <Table.Thead>{ths}</Table.Thead>
-        <Table.Tbody>{rows}</Table.Tbody>
+        {laundromats.length === 0 ? (
+          <Table.Tr h={100}>
+            <Table.Td colSpan={5} p={3}>
+              <Grid>
+                <EmptyData message="Laundromat" />
+              </Grid>
+            </Table.Td>
+          </Table.Tr>
+        ) : (
+          <Table.Tbody>{rows}</Table.Tbody>
+        )}{' '}
       </Table>
 
       {laundromats.length > 0 && (
