@@ -5,6 +5,7 @@ import {
   Container,
   Divider,
   Flex,
+  Grid,
   Group,
   LoadingOverlay,
   Modal,
@@ -16,6 +17,7 @@ import { useNavigate } from 'react-router-dom';
 import AddWashingMachine from '../../components/ui/AddWashingMachine';
 import FormInputFields from '../../components/ui/form-input-fields';
 import useLaundromatDetail from './useLaundromatDetail';
+import EmptyData from '../../components/EmptyData';
 
 const LaundromatDetailPage = () => {
   const navigate = useNavigate();
@@ -157,7 +159,17 @@ const LaundromatDetailPage = () => {
           </Flex>
           <Table>
             <Table.Thead>{ths}</Table.Thead>
-            <Table.Tbody>{rows}</Table.Tbody>
+            {laundromat.washingMachines?.length === 0 ? (
+              <Table.Tr h={100}>
+                <Table.Td colSpan={5} p={3}>
+                  <Grid>
+                    <EmptyData message="Machine" />
+                  </Grid>
+                </Table.Td>
+              </Table.Tr>
+            ) : (
+              <Table.Tbody>{rows}</Table.Tbody>
+            )}{' '}
           </Table>
         </>
       )}
