@@ -1,8 +1,8 @@
 import { BarChart } from '@mantine/charts';
 import {
   Button,
+  Center,
   Container,
-  Grid,
   Group,
   NumberFormatter,
   Select,
@@ -109,18 +109,14 @@ const LaundromatsManagePage = () => {
 
       <Table>
         <Table.Thead>{ths}</Table.Thead>
-        {laundromats.length === 0 ? (
-          <Table.Tr h={100}>
-            <Table.Td colSpan={5} p={3}>
-              <Grid>
-                <EmptyData message="Laundromat" />
-              </Grid>
-            </Table.Td>
-          </Table.Tr>
-        ) : (
-          <Table.Tbody>{rows}</Table.Tbody>
-        )}{' '}
+        <Table.Tbody>{rows}</Table.Tbody>
       </Table>
+
+      {laundromats.length === 0 && (
+        <Center>
+          <EmptyData message="Laundromat" />
+        </Center>
+      )}
 
       {laundromats.length > 0 && (
         <Stack>
@@ -138,7 +134,6 @@ const LaundromatsManagePage = () => {
           </Group>
         </Stack>
       )}
-
       <Stack px="xl">
         {analytics.map((laundromatAnalytics) => (
           <Stack key={laundromatAnalytics.laundromat.id}>
