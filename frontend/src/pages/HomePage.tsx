@@ -12,6 +12,7 @@ import Laundromat from '../interfaces/entities/laundromat';
 import { useAuth } from '../providers/authentication/Authentication.Context';
 import { getFilteredLaundromats, getLaundromats } from '../utils/api';
 import { showCustomNotification, showErrorNotification } from '../utils/mantine-notifications';
+import EmptyData from '../components/EmptyData';
 
 const HomePage = () => {
   const { user } = useAuth();
@@ -157,6 +158,7 @@ const HomePage = () => {
               </FixedSizeList>
             )}
           </AutoSizer>
+          {laundromats.length === 0 && <EmptyData message="Laundromat" />}
         </Stack>
 
         {chosenLaundromat && (
