@@ -24,11 +24,11 @@ test-format:
     - cp ${ENV_TEST} .env
   script:
     - cd backend
-    - npm install
+    - npm ci
     - npm run prettier:check
     - npm run lint
     - cd ../frontend
-    - npm install
+    - npm ci
     - npm run prettier:check
     - npm run lint
   after_script:
@@ -52,12 +52,12 @@ test-integration:
     - psql -h "postgres" -U "$POSTGRES_USER" -d "$POSTGRES_DB" -f init.sql
   script:
     - cd backend
-    - npm install
+    - npm ci
     - npm run test
     - npm run build
     - npm run start &
     - cd ../frontend
-    - npm install
+    - npm ci
     - npm run build
     - npm run preview & sleep 5 && npm run test
   after_script:
@@ -89,11 +89,11 @@ deploy:
     - npm install -g pm2
     - sudo docker compose down && sudo docker compose up -d click-n-wash-db --build
     - cd backend
-    - npm install
+    - npm ci
     - npm run build
     - npm run production
     - cd ../frontend
-    - npm install
+    - npm ci
     - npm run build
     - cd ..
     - if [[ ! -x "./deploy.sh" ]]; then chmod +x ./deploy.sh; fi

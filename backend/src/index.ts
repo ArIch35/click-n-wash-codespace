@@ -1,4 +1,5 @@
 import child_process from 'child_process';
+import crypto from 'crypto';
 import fs from 'fs';
 import { IncomingMessage, Server, ServerResponse } from 'http';
 import 'reflect-metadata';
@@ -8,6 +9,7 @@ import loadEnv from './utils/load-env';
 import sendNotification from './utils/send-notification';
 import { openApiSpecPath } from './utils/utils';
 
+const signals: NodeJS.Signals[] = ['SIGINT', 'SIGTERM', 'SIGQUIT'];
 const PORT = loadEnv().PORT;
 
 if (!process.env.NODE_ENV) {
@@ -27,6 +29,10 @@ const closeServer = (server: Server<typeof IncomingMessage, typeof ServerRespons
       });
     });
 
+    signals.forEach((signal) => {
+      process.removeAllListeners(signal);
+    });
+
     server.close(() => resolve());
   });
   return closePromise;
@@ -34,7 +40,6 @@ const closeServer = (server: Server<typeof IncomingMessage, typeof ServerRespons
 
 const initServer = async () => {
   const app = await server();
-  const signals: NodeJS.Signals[] = ['SIGINT', 'SIGTERM', 'SIGQUIT'];
   signals.forEach((signal) => {
     process.on(signal, () => {
       console.log(`Received ${signal}, shutting down`);
@@ -57,8 +62,8 @@ let myServer: Server<typeof IncomingMessage, typeof ServerResponse>;
 // Watch for changes in the OpenAPI file
 type status = 'checking' | 'generating' | 'exist';
 let currentStatus: status = 'checking';
+let previousHash = fs.existsSync('.openapi-hash') ? fs.readFileSync('.openapi-hash', 'utf8') : '';
 fs.watchFile(openApiSpecPath, {}, (file) => {
-  console.log('OpenAPI file changed');
   if (currentStatus === 'checking') {
     if (!file.isFile()) {
       console.log('OpenAPI file does not exist, generating it now');
@@ -81,6 +86,21 @@ fs.watchFile(openApiSpecPath, {}, (file) => {
     console.log('OpenAPI file is being generated');
     return;
   }
+
+  // Get the file content and hash it
+  const fileContent = fs.readFileSync(openApiSpecPath, 'utf8');
+  const fileHash = crypto.createHash('sha256').update(fileContent).digest('hex');
+
+  // If the file hash has not changed, do nothing
+  if (fileHash === previousHash) {
+    console.log('OpenAPI file has not changed');
+    return;
+  }
+
+  // If the file hash has changed, write it to the previousHash and save the new hash to a file
+  console.log('OpenAPI file has changed');
+  previousHash = fileHash;
+  fs.writeFileSync('.openapi-hash', fileHash);
 
   const isServerRunning = myServer && myServer.listening;
 
