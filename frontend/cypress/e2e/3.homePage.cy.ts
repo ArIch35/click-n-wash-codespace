@@ -1,7 +1,7 @@
 import { login } from './index.cy';
 
 // Create new Date
-const date = new Date();
+const date = new Date(new Date().getTime() + 24 * 60 * 60 * 1000);
 const formattedDate = date.toLocaleDateString('en-GB', {
   day: 'numeric',
   month: 'long',

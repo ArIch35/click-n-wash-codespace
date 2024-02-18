@@ -192,7 +192,12 @@ const TimePicker = ({
           );
         }}
         excludeDate={(date: Date) => {
-          return getBookedStatus(date) === BookingStatus.FullyBooked || date < getTodayDate();
+          console.log(date, '===', getTodayDate(), date.toString() === getTodayDate().toString());
+          return (
+            date < getTodayDate() ||
+            getBookedStatus(date) === BookingStatus.FullyBooked ||
+            (date.toString() === getTodayDate().toString() && new Date().getHours() >= 22)
+          );
         }}
       />
       {selectedDate && (

@@ -2,6 +2,7 @@ import {
   ActionIcon,
   Box,
   Button,
+  Center,
   Container,
   Divider,
   Flex,
@@ -16,6 +17,7 @@ import { useNavigate } from 'react-router-dom';
 import AddWashingMachine from '../../components/ui/AddWashingMachine';
 import FormInputFields from '../../components/ui/form-input-fields';
 import useLaundromatDetail from './useLaundromatDetail';
+import EmptyData from '../../components/EmptyData';
 
 const LaundromatDetailPage = () => {
   const navigate = useNavigate();
@@ -96,9 +98,16 @@ const LaundromatDetailPage = () => {
       )}
       {!loading && laundromat && (
         <>
-          <Text ta="center" size="xl">
-            Laundromat {laundromat.name}
-          </Text>
+          <Flex justify="flex-start" align="center" mb={20}>
+            <Box w={'40%'}>
+              <Button variant="link" onClick={() => window.history.back()}>
+                {'< Back'}
+              </Button>
+            </Box>
+            <Text ta="center" size="xl">
+              Laundromat {laundromat.name}
+            </Text>
+          </Flex>
           <Box mx="auto">
             <form onSubmit={form.onSubmit(handleUpdateLaundromat)}>
               <FormInputFields
@@ -152,6 +161,12 @@ const LaundromatDetailPage = () => {
             <Table.Thead>{ths}</Table.Thead>
             <Table.Tbody>{rows}</Table.Tbody>
           </Table>
+
+          {laundromat.washingMachines?.length === 0 && (
+            <Center>
+              <EmptyData message="Laundromat" />
+            </Center>
+          )}
         </>
       )}
     </Container>

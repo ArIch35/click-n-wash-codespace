@@ -3,6 +3,7 @@ import { useForm } from '@mantine/form';
 import React, { useEffect } from 'react';
 import { getLaundromatFilters } from '../../utils/api';
 import FormInputFields from '../ui/form-input-fields';
+import { showCustomNotification } from '../../utils/mantine-notifications';
 
 export interface SearchFilter {
   name?: string;
@@ -35,6 +36,16 @@ const Filter: React.FC<FilterProps> = ({ onFilterSelected, onFilterReset }) => {
   });
 
   const onSubmit = (values: SearchFilter, event?: React.FormEvent<HTMLFormElement>) => {
+    if (!form.isDirty()) {
+      showCustomNotification({
+        title: 'Could not filter',
+        message: 'Pleae enter your search criteria',
+        color: 'yellow',
+        autoClose: true,
+      });
+      return;
+    }
+
     event?.preventDefault();
     onFilterSelected(values);
   };

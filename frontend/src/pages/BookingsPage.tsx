@@ -19,6 +19,7 @@ import { cancelContract, getContracts } from '../utils/api';
 import formatDate from '../utils/format-date';
 import { showCustomNotification } from '../utils/mantine-notifications';
 import { getColor } from '../utils/utils';
+import EmptyData from '../components/EmptyData';
 
 const BookingsPage = () => {
   const [contracts, setContracts] = React.useState<Contract[]>([]);
@@ -123,9 +124,11 @@ const BookingsPage = () => {
         <Center>
           <Title order={3}>Your Bookings</Title>
         </Center>
-        {contracts.map((contract) => (
-          <ContractCard key={contract.id} {...contract} />
-        ))}
+        {contracts.length > 0 ? (
+          contracts.map((contract) => <ContractCard key={contract.id} {...contract} />)
+        ) : (
+          <EmptyData message="Bookings" />
+        )}
       </Stack>
     </Container>
   );

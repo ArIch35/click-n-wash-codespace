@@ -1,9 +1,10 @@
-import { Container, Table, Tabs } from '@mantine/core';
+import { Center, Container, Table, Tabs } from '@mantine/core';
 import { useLocalStorage } from '@mantine/hooks';
 import React from 'react';
 import { useAuth } from '../providers/authentication/Authentication.Context';
 import { markAsRead } from '../utils/api';
 import formatDate from '../utils/format-date';
+import EmptyData from '../components/EmptyData';
 
 const InboxPage = () => {
   const { user, refreshUser } = useAuth();
@@ -82,6 +83,12 @@ const InboxPage = () => {
             <Table.Thead>{ths}</Table.Thead>
             <Table.Tbody>{userRows}</Table.Tbody>
           </Table>
+
+          {user.inbox?.filter((message) => message.forVendor).length === 0 && (
+            <Center>
+              <EmptyData message="Message" />
+            </Center>
+          )}
         </Tabs.Panel>
 
         {user.isAlsoVendor && (
@@ -90,6 +97,12 @@ const InboxPage = () => {
               <Table.Thead>{ths}</Table.Thead>
               <Table.Tbody>{vendorRows}</Table.Tbody>
             </Table>
+
+            {user.inbox?.filter((message) => message.forVendor).length === 0 && (
+              <Center>
+                <EmptyData message="Message" />
+              </Center>
+            )}
           </Tabs.Panel>
         )}
       </Tabs>
