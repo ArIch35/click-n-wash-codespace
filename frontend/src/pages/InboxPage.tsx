@@ -84,7 +84,7 @@ const InboxPage = () => {
             <Table.Tbody>{userRows}</Table.Tbody>
           </Table>
 
-          {user.inbox?.filter((message) => message.forVendor).length === 0 && (
+          {user.inbox?.filter((message) => !message.forVendor).length === 0 && (
             <Center>
               <EmptyData message="Message" />
             </Center>
