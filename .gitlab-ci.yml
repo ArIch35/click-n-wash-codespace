@@ -23,14 +23,14 @@ test-format:
   before_script:
     - cp ${ENV_TEST} .env
   script:
-    - cd backend
-    - npm ci
-    - npm run prettier:check
-    - npm run lint
-    - cd ../frontend
-    - npm ci
-    - npm run prettier:check
-    - npm run lint
+    - npm ci --prefix backend &
+    - npm ci --prefix frontend &
+    - wait
+    - npm run prettier:check --prefix backend &
+    - npm run prettier:check --prefix frontend &
+    - npm run lint --prefix backend &
+    - npm run lint --prefix frontend &
+    - wait
   after_script:
     - rm .env
 
