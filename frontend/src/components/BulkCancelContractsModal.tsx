@@ -58,6 +58,7 @@ const BulkCancelContractsModal: React.FC<BulkCancelContractsModalProps> = ({
           autoClose: true,
         });
         form.reset();
+        window.location.reload();
       })
       .catch((error: Message) => showErrorNotification('Contracts', 'bulk cancel', error.message));
   };
