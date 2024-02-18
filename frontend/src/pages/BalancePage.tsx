@@ -57,7 +57,7 @@ const BalancePage = () => {
             <AddFundsModal />
           </Flex>
         </Flex>
-        <Flex mt="m" px="md">
+        <Flex mt="m" px="md" direction="column" gap="md">
           <Table fz="md" highlightOnHover>
             <Table.Thead>{ths}</Table.Thead>
             <Table.Tbody>{rows}</Table.Tbody>
