@@ -9,7 +9,7 @@ interface EmptyDataProps {
 const EmptyData: React.FC<EmptyDataProps> = ({ message }) => {
   return (
     <Container>
-      <Card shadow="sm" padding="lg" radius="lg" style={{ width: 400 }}>
+      <Card shadow="sm" padding="lg" radius="lg" style={{ width: '100%' }}>
         <Flex direction="column" align="center">
           <IconReceiptOff size={30} />
           <Text>No Entry For {message} Found</Text>
