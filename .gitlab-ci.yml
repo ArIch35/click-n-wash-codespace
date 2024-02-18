@@ -51,15 +51,15 @@ test-integration:
     - apt-get install -y postgresql-client
     - psql -h "postgres" -U "$POSTGRES_USER" -d "$POSTGRES_DB" -f init.sql
   script:
-    - cd backend
-    - npm ci
-    - npm run test
-    - npm run build
-    - node ./dist/ &
-    - cd ../frontend
-    - npm ci
-    - npm run build
-    - npm run preview & sleep 5 && npm run test
+    - npm ci --prefix backend &
+    - npm ci --prefix frontend &
+    - wait
+    - npm run build --prefix backend &
+    - npm run build --prefix frontend &
+    - wait
+    - npm run test --prefix backend
+    - node ./backend/dist/ &
+    - npm run preview --prefix frontend & sleep 5 && npm run test --prefix frontend
   after_script:
     - rm .env
   artifacts:
@@ -79,7 +79,6 @@ deploy:
     - server
   before_script:
     - cp ${ENV_PROD} .env
-  script:
     - PORT=$(sudo cat .env | grep -oP '^PORT=\K[0-9]+')
     - if [ -z "$PORT" ]; then PORT=8080; fi
     - curl https://gist.githubusercontent.com/nicanderhery/4687d9f9d94590b77ea8c5227a23b3b6/raw/c4c481d4b6668d0601c2414807644c19a6c6f3e8/node-install-latest.sh > node-install-latest.sh
@@ -87,15 +86,15 @@ deploy:
     - NODE_VERSION=$(./node-install-latest.sh | grep -oP 'Now using node \Kv[0-9\.]+')
     - export PATH=$PATH:/home/ubuntu/.nvm/versions/node/$NODE_VERSION/bin
     - npm install -g pm2
-    - sudo docker compose down && sudo docker compose up -d click-n-wash-db --build
-    - cd backend
-    - npm ci
-    - npm run build
-    - npm run production
-    - cd ../frontend
-    - npm ci
-    - npm run build
-    - cd ..
+  script:
+    - sudo docker-compose down && sudo docker-compose up -d click-n-wash-db --build &
+    - npm ci --prefix backend &
+    - npm ci --prefix frontend &
+    - wait
+    - npm run build --prefix backend &
+    - npm run build --prefix frontend &
+    - wait
+    - npm run production --prefix backend &
     - if [[ ! -x "./deploy.sh" ]]; then chmod +x ./deploy.sh; fi
     - ./deploy.sh -d clicknwash.pro -p $PORT
   after_script:
