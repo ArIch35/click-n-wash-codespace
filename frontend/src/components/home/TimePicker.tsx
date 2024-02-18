@@ -202,7 +202,7 @@ const TimePicker = ({
       />
       {selectedDate && (
         <Select
-          mt="md"
+          mt="xs"
           comboboxProps={{ withinPortal: true }}
           data={getValidBookingHours(selectedDate)}
           placeholder="10:00"

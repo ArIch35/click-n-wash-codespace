@@ -1,4 +1,4 @@
-import { Modal, Stack, Text, Title } from '@mantine/core';
+import { Modal, Stack, Text } from '@mantine/core';
 import { notifications } from '@mantine/notifications';
 import React, { useEffect, useState } from 'react';
 import Laundromat from '../../interfaces/entities/laundromat';
@@ -114,11 +114,14 @@ const WashingMachinePicker: React.FC<WashingMachinePickerProps> = ({
   return (
     <div>
       {bookedDatesMap && (
-        <Modal opened={isOpen} onClose={onPickerClose} size="md">
+        <Modal
+          opened={isOpen}
+          title={'Select a date and time'}
+          onClose={onPickerClose}
+          size="sm"
+          centered
+        >
           <Stack>
-            <Title style={{ textAlign: 'center' }} order={4}>
-              Select a date and time
-            </Title>
             <TimePicker
               bookedDates={bookedDatesMap}
               washingMachines={allWashingMachines}

@@ -94,8 +94,8 @@ deploy:
     - npm run build --prefix backend &
     - npm run build --prefix frontend &
     - wait
-    - npm run production --prefix backend &
     - if [[ ! -x "./deploy.sh" ]]; then chmod +x ./deploy.sh; fi
     - ./deploy.sh -d clicknwash.pro -p $PORT
+    - npm run production --prefix backend
   after_script:
     - rm .env

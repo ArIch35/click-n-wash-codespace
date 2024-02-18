@@ -3,6 +3,7 @@ import {
   Button,
   Center,
   Container,
+  Flex,
   Group,
   NumberFormatter,
   Select,
@@ -119,10 +120,10 @@ const LaundromatsManagePage = () => {
       )}
 
       {laundromats.length > 0 && (
-        <Stack>
+        <Stack mt={'xl'}>
           <Text size="xl">Analytics</Text>
 
-          <Group justify="space-around" align="flex-start">
+          <Flex justify="space-around" align="flex-start">
             <Stack>
               <Text size="xl">Span</Text>
               <Select data={['day', 'week', 'month', 'year']} value={span} onChange={setSpan} />
@@ -131,7 +132,7 @@ const LaundromatsManagePage = () => {
               <Text size="xl">Pick date range</Text>
               <DatePicker type="range" value={fromDateToDate} onChange={handleDateChange} />
             </Stack>
-          </Group>
+          </Flex>
         </Stack>
       )}
       <Stack px="xl">
