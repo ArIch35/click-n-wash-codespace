@@ -58,7 +58,7 @@ test-integration:
     - npm run build --prefix frontend &
     - wait
     - npm run test --prefix backend
-    - node ./backend/dist/ &
+    - npm run start --prefix backend &
     - npm run preview --prefix frontend & sleep 5 && npm run test --prefix frontend
   after_script:
     - rm .env
